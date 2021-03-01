@@ -2,12 +2,18 @@
   "name": "crm-app-frontend",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://crm-app.dev.crm.d-p.io",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "axios": "^0.21.1",
+    "http-proxy-middleware": "^1.0.6",
+    "query-string": "^6.14.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
     "web-vitals": "^1.0.1"
   },
