@@ -4,17 +4,23 @@
   "private": true,
   "proxy": "https://crm-app.dev.crm.d-p.io",
   "dependencies": {
+    "@date-io/moment": "^2.10.8",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/pickers": "^3.2.10",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
+    "date-fns": "^2.18.0",
     "formik": "^2.2.6",
+    "moment": "^2.29.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
-    "web-vitals": "^1.0.1"
+    "web-vitals": "^1.0.1",
+    "yup": "^0.32.9"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -39,5 +45,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@date-io/date-fns": "^1.3.13"
   }
 }
