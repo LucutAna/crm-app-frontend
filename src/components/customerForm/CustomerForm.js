@@ -1,4 +1,5 @@
 import React from 'react';
+import {useState} from 'react';
 import {useFormik} from 'formik';
 import {makeStyles} from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -7,9 +8,11 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import * as yup from 'yup';
 import TextField from '@material-ui/core/TextField';
-import Button from "@material-ui/core/Button";
 import DateFnsUtils from '@date-io/date-fns';
-import './CustomerForm.css';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import Radio from '@material-ui/core/Radio';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+// import Button from "@material-ui/core/Button";
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
@@ -28,7 +31,7 @@ const validationSchema = yup.object({
         .string('Street your last name')
         .min(2, 'Street should be of minimum 2 characters length')
         .required('Street is required'),
-    zipCode: yup
+    zipcode: yup
         .string('Enter your zip code')
         .min(5, 'Zip code should be of minimum 5 characters length')
         .required('Zip code is required'),
@@ -36,10 +39,6 @@ const validationSchema = yup.object({
         .string('Enter your City')
         .min(2, 'City should be of minimum 2 characters length')
         .required('City is required'),
-    country: yup
-        .string('Enter your Country')
-        .min(2, 'Country should be of minimum 2 characters length')
-        .required('Country is required'),
     phoneNumber: yup
         .number('Enter your phone')
         .min(5, 'Phone should be of minimum 5 digits length')
@@ -48,56 +47,95 @@ const validationSchema = yup.object({
         .string('Enter your email')
         .email('Enter a valid email')
         .required('Email is required'),
+    salutation: yup
+        .string()
+        .required('Salutation is required')
 });
 
-const CustomerForm = () => {
-    const [country, setCountry] = React.useState('CH');
-    const [selectedDate, setSelectedDate] = React.useState(new Date('2000-08-18T21:11:54'));
-    const formik = useFormik({
-        initialValues: {
-            gender: '',
-            firstName: '',
-            lastName: '',
-            street: '',
-            zipCode: '',
-            city: '',
-            country: '',
-            birthday: '',
-            phoneNumber: '',
-            email: ''
-        },
-        validationSchema: validationSchema
-    });
+const CustomerForm = ({customerData}) => {
+
     const useStyles = makeStyles((theme) => ({
         country: {
-            marginTop: theme.spacing(2),
+            marginTop: theme.spacing(4),
             marginRight: theme.spacing(2),
             minWidth: 500,
+        },
+        birthDate: {
+            marginTop: theme.spacing(4),
         },
         selectEmpty: {
             marginTop: theme.spacing(2),
         },
+        gender: {
+          flexDirection: 'row',
+        },
         btnRegistration: {
             marginTop: theme.spacing(2),
+        },
+        inputText: {
+            marginTop: theme.spacing(2)
         }
     }));
     const classes = useStyles();
+    const [salutation, setSalutation] = useState('');
+    const [country, setCountry] = useState('DE');
+    const [birthDate, setBirthDate] = useState(new Date('2000-08-18T21:11:54'));
+    // const formik = useFormik({
+    //     initialValues: {
+    //         firstName: '',
+    //         lastName: '',
+    //         street: '',
+    //         zipcode: '',
+    //         city: '',
+    //         phoneNumber: '',
+    //         email: ''
+    //     },
+    //     validationSchema: validationSchema,
+    //     enableReinitialize: true,
+    // });
 
-    const handleChange = (event) => {
+
+
+    const formik = useFormik({
+        initialValues: {
+            firstName: !!customerData ? customerData.firstName : '',
+            lastName: !!customerData ?  customerData.lastName : '',
+            street: !!customerData ?  customerData.street1 : '',
+            zipCode: !!customerData ?  customerData.zipcode : '',
+            city: !!customerData ? customerData.city: '',
+            phoneNumber: !!customerData ? customerData.mobile : '',
+            email: !!customerData ?  customerData.email : ''
+        },
+        enableReinitialize: true,
+        validationSchema: validationSchema
+    });
+
+    const handleChangeCountry = (event) => {
         setCountry(event.target.value);
     };
-
-    const handleDateChange = (date) => {
-        setSelectedDate(date.toISOString());
+    const handleBirthDate = (date) => {
+        setBirthDate(date.toISOString());
     };
-    const submitCustomerData = (data) => {
-        const customerData = {...data.values, country, selectedDate}
-        console.log(customerData);
-    }
+    const handleChangeSalutation = (event) => {
+        setSalutation(event.target.value);
+    };
+    // const submitCustomerData = (data) => {
+    //     const customerData = {...data.values, country, birthDate, salutation}
+    //     console.log(1111, customerData);
+    // }
     return (
         <div className="form-container">
-            <form onSubmit={formik.handleSubmit} className={classes.formControl}>
+            <form onSubmit={formik.handleSubmit} >
+                <RadioGroup className={classes.gender}
+                            aria-label="gender"
+                            name="salutation"
+                            value={salutation}
+                            onChange={handleChangeSalutation}>
+                    <FormControlLabel value="Mrs." control={<Radio />} label="Mrs." />
+                    <FormControlLabel value="Mr." control={<Radio />} label="Mr." />
+                </RadioGroup>
                 <TextField
+                    className={classes.inputText}
                     fullWidth
                     id="firstName"
                     name="firstName"
@@ -108,6 +146,7 @@ const CustomerForm = () => {
                     helperText={formik.touched.firstName && formik.errors.firstName}
                 />
                 <TextField
+                    className={classes.inputText}
                     fullWidth
                     id="lastName"
                     name="lastName"
@@ -118,6 +157,7 @@ const CustomerForm = () => {
                     helperText={formik.touched.lastName && formik.errors.lastName}
                 />
                 <TextField
+                    className={classes.inputText}
                     fullWidth
                     id="street"
                     name="street"
@@ -128,16 +168,18 @@ const CustomerForm = () => {
                     helperText={formik.touched.street && formik.errors.street}
                 />
                 <TextField
+                    className={classes.inputText}
                     fullWidth
                     id="zipCode"
                     name="zipCode"
                     label="Zip Code"
-                    value={formik.values.zipCode}
+                    value={formik.values.zipcode}
                     onChange={formik.handleChange}
-                    error={formik.touched.zipCode && Boolean(formik.errors.zipCode)}
-                    helperText={formik.touched.zipCode && formik.errors.zipCode}
+                    error={formik.touched.zipcode && Boolean(formik.errors.zipcode)}
+                    helperText={formik.touched.zipcode && formik.errors.zipcode}
                 />
                 <TextField
+                    className={classes.inputText}
                     fullWidth
                     id="city"
                     name="city"
@@ -153,7 +195,7 @@ const CustomerForm = () => {
                         labelId="demo-simple-select-placeholder-label-label"
                         id='country'
                         value={country}
-                        onChange={handleChange}
+                        onChange={handleChangeCountry}
                         displayEmpty
                         className={classes.selectEmpty}
                     >
@@ -165,20 +207,22 @@ const CustomerForm = () => {
                         <MenuItem value='PL'>PL</MenuItem>
                     </Select>
                 </FormControl>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <MuiPickersUtilsProvider  utils={DateFnsUtils} >
                     <KeyboardDatePicker
+                        className={classes.birthDate}
                         margin="normal"
                         id="date-picker-dialog"
                         label="Birthday"
                         format="MM/dd/yyyy"
-                        value={selectedDate}
-                        onChange={handleDateChange}
+                        value={birthDate}
+                        onChange={handleBirthDate}
                         KeyboardButtonProps={{
                             'aria-label': 'change date',
                         }}
                     />
                 </MuiPickersUtilsProvider>
                 <TextField
+                    className={classes.inputText}
                     fullWidth
                     id="phoneNumber"
                     name="phoneNumber"
@@ -189,6 +233,7 @@ const CustomerForm = () => {
                     helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
                 />
                 <TextField
+                    className={classes.inputText}
                     fullWidth
                     id="email"
                     name="email"
@@ -198,12 +243,12 @@ const CustomerForm = () => {
                     error={formik.touched.email && Boolean(formik.errors.email)}
                     helperText={formik.touched.email && formik.errors.email}
                 />
-                <Button fullWidth
-                        className={classes.btnRegistration}
-                        color="secondary" variant="contained"
-                        type="submit"
-                        onClick={() => submitCustomerData(formik)}> New Club Registration
-                </Button>
+                {/*<Button fullWidth*/}
+                {/*        className={classes.btnRegistration}*/}
+                {/*        color="secondary" variant="contained"*/}
+                {/*        type="submit"*/}
+                {/*        onClick={() => submitCustomerData(formik)}> New Club Registration*/}
+                {/*</Button>*/}
             </form>
         </div>
     );
