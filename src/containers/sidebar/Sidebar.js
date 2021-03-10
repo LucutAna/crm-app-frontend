@@ -112,7 +112,7 @@ const Sidebar = () => {
         };
         getStoreConfig();
 
-    }, []);
+    }, [addConfig]);
 
 
     const getStore = async (outletId) => {

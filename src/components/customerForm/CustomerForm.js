@@ -1,5 +1,5 @@
 import React from 'react';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useFormik} from 'formik';
 import {makeStyles} from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -52,7 +52,7 @@ const validationSchema = yup.object({
         .required('Salutation is required')
 });
 
-const CustomerForm = ({customerData}) => {
+const CustomerForm = ({customerData, creation, setNewCustomerData}) => {
 
     const useStyles = makeStyles((theme) => ({
         country: {
@@ -94,8 +94,6 @@ const CustomerForm = ({customerData}) => {
     //     enableReinitialize: true,
     // });
 
-
-
     const formik = useFormik({
         initialValues: {
             firstName: !!customerData ? customerData.firstName : '',
@@ -109,6 +107,14 @@ const CustomerForm = ({customerData}) => {
         enableReinitialize: true,
         validationSchema: validationSchema
     });
+
+    useEffect(() => {
+        if (creation) {
+            setNewCustomerData({...formik.values, country, birthDate, salutation});
+        } else {
+            setNewCustomerData('');
+        }
+    }, [creation, formik.values, country, birthDate, salutation, setNewCustomerData]);
 
     const handleChangeCountry = (event) => {
         setCountry(event.target.value);
