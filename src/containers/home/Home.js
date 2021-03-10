@@ -12,7 +12,9 @@ const Home = () => {
     const {configData} = useContext(GlobalContext);
     const [searchCiid, setSearchCiid] = useState('');
     const [customerData, setCustomerData] = useState('');
-    const [openDialog, setOpenDialog] = useState(false)
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newCustomerData, setNewCustomerData] = useState('');
+    const [creation, setCreation] = useState(false);
 
     const selectCustomerByCiid = async () => {
         const customer = await selectCustomer(searchCiid);
@@ -51,7 +53,12 @@ const Home = () => {
         //     country: 'DE',
         //     birthDate: '2000-01-01T10:00:00.000Z',
         // }
-        setOpenDialog(true);
+        // setOpenDialog(true);
+
+        console.log('NEW CLUB REGISTRATION BUTTON CLICKED');
+        setCreation(true);
+        // setCreation(false) -> metoda asta trebuie apelata dupa ce se incheie procesul de register
+        console.log('NEW CUSTOMER: ', newCustomerData);
     }
 
     const handleCloseDialog = () => {
@@ -65,12 +72,14 @@ const Home = () => {
                     <SearchInput onHandleCiid={handleCiid}/>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                    <CustomerForm customerData={customerData}/>
+                    <CustomerForm customerData={customerData}
+                        setNewCustomerData={setNewCustomerData}
+                        creation={creation} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                     <HomeButtons onSelectCustomer={selectCustomerByCiid}
-                                 onClearForm={clearForm}
-                                 onNewRegistration={newRegistration}/>
+                        onClearForm={clearForm}
+                        onNewRegistration={newRegistration}/>
                 </Grid>
             </Grid>
             <EnrollDialog onOpenDialog={openDialog}
