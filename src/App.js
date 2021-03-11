@@ -60,15 +60,6 @@ function App() {
 
     }, []);
 
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
-
-
-
     const getOutletId = () => {
         let outletId = window.location.href.split('=')[1];
         if (outletId === undefined)
@@ -78,6 +69,14 @@ function App() {
         else localStorage.setItem('outletId', outletId);
         setOutletID(outletId);
         return outletId;
+    };
+
+    //handle for sidebar navigation
+    const handleDrawerOpen = () => {
+        setOpen(true);
+    };
+    const handleDrawerClose = () => {
+        setOpen(false);
     };
 
     return (

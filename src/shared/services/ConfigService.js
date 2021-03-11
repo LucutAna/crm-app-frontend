@@ -4,7 +4,7 @@ const getStore = (outletId) => {
     return axiosInstance.get(`/crm-util/stores/${outletId}/`);
 };
 
-const getConfigData =  ({data}) => {
+const getConfigData = ({data}) => {
     return axiosInstance.get(`/crm-util/configurations/`, {
         headers: {
             salesDivision: data.salesDivision,
