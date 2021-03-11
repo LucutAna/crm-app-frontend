@@ -53,8 +53,8 @@ function App() {
     useEffect(() => {
         const getStoreConfig = async () => {
             const storeConfig = await ConfigService.getStore(getOutletId());
-            const dataConfig = await ConfigService.getConfigData(storeConfig);
-            setConfigData({...dataConfig, ...storeConfig});
+            const dataConfig = await ConfigService.getConfigData({...storeConfig.data});
+            setConfigData({...dataConfig.data, ...storeConfig.data});
         };
         getStoreConfig();
 

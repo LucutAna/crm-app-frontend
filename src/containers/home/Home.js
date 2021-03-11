@@ -6,6 +6,7 @@ import CustomerForm from "../../components/customerForm/CustomerForm";
 import RegistrationButtons from "../../components/registrationButtons/RegistrationButtons";
 import SearchInput from "../../components/searchInput/SearchInput";
 import EnrollDialog from "../../components/modals/EnrollDialog";
+import CustomerService from "../../shared/services/CustomerService";
 
 const Home = ({configData}) => {
     const [searchCiid, setSearchCiid] = useState('');
@@ -14,25 +15,33 @@ const Home = ({configData}) => {
     const [newCustomerData, setNewCustomerData] = useState('');
     const [creation, setCreation] = useState(false);
 
+
     const selectCustomerByCiid = async () => {
-        const customer = await selectCustomer(searchCiid);
-        setCustomerData(customer);
+        let data = {
+            ciid: searchCiid,
+            salesDivision: configData.salesDivision,
+            searchCiid: searchCiid,
+            storeId: configData.storeNumber,
+            subsidiary: configData.subsidiary
+        };
+        const customer = await CustomerService.selectCustomer(data);
+        setCustomerData(customer.data);
     }
 
     const handleCiid = (ciid) => {
         setSearchCiid(ciid);
     }
 
-    const selectCustomer = async (ciid) => {
-        const response = await axios.post(`/crm-customer/selectCustomer/`, {
-            ciid: ciid,
-            salesDivision: configData.salesDivision,
-            searchCiid: ciid,
-            storeId: configData.storeNumber,
-            subsidiary: configData.subsidiary
-        });
-        return await response.data;
-    }
+    // const selectCustomer = async (ciid) => {
+    //     const response = await axios.post(`/crm-customer/selectCustomer/`, {
+    //         ciid: ciid,
+    //         salesDivision: configData.salesDivision,
+    //         searchCiid: ciid,
+    //         storeId: configData.storeNumber,
+    //         subsidiary: configData.subsidiary
+    //     });
+    //     return await response.data;
+    // }
 
     const clearForm = () => {
         setCustomerData('');
@@ -71,8 +80,8 @@ const Home = ({configData}) => {
                 </Grid>
                 <Grid item xs={12} sm={8}>
                     <CustomerForm customerData={customerData}
-                        setNewCustomerData={setNewCustomerData}
-                        creation={creation} />
+                                  setNewCustomerData={setNewCustomerData}
+                                  creation={creation}/>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                     <RegistrationButtons onSelectCustomer={selectCustomerByCiid}
