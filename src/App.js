@@ -10,7 +10,7 @@ import OrderHistory from "./containers/order-history/OrderHistory";
 import Coupons from "./containers/coupons/Coupons";
 import {useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import axios from "axios";
+import ConfigService from './shared/services/ConfigService'
 
 
 function App() {
@@ -52,8 +52,8 @@ function App() {
 
     useEffect(() => {
         const getStoreConfig = async () => {
-            const storeConfig = await getStore(getOutletId());
-            const dataConfig = await getConfigData(storeConfig);
+            const storeConfig = await ConfigService.getStore(getOutletId());
+            const dataConfig = await ConfigService.getConfigData(storeConfig);
             setConfigData({...dataConfig, ...storeConfig});
         };
         getStoreConfig();
@@ -67,20 +67,7 @@ function App() {
         setOpen(false);
     };
 
-    const getStore = async (outletId) => {
-        const response = await axios.get(`/crm-util/stores/${outletId}/`);
-        return await response.data;
-    };
 
-    const getConfigData = async ({salesDivision, subsidiary}) => {
-        const response = await axios.get(`/crm-util/configurations/`, {
-            headers: {
-                salesDivision,
-                subsidiary
-            }
-        });
-        return await response.data;
-    }
 
     const getOutletId = () => {
         let outletId = window.location.href.split('=')[1];
