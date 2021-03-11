@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
-const HomeButtons = ({onSelectCustomer, onClearForm, onNewRegistration}) => {
+const RegistrationButtons = ({onSelectCustomer, onClearForm, onNewRegistration}) => {
 
     const useStyles = makeStyles((theme) => ({
         root: {
@@ -56,4 +56,4 @@ const HomeButtons = ({onSelectCustomer, onClearForm, onNewRegistration}) => {
 
 }
 
-export default HomeButtons;
+export default RegistrationButtons;
