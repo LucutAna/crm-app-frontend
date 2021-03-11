@@ -1,15 +1,13 @@
 import Grid from '@material-ui/core/Grid';
-import {useState, useContext} from 'react';
+import {useState} from 'react';
 import axios from 'axios';
 
 import CustomerForm from "../../components/customerForm/CustomerForm";
-import HomeButtons from "../../components/homeButtons/HomeButtons";
+import RegistrationButtons from "../../components/registrationButtons/RegistrationButtons";
 import SearchInput from "../../components/searchInput/SearchInput";
-import {GlobalContext} from "../../context/GlobalState";
 import EnrollDialog from "../../components/modals/EnrollDialog";
 
-const Home = () => {
-    const {configData} = useContext(GlobalContext);
+const Home = ({configData}) => {
     const [searchCiid, setSearchCiid] = useState('');
     const [customerData, setCustomerData] = useState('');
     const [openDialog, setOpenDialog] = useState(false);
@@ -77,9 +75,9 @@ const Home = () => {
                         creation={creation} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                    <HomeButtons onSelectCustomer={selectCustomerByCiid}
-                        onClearForm={clearForm}
-                        onNewRegistration={newRegistration}/>
+                    <RegistrationButtons onSelectCustomer={selectCustomerByCiid}
+                                         onClearForm={clearForm}
+                                         onNewRegistration={newRegistration}/>
                 </Grid>
             </Grid>
             <EnrollDialog onOpenDialog={openDialog}
