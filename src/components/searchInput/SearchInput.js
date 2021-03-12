@@ -1,10 +1,11 @@
 import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 
-const SearchInput = ({onHandleCiid}) => {
+const SearchInput = ({onHandleCiid, ciid}) => {
     const useStyles = makeStyles((theme) => ({
         root: {
             display: 'flex',
+            paddingBottom: 50
         },
         textField: {
             marginLeft: theme.spacing(10),
@@ -24,6 +25,7 @@ const SearchInput = ({onHandleCiid}) => {
                 InputLabelProps={{
                     shrink: true,
                 }}
+                value={ciid}
                 variant="outlined"
                 onChange={event => onHandleCiid(event.target.value)}
             />

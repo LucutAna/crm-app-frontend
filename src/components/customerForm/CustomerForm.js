@@ -1,5 +1,5 @@
-import React from 'react';
-import {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
+import {useState} from 'react';
 import {useFormik} from 'formik';
 import {makeStyles} from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -12,11 +12,14 @@ import DateFnsUtils from '@date-io/date-fns';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-// import Button from "@material-ui/core/Button";
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 
 const validationSchema = yup.object({
     firstName: yup
@@ -27,7 +30,7 @@ const validationSchema = yup.object({
         .string('Enter your last name')
         .min(2, 'Last name should be of minimum 2 characters length')
         .required('Last name is required'),
-    street: yup
+    street1: yup
         .string('Street your last name')
         .min(2, 'Street should be of minimum 2 characters length')
         .required('Street is required'),
@@ -39,10 +42,9 @@ const validationSchema = yup.object({
         .string('Enter your City')
         .min(2, 'City should be of minimum 2 characters length')
         .required('City is required'),
-    phoneNumber: yup
+    mobile: yup
         .number('Enter your phone')
-        .min(5, 'Phone should be of minimum 5 digits length')
-        .required('Country is required'),
+        .min(5, 'Phone should be of minimum 5 digits length'),
     email: yup
         .string('Enter your email')
         .email('Enter a valid email')
@@ -52,7 +54,7 @@ const validationSchema = yup.object({
         .required('Salutation is required')
 });
 
-const CustomerForm = ({customerData, creation, setNewCustomerData}) => {
+const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCustomer, onClearForm}) => {
 
     const useStyles = makeStyles((theme) => ({
         country: {
@@ -67,54 +69,57 @@ const CustomerForm = ({customerData, creation, setNewCustomerData}) => {
             marginTop: theme.spacing(2),
         },
         gender: {
-          flexDirection: 'row',
+            flexDirection: 'row',
         },
         btnRegistration: {
             marginTop: theme.spacing(2),
         },
         inputText: {
             marginTop: theme.spacing(2)
+        },
+        paper: {
+            display: 'flex',
+            flexDirection: 'column',
+            padding: theme.spacing(4),
+            paddingTop: theme.spacing(6),
+            paddingBottom: theme.spacing(4),
+            textAlign: 'center',
+            color: theme.palette.text.secondary,
+        },
+        buttons: {
+            marginTop: 20
         }
     }));
     const classes = useStyles();
     const [salutation, setSalutation] = useState('');
-    const [country, setCountry] = useState('DE');
-    const [birthDate, setBirthDate] = useState(new Date('2000-08-18T21:11:54'));
-    // const formik = useFormik({
-    //     initialValues: {
-    //         firstName: '',
-    //         lastName: '',
-    //         street: '',
-    //         zipcode: '',
-    //         city: '',
-    //         phoneNumber: '',
-    //         email: ''
-    //     },
-    //     validationSchema: validationSchema,
-    //     enableReinitialize: true,
-    // });
+    const [country, setCountry] = useState('');
+    const [birthDate, setBirthDate] = useState(new Date());
 
     const formik = useFormik({
         initialValues: {
             firstName: !!customerData ? customerData.firstName : '',
-            lastName: !!customerData ?  customerData.lastName : '',
-            street: !!customerData ?  customerData.street1 : '',
-            zipCode: !!customerData ?  customerData.zipcode : '',
-            city: !!customerData ? customerData.city: '',
-            phoneNumber: !!customerData ? customerData.mobile : '',
-            email: !!customerData ?  customerData.email : ''
+            lastName: !!customerData ? customerData.lastName : '',
+            street1: !!customerData ? customerData.street1 : '',
+            zipcode: !!customerData ? customerData.zipcode : '',
+            city: !!customerData ? customerData.city : '',
+            mobile: !!customerData ? customerData.mobile : '',
+            email: !!customerData ? customerData.email : ''
         },
         enableReinitialize: true,
-        validationSchema: validationSchema
+        validationSchema: validationSchema,
     });
 
     useEffect(() => {
-        if (creation) {
-            setNewCustomerData({...formik.values, country, birthDate, salutation});
-        } else {
-            setNewCustomerData('');
+        if (!!customerData) {
+            setSalutation(customerData.salutation);
+            setBirthDate(customerData.birthDate);
+            setCountry(customerData.country);
+        } else  if (Object.entries(configData).length !== 0) {
+            setSalutation('');
+            setBirthDate(new Date());
+            setCountry(configData.locales[0].split('_')[1]);
         }
-    }, [creation, formik.values, country, birthDate, salutation, setNewCustomerData]);
+    }, [customerData, configData])
 
     const handleChangeCountry = (event) => {
         setCountry(event.target.value);
@@ -125,140 +130,153 @@ const CustomerForm = ({customerData, creation, setNewCustomerData}) => {
     const handleChangeSalutation = (event) => {
         setSalutation(event.target.value);
     };
-    // const submitCustomerData = (data) => {
-    //     const customerData = {...data.values, country, birthDate, salutation}
-    //     console.log(1111, customerData);
-    // }
     return (
-        <div className="form-container">
-            <form onSubmit={formik.handleSubmit} >
-                <RadioGroup className={classes.gender}
-                            aria-label="gender"
-                            name="salutation"
-                            value={salutation}
-                            onChange={handleChangeSalutation}>
-                    <FormControlLabel value="Mrs." control={<Radio />} label="Mrs." />
-                    <FormControlLabel value="Mr." control={<Radio />} label="Mr." />
-                </RadioGroup>
-                <TextField
-                    className={classes.inputText}
-                    fullWidth
-                    id="firstName"
-                    name="firstName"
-                    label="First name"
-                    value={formik.values.firstName}
-                    onChange={formik.handleChange}
-                    error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                    helperText={formik.touched.firstName && formik.errors.firstName}
-                />
-                <TextField
-                    className={classes.inputText}
-                    fullWidth
-                    id="lastName"
-                    name="lastName"
-                    label="Last name"
-                    value={formik.values.lastName}
-                    onChange={formik.handleChange}
-                    error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-                    helperText={formik.touched.lastName && formik.errors.lastName}
-                />
-                <TextField
-                    className={classes.inputText}
-                    fullWidth
-                    id="street"
-                    name="street"
-                    label="Street"
-                    value={formik.values.street}
-                    onChange={formik.handleChange}
-                    error={formik.touched.street && Boolean(formik.errors.street)}
-                    helperText={formik.touched.street && formik.errors.street}
-                />
-                <TextField
-                    className={classes.inputText}
-                    fullWidth
-                    id="zipCode"
-                    name="zipCode"
-                    label="Zip Code"
-                    value={formik.values.zipcode}
-                    onChange={formik.handleChange}
-                    error={formik.touched.zipcode && Boolean(formik.errors.zipcode)}
-                    helperText={formik.touched.zipcode && formik.errors.zipcode}
-                />
-                <TextField
-                    className={classes.inputText}
-                    fullWidth
-                    id="city"
-                    name="city"
-                    label="City"
-                    value={formik.values.city}
-                    onChange={formik.handleChange}
-                    error={formik.touched.city && Boolean(formik.errors.city)}
-                    helperText={formik.touched.city && formik.errors.city}
-                />
-                <FormControl className={classes.country}>
-                    <InputLabel shrink>Country</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-placeholder-label-label"
-                        id='country'
-                        value={country}
-                        onChange={handleChangeCountry}
-                        displayEmpty
-                        className={classes.selectEmpty}
-                    >
-                        <MenuItem value="DE">
-                            <em>DE</em>
-                        </MenuItem>
-                        <MenuItem value='CH'>CH</MenuItem>
-                        <MenuItem value='AT'>AT</MenuItem>
-                        <MenuItem value='PL'>PL</MenuItem>
-                    </Select>
-                </FormControl>
-                <MuiPickersUtilsProvider  utils={DateFnsUtils} >
-                    <KeyboardDatePicker
-                        className={classes.birthDate}
-                        margin="normal"
-                        id="date-picker-dialog"
-                        label="Birthday"
-                        format="MM/dd/yyyy"
-                        value={birthDate}
-                        onChange={handleBirthDate}
-                        KeyboardButtonProps={{
-                            'aria-label': 'change date',
-                        }}
+        <form onSubmit={formik.handleSubmit}>
+            <Grid container spacing={6}>
+                <Grid item xs={12} sm={8}>
+                    <RadioGroup className={classes.gender}
+                                aria-label="gender"
+                                name="salutation"
+                                value={salutation}
+                                onChange={handleChangeSalutation}>
+                        <FormControlLabel value="Mrs." control={<Radio/>} label="Mrs."/>
+                        <FormControlLabel value="Mr." control={<Radio/>} label="Mr."/>
+                    </RadioGroup>
+                    <TextField
+                        fullWidth
+                        className={classes.inputText}
+                        id="firstName"
+                        name="firstName"
+                        label="First name"
+                        value={formik.values.firstName}
+                        onChange={formik.handleChange}
+                        error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                        helperText={formik.touched.firstName && formik.errors.firstName}
                     />
-                </MuiPickersUtilsProvider>
-                <TextField
-                    className={classes.inputText}
-                    fullWidth
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    label="Phone number"
-                    value={formik.values.phoneNumber}
-                    onChange={formik.handleChange}
-                    error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
-                    helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
-                />
-                <TextField
-                    className={classes.inputText}
-                    fullWidth
-                    id="email"
-                    name="email"
-                    label="Email"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                />
-                {/*<Button fullWidth*/}
-                {/*        className={classes.btnRegistration}*/}
-                {/*        color="secondary" variant="contained"*/}
-                {/*        type="submit"*/}
-                {/*        onClick={() => submitCustomerData(formik)}> New Club Registration*/}
-                {/*</Button>*/}
-            </form>
-        </div>
+                    <TextField
+                        fullWidth
+                        className={classes.inputText}
+                        id="lastName"
+                        name="lastName"
+                        label="Last name"
+                        value={formik.values.lastName}
+                        onChange={formik.handleChange}
+                        error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                        helperText={formik.touched.lastName && formik.errors.lastName}
+                    />
+                    <TextField
+                        className={classes.inputText}
+                        fullWidth
+                        id="street"
+                        name="street"
+                        label="Street"
+                        value={formik.values.street1}
+                        onChange={formik.handleChange}
+                        error={formik.touched.street1 && Boolean(formik.errors.street1)}
+                        helperText={formik.touched.street1 && formik.errors.street1}
+                    />
+                    <TextField
+                        className={classes.inputText}
+                        fullWidth
+                        id="zipCode"
+                        name="zipCode"
+                        label="Zip Code"
+                        value={formik.values.zipcode}
+                        onChange={formik.handleChange}
+                        error={formik.touched.zipcode && Boolean(formik.errors.zipcode)}
+                        helperText={formik.touched.zipcode && formik.errors.zipcode}
+                    />
+                    <TextField
+                        className={classes.inputText}
+                        fullWidth
+                        id="city"
+                        name="city"
+                        label="City"
+                        value={formik.values.city}
+                        onChange={formik.handleChange}
+                        error={formik.touched.city && Boolean(formik.errors.city)}
+                        helperText={formik.touched.city && formik.errors.city}
+                    />
+                    <FormControl className={classes.country}>
+                        <InputLabel shrink>Country</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-placeholder-label-label"
+                            id='country'
+                            value={country}
+                            onChange={handleChangeCountry}
+                            displayEmpty
+                            className={classes.selectEmpty}
+                        >
+                            <MenuItem value="DE">
+                                <em>DE</em>
+                            </MenuItem>
+                            <MenuItem value='CH'>CH</MenuItem>
+                            <MenuItem value='AT'>AT</MenuItem>
+                            <MenuItem value='PL'>PL</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <KeyboardDatePicker
+                            className={classes.birthDate}
+                            margin="normal"
+                            id="date-picker-dialog"
+                            label="Birthday"
+                            format="dd/MM/yyyy"
+                            value={birthDate}
+                            onChange={handleBirthDate}
+                            KeyboardButtonProps={{
+                                'aria-label': 'change date',
+                            }}
+                        />
+                    </MuiPickersUtilsProvider>
+                    <TextField
+                        className={classes.inputText}
+                        fullWidth
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        label="Phone number"
+                        value={formik.values.mobile}
+                        onChange={formik.handleChange}
+                        error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                        helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                    />
+                    <TextField
+                        className={classes.inputText}
+                        fullWidth
+                        id="email"
+                        name="email"
+                        label="Email"
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        error={formik.touched.email && Boolean(formik.errors.email)}
+                        helperText={formik.touched.email && formik.errors.email}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <Paper className={classes.paper}>
+                        <Button size="large"
+                                variant="contained"
+                                color="secondary"
+                                type="submit"
+                                onClick={() => onNewRegistration({...formik.values, country, birthDate, salutation})}>New
+                            Club Registration
+                        </Button>
+                        <Button size="large"
+                                className={classes.buttons}
+                                variant="contained"
+                                color="primary"
+                                onClick={onSelectCustomer}>Search
+                        </Button>
+                        <Button size="large"
+                                className={classes.buttons}
+                                onClick={onClearForm}>
+                            <DeleteForeverIcon fontSize="small"/> Clear
+                        </Button>
+                    </Paper>
+                </Grid>
+            </Grid>
+        </form>
     );
 };
-
 
 export default CustomerForm;
