@@ -1,22 +1,27 @@
 import {useState} from 'react';
+import moment from "moment";
+import {Redirect} from "react-router-dom";
 
 import CustomerForm from "../../components/customerForm/CustomerForm";
 import SearchInput from "../../components/searchInput/SearchInput";
-import EnrollDialog from "../../components/modals/EnrollDialog";
+import EnrollModal from "../../components/modals/EnrollModal";
 import CustomerService from "../../shared/services/CustomerService";
+import PrintModal from "../../components/modals/PrintModal";
 
 const Home = ({configData}) => {
     const [ciid, setCiid] = useState('');
     const [customerData, setCustomerData] = useState('');
-    const [openDialog, setOpenDialog] = useState(false);
-
+    const [openEnrollModal, setOpenEnrollModal] = useState(false);
+    const [openPrintModal, setOpenPrintModal] = useState(false);
+    const [customerRegistration, setCustomerRegistration] = useState({});
+    const [redirect, setRedirect] = useState(null);
 
     const selectCustomerByCiid = async () => {
         let data = {
             ciid,
             searchCiid: ciid,
-            salesDivision: configData.salesDivision,
             storeId: configData.storeNumber,
+            salesDivision: configData.salesDivision,
             subsidiary: configData.subsidiary
         };
         const customer = await CustomerService.selectCustomer(data);
@@ -34,25 +39,108 @@ const Home = ({configData}) => {
     }
 
     const newRegistration = (customer) => {
-        // setOpenDialog(true);
         setCustomerData(customer)
-        console.log('NEW CUSTOMER:', customer);
+        if (!!ciid) {
+            setOpenPrintModal(true);
+            createCustomerPrintData(ciid);
+        } else {
+            setOpenEnrollModal(true);
+        }
+
+        //setOpenEnrollModal(true);
     }
 
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
+    const handleCloseEnrollModal = async (event, data) => {
+        if (!!data && data === "E-KIT_CARD") {
+            console.log(data);
+        }
+        if (!!data && data === "GENERATE_CIID") {
+            try {
+                let data = {
+                    cardTypeCode: 'P',
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                }
+                const cardCiid = await CustomerService.generateCiid(data);
+                createCustomerPrintData(cardCiid.data.ciid);
+            } catch (error) {
+                console.log(error);
+            }
+            setOpenPrintModal(true);
+
+        }
+
+        setOpenEnrollModal(false);
+    }
+
+    const handleClosePrintModal = async (event, data) => {
+        if (!!data && data === "SUBMIT") {
+            try {
+                const customerCreated = await CustomerService.upsertCustomer(customerRegistration);
+                setRedirect(customerCreated.data.code === "SUCCESS");
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        setOpenPrintModal(false);
+    }
+
+    const createCustomerPrintData = (ciid) => {
+        let customerPrintData = {
+            subsidiary: configData.subsidiary,
+            cardCiid: ciid,
+            crefid: null,
+            birthDate: customerData.birthDate,
+            email: customerData.email,
+            firstName: customerData.firstName,
+            lastName: customerData.lastName,
+            memberCardFlag: true,
+            clubMemberActiveFlag: true,
+            customerConsentFlag: true,
+            outletId: configData.storeNumber,
+            preferredOutlet: customerData.preferredOutlet || configData.storeNumber,
+            salesDivision: configData.salesDivision,
+            salutation: customerData.salutation,
+            street1: customerData.street1,
+            city: customerData.city,
+            zipcode: customerData.zipcode,
+            mobile: customerData.mobile,
+            country: customerData.country,
+            language: configData.locales[0],
+            generateExternalKey: true,
+            legalAgreementVersion: "1.2",
+            systemName: "KONYWWS",
+            updateCustomerFlag: !!customerData.partyId || !!customerData.partyUid ? true : null,
+            partyId: !!customerData.partyId ? customerData.partyId : null,
+            partyUid: !!customerData.partyUid ? customerData.partyUid : null,
+            loyaltyActiveFlag: true,
+            legalAgreements: [],
+            customerCards: [],
+            activationDate: moment().format('YYYY-MM-DDThh:mm:ss'),
+            clubDateOfEntry: customerData.clubDateOfEntry || moment().format('YYYY-MM-DDThh:mm:ss'),
+            mailConsentFlag: true,
+            emailConsentFlag: true,
+            phoneConsentFlag: true,
+            smsConsentFlag: true,
+            emailAddressAdded: false,
+            phoneNumberAdded: false
+        }
+        setCustomerRegistration(customerPrintData);
     }
 
     return (
         <>
+            {redirect ? <Redirect to={{pathname: "/success", state: {customerRegistration}}}/> : null}
             <SearchInput onHandleCiid={handleCiid} ciid={ciid}/>
             <CustomerForm customerData={customerData}
                           configData={configData}
                           onSelectCustomer={selectCustomerByCiid}
                           onClearForm={clearForm}
                           onNewRegistration={newRegistration}/>
-            <EnrollDialog onOpenDialog={openDialog}
-                          onHandleCloseDialog={handleCloseDialog}/>
+            <EnrollModal openEnrollModal={openEnrollModal}
+                         onHandleCloseEnrollModal={handleCloseEnrollModal}/>
+            <PrintModal openPrintModal={openPrintModal}
+                        onHandleClosePrintModal={handleClosePrintModal}/>
         </>
     )
 }

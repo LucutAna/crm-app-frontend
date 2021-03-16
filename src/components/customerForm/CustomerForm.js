@@ -166,8 +166,8 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                     <TextField
                         className={classes.inputText}
                         fullWidth
-                        id="street"
-                        name="street"
+                        id="street1"
+                        name="street1"
                         label="Street"
                         value={formik.values.street1}
                         onChange={formik.handleChange}
@@ -177,8 +177,8 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                     <TextField
                         className={classes.inputText}
                         fullWidth
-                        id="zipCode"
-                        name="zipCode"
+                        id="zipcode"
+                        name="zipcode"
                         label="Zip Code"
                         value={formik.values.zipcode}
                         onChange={formik.handleChange}
@@ -231,13 +231,13 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                     <TextField
                         className={classes.inputText}
                         fullWidth
-                        id="phoneNumber"
-                        name="phoneNumber"
+                        id="mobile"
+                        name="mobile"
                         label="Phone number"
                         value={formik.values.mobile}
                         onChange={formik.handleChange}
-                        error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
-                        helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                        error={formik.touched.mobile && Boolean(formik.errors.mobile)}
+                        helperText={formik.touched.mobile && formik.errors.mobile}
                     />
                     <TextField
                         className={classes.inputText}

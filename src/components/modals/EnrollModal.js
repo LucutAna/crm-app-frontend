@@ -1,4 +1,3 @@
-import React from 'react';
 import {makeStyles, withStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -10,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 
 
-const EnrollDialog = ({onOpenDialog, onHandleCloseDialog}) => {
+const EnrollModal = ({openEnrollModal, onHandleCloseEnrollModal}) => {
 
     const styles = (theme) => ({
         root: {
@@ -47,7 +46,7 @@ const EnrollDialog = ({onOpenDialog, onHandleCloseDialog}) => {
     }))(MuiDialogContent);
 
     const useStyles = makeStyles((theme) => ({
-        root: { },
+        root: {},
         buttonRegistration: {
             marginTop: theme.spacing(3),
             marginBottom: theme.spacing(3),
@@ -57,7 +56,7 @@ const EnrollDialog = ({onOpenDialog, onHandleCloseDialog}) => {
         },
         infoText: {
             fontSize: 14,
-            paddingBottom: theme.spacing (1)
+            paddingBottom: theme.spacing(1)
         },
         divider: {
             textAlign: 'center',
@@ -68,12 +67,12 @@ const EnrollDialog = ({onOpenDialog, onHandleCloseDialog}) => {
     const classes = useStyles();
     return (
         <div>
-            <Dialog onClose={onHandleCloseDialog}
+            <Dialog onClose={onHandleCloseEnrollModal}
                     fullWidth
                     maxWidth='md'
                     aria-labelledby="customized-dialog-title"
-                    open={onOpenDialog}>
-                <DialogTitle id="customized-dialog-title" onClose={onHandleCloseDialog}>
+                    open={openEnrollModal}>
+                <DialogTitle id="customized-dialog-title" onClose={onHandleCloseEnrollModal}>
                     E-kit number creation
                 </DialogTitle>
                 <DialogContent dividers>
@@ -87,6 +86,8 @@ const EnrollDialog = ({onOpenDialog, onHandleCloseDialog}) => {
                             size="large"
                             variant="contained"
                             fullWidth
+                            disabled
+                            onClick={(event) => onHandleCloseEnrollModal(event, "E-KIT_CARD")}
                             color="secondary">Continue with the registration
                     </Button>
                     <Typography className={classes.divider}>
@@ -99,6 +100,7 @@ const EnrollDialog = ({onOpenDialog, onHandleCloseDialog}) => {
                             size="large"
                             variant="contained"
                             fullWidth
+                            onClick={(event) => onHandleCloseEnrollModal(event, "GENERATE_CIID")}
                             color="secondary">Generate Club card number
                     </Button>
                 </DialogContent>
@@ -107,4 +109,4 @@ const EnrollDialog = ({onOpenDialog, onHandleCloseDialog}) => {
     );
 }
 
-export default EnrollDialog;
+export default EnrollModal;
