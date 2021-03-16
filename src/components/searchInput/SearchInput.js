@@ -1,18 +1,8 @@
-import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import SearchInputStyles from './SearchInputStyles'
 
 const SearchInput = ({onHandleCiid, ciid}) => {
-    const useStyles = makeStyles((theme) => ({
-        root: {
-            display: 'flex',
-            paddingBottom: 50
-        },
-        textField: {
-            marginLeft: theme.spacing(10),
-            marginRight: theme.spacing(10),
-        },
-    }));
-    const classes = useStyles();
+    const classes = SearchInputStyles();
     return (
         <div className={classes.root}>
             <TextField

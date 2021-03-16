@@ -1,6 +1,5 @@
 import {useState, useEffect} from 'react';
 import {useFormik} from 'formik';
-import {makeStyles} from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -19,6 +18,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import CustomerFormStyles from './CustomerFormStyles'
 
 const validationSchema = yup.object({
     firstName: yup
@@ -54,45 +54,8 @@ const validationSchema = yup.object({
 });
 
 const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCustomer, onClearForm}) => {
-
-    const useStyles = makeStyles((theme) => ({
-        country: {
-            marginTop: theme.spacing(4),
-            marginRight: theme.spacing(2)
-        },
-        birthDate: {
-            marginTop: theme.spacing(4),
-            width: '100%'
-        },
-        selectEmpty: {
-            marginTop: theme.spacing(2),
-        },
-        gender: {
-            flexDirection: 'row',
-        },
-        btnRegistration: {
-            marginTop: theme.spacing(2),
-        },
-        inputText: {
-            marginTop: theme.spacing(2)
-        },
-        paper: {
-            display: 'flex',
-            flexDirection: 'column',
-            padding: theme.spacing(4),
-            paddingTop: theme.spacing(6),
-            paddingBottom: theme.spacing(4),
-            textAlign: 'center',
-            color: theme.palette.text.secondary,
-        },
-        wrapperButtons: {
-            paddingTop: '60px !important'
-        },
-        buttons: {
-            marginTop: 20
-        }
-    }));
-    const classes = useStyles();
+    
+    const classes = CustomerFormStyles();
     const [salutation, setSalutation] = useState('');
     const [country, setCountry] = useState('');
     const [birthDate, setBirthDate] = useState(new Date());
@@ -284,7 +247,8 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                 variant="contained"
                                 color="primary"
                                 type="submit"
-                                onClick={() => onNewRegistration({...formik.values, country, birthDate, salutation})}>New
+                                onClick={() => onNewRegistration({...formik.values, country, birthDate, salutation})}>
+                            New
                             Club Registration
                         </Button>
                         <Button size="large"
@@ -296,7 +260,8 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                         <Button size="large"
                                 className={classes.buttons}
                                 onClick={onClearForm}>
-                            <DeleteForeverIcon fontSize="small"/> Clear
+                            <DeleteForeverIcon fontSize="small"/>
+                            Clear
                         </Button>
                     </Paper>
                 </Grid>

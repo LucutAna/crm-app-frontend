@@ -13,30 +13,12 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import ReceiptIcon from "@material-ui/icons/Receipt";
 import CreditCardIcon from "@material-ui/icons/CreditCard";
 import React from "react";
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {useTheme} from "@material-ui/core/styles";
 
-const SideBarNav = ({drawerWidth, open, onHandleDrawerClose}) => {
-    const useStyles = makeStyles((theme) => ({
-        root: {
-            display: 'flex',
-        },
-        drawer: {
-            width: drawerWidth,
-            flexShrink: 0,
-        },
-        drawerPaper: {
-            width: drawerWidth,
-        },
-        drawerHeader: {
-            display: 'flex',
-            alignItems: 'center',
-            padding: theme.spacing(0, 1),
-            // necessary for content to be below app bar
-            ...theme.mixins.toolbar,
-            justifyContent: 'flex-end',
-        }
-    }));
-    const classes = useStyles();
+import SideBarNavStyles from './SideBarNavStyles'
+
+const SideBarNav = ({open, onHandleDrawerClose}) => {
+    const classes = SideBarNavStyles();
     const theme = useTheme();
 
     return (

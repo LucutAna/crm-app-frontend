@@ -1,4 +1,4 @@
-import {makeStyles, withStyles} from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -8,6 +8,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 
+import EnrollModalStyles from './EnrollModalStyles';
 
 const EnrollModal = ({openEnrollModal, onHandleCloseEnrollModal}) => {
 
@@ -45,26 +46,7 @@ const EnrollModal = ({openEnrollModal, onHandleCloseEnrollModal}) => {
         },
     }))(MuiDialogContent);
 
-    const useStyles = makeStyles((theme) => ({
-        root: {},
-        buttonRegistration: {
-            marginTop: theme.spacing(3),
-            marginBottom: theme.spacing(3),
-        },
-        buttonGenerate: {
-            marginBottom: theme.spacing(2)
-        },
-        infoText: {
-            fontSize: 14,
-            paddingBottom: theme.spacing(1)
-        },
-        divider: {
-            textAlign: 'center',
-            paddingBottom: theme.spacing(3),
-            fontWeight: 700
-        }
-    }));
-    const classes = useStyles();
+    const classes = EnrollModalStyles();
     return (
         <div>
             <Dialog onClose={onHandleCloseEnrollModal}

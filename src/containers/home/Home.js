@@ -4,9 +4,9 @@ import {Redirect} from "react-router-dom";
 
 import CustomerForm from "../../components/customerForm/CustomerForm";
 import SearchInput from "../../components/searchInput/SearchInput";
-import EnrollModal from "../../components/modals/EnrollModal";
+import EnrollModal from "../../components/modals/enrollModal/EnrollModal";
 import CustomerService from "../../shared/services/CustomerService";
-import PrintModal from "../../components/modals/PrintModal";
+import PrintModal from "../../components/modals/printModal/PrintModal";
 
 const Home = ({configData}) => {
     const [ciid, setCiid] = useState('');
