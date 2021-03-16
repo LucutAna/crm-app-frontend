@@ -4,8 +4,8 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
-import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
+import {NavLink} from "react-router-dom";
 
 const Header = ({drawerWidth, open, configData, onHandleDrawerOpen}) => {
     const useStyles = makeStyles((theme) => ({
@@ -35,10 +35,16 @@ const Header = ({drawerWidth, open, configData, onHandleDrawerOpen}) => {
         drawer: {
             width: drawerWidth,
             flexShrink: 0,
+        },
+        homeButton: {
+            listStyle: 'none',
+            textDecoration: 'none',
+            color: 'white',
+            paddingRight: theme.spacing(1)
         }
     }));
     const classes = useStyles();
-    return(
+    return (
         <AppBar
             position="fixed"
             className={clsx(classes.appBar, {
@@ -56,7 +62,8 @@ const Header = ({drawerWidth, open, configData, onHandleDrawerOpen}) => {
                     <MenuIcon/>
                 </IconButton>
                 <Typography variant="h6" noWrap>
-                    Club-Browser {configData.storeName}
+                    <NavLink className={classes.homeButton} to='/crm'>Club-Browser</NavLink>
+                    {configData.storeName}
                 </Typography>
             </Toolbar>
         </AppBar>

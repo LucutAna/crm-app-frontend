@@ -1,96 +1,146 @@
-import Grid from '@material-ui/core/Grid';
 import {useState} from 'react';
-import axios from 'axios';
+import moment from "moment";
+import {Redirect} from "react-router-dom";
 
 import CustomerForm from "../../components/customerForm/CustomerForm";
-import RegistrationButtons from "../../components/registrationButtons/RegistrationButtons";
 import SearchInput from "../../components/searchInput/SearchInput";
-import EnrollDialog from "../../components/modals/EnrollDialog";
+import EnrollModal from "../../components/modals/EnrollModal";
 import CustomerService from "../../shared/services/CustomerService";
+import PrintModal from "../../components/modals/PrintModal";
 
 const Home = ({configData}) => {
-    const [searchCiid, setSearchCiid] = useState('');
+    const [ciid, setCiid] = useState('');
     const [customerData, setCustomerData] = useState('');
-    const [openDialog, setOpenDialog] = useState(false);
-    const [newCustomerData, setNewCustomerData] = useState('');
-    const [creation, setCreation] = useState(false);
-
+    const [openEnrollModal, setOpenEnrollModal] = useState(false);
+    const [openPrintModal, setOpenPrintModal] = useState(false);
+    const [customerRegistration, setCustomerRegistration] = useState({});
+    const [redirect, setRedirect] = useState(null);
 
     const selectCustomerByCiid = async () => {
         let data = {
-            ciid: searchCiid,
-            salesDivision: configData.salesDivision,
-            searchCiid: searchCiid,
+            ciid,
+            searchCiid: ciid,
             storeId: configData.storeNumber,
+            salesDivision: configData.salesDivision,
             subsidiary: configData.subsidiary
         };
         const customer = await CustomerService.selectCustomer(data);
         setCustomerData(customer.data);
+        setCiid(customer.data.cardCiid[0]);
     }
 
-    const handleCiid = (ciid) => {
-        setSearchCiid(ciid);
+    const handleCiid = (searchCiid) => {
+        setCiid(searchCiid);
     }
-
-    // const selectCustomer = async (ciid) => {
-    //     const response = await axios.post(`/crm-customer/selectCustomer/`, {
-    //         ciid: ciid,
-    //         salesDivision: configData.salesDivision,
-    //         searchCiid: ciid,
-    //         storeId: configData.storeNumber,
-    //         subsidiary: configData.subsidiary
-    //     });
-    //     return await response.data;
-    // }
 
     const clearForm = () => {
         setCustomerData('');
+        setCiid('');
     }
 
-    const newRegistration = () => {
-        // let newCustomer = {
-        //     firstName: 'Cristian',
-        //     lastName: 'Test',
-        //     street1: 'TEST',
-        //     zipcode: 80331,
-        //     city: 'TEST',
-        //     phoneNumber: 789789222,
-        //     email: 'test@chiriac.com',
-        //     salutation: 'Mr',
-        //     country: 'DE',
-        //     birthDate: '2000-01-01T10:00:00.000Z',
-        // }
-        // setOpenDialog(true);
+    const newRegistration = (customer) => {
+        setCustomerData(customer)
+        if (!!ciid) {
+            setOpenPrintModal(true);
+            createCustomerPrintData(ciid);
+        } else {
+            setOpenEnrollModal(true);
+        }
 
-        console.log('NEW CLUB REGISTRATION BUTTON CLICKED');
-        setCreation(true);
-        // setCreation(false) -> metoda asta trebuie apelata dupa ce se incheie procesul de register
-        console.log('NEW CUSTOMER: ', newCustomerData);
+        //setOpenEnrollModal(true);
     }
 
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
+    const handleCloseEnrollModal = async (event, data) => {
+        if (!!data && data === "E-KIT_CARD") {
+            console.log(data);
+        }
+        if (!!data && data === "GENERATE_CIID") {
+            try {
+                let data = {
+                    cardTypeCode: 'P',
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                }
+                const cardCiid = await CustomerService.generateCiid(data);
+                createCustomerPrintData(cardCiid.data.ciid);
+            } catch (error) {
+                console.log(error);
+            }
+            setOpenPrintModal(true);
+
+        }
+
+        setOpenEnrollModal(false);
+    }
+
+    const handleClosePrintModal = async (event, data) => {
+        if (!!data && data === "SUBMIT") {
+            try {
+                const customerCreated = await CustomerService.upsertCustomer(customerRegistration);
+                setRedirect(customerCreated.data.code === "SUCCESS");
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        setOpenPrintModal(false);
+    }
+
+    const createCustomerPrintData = (ciid) => {
+        let customerPrintData = {
+            subsidiary: configData.subsidiary,
+            cardCiid: ciid,
+            crefid: null,
+            birthDate: customerData.birthDate,
+            email: customerData.email,
+            firstName: customerData.firstName,
+            lastName: customerData.lastName,
+            memberCardFlag: true,
+            clubMemberActiveFlag: true,
+            customerConsentFlag: true,
+            outletId: configData.storeNumber,
+            preferredOutlet: customerData.preferredOutlet || configData.storeNumber,
+            salesDivision: configData.salesDivision,
+            salutation: customerData.salutation,
+            street1: customerData.street1,
+            city: customerData.city,
+            zipcode: customerData.zipcode,
+            mobile: customerData.mobile,
+            country: customerData.country,
+            language: configData.locales[0],
+            generateExternalKey: true,
+            legalAgreementVersion: "1.2",
+            systemName: "KONYWWS",
+            updateCustomerFlag: !!customerData.partyId || !!customerData.partyUid ? true : null,
+            partyId: !!customerData.partyId ? customerData.partyId : null,
+            partyUid: !!customerData.partyUid ? customerData.partyUid : null,
+            loyaltyActiveFlag: true,
+            legalAgreements: [],
+            customerCards: [],
+            activationDate: moment().format('YYYY-MM-DDThh:mm:ss'),
+            clubDateOfEntry: customerData.clubDateOfEntry || moment().format('YYYY-MM-DDThh:mm:ss'),
+            mailConsentFlag: true,
+            emailConsentFlag: true,
+            phoneConsentFlag: true,
+            smsConsentFlag: true,
+            emailAddressAdded: false,
+            phoneNumberAdded: false
+        }
+        setCustomerRegistration(customerPrintData);
     }
 
     return (
         <>
-            <Grid container spacing={6}>
-                <Grid item xs={12} sm={12}>
-                    <SearchInput onHandleCiid={handleCiid}/>
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                    <CustomerForm customerData={customerData}
-                                  setNewCustomerData={setNewCustomerData}
-                                  creation={creation}/>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <RegistrationButtons onSelectCustomer={selectCustomerByCiid}
-                                         onClearForm={clearForm}
-                                         onNewRegistration={newRegistration}/>
-                </Grid>
-            </Grid>
-            <EnrollDialog onOpenDialog={openDialog}
-                          onHandleCloseDialog={handleCloseDialog}/>
+            {redirect ? <Redirect to={{pathname: "/success", state: {customerRegistration}}}/> : null}
+            <SearchInput onHandleCiid={handleCiid} ciid={ciid}/>
+            <CustomerForm customerData={customerData}
+                          configData={configData}
+                          onSelectCustomer={selectCustomerByCiid}
+                          onClearForm={clearForm}
+                          onNewRegistration={newRegistration}/>
+            <EnrollModal openEnrollModal={openEnrollModal}
+                         onHandleCloseEnrollModal={handleCloseEnrollModal}/>
+            <PrintModal openPrintModal={openPrintModal}
+                        onHandleClosePrintModal={handleClosePrintModal}/>
         </>
     )
 }
