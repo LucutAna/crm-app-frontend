@@ -30,7 +30,7 @@ const validationSchema = yup.object({
         .min(2, 'Last name should be of minimum 2 characters length')
         .required('Last name is required'),
     street1: yup
-        .string('Street your last name')
+        .string('Enter your street')
         .min(2, 'Street should be of minimum 2 characters length')
         .required('Street is required'),
     zipcode: yup
