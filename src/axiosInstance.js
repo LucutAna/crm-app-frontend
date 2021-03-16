@@ -1,5 +1,5 @@
 import axios from "axios";
-import token from "../token.json"
+import token from "./token.json"
 
 //add default header with authorization FIFAToken only for development mode
 const setAuth = () => {
