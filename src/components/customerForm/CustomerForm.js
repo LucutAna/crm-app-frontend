@@ -47,10 +47,7 @@ const validationSchema = yup.object({
     email: yup
         .string('Enter your email')
         .email('Enter a valid email')
-        .required('Email is required'),
-    salutation: yup
-        .string()
-        .required('Salutation is required')
+        .required('Email is required')
 });
 
 const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCustomer, onClearForm}) => {
@@ -72,7 +69,9 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
         },
         enableReinitialize: true,
         validationSchema: validationSchema,
-
+        onSubmit: (values) => {
+            onNewRegistration({...values, country, birthDate, salutation})
+        },
     });
 
     useEffect(() => {
@@ -247,8 +246,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                         <Button size="large"
                                 variant="contained"
                                 color="primary"
-                                type="submit"
-                                onClick={() => onNewRegistration({...formik.values, country, birthDate, salutation})}>
+                                type="submit">
                             New Club Registration
                         </Button>
                         <Button size="large"
