@@ -40,19 +40,18 @@ const Home = ({configData}) => {
 
     const newRegistration = (customer) => {
         setCustomerData(customer)
-        if (!!ciid) {
+        if (!!ciid && !!customerData) {
             setOpenPrintModal(true);
             createCustomerPrintData(ciid);
         } else {
             setOpenEnrollModal(true);
         }
-
-        //setOpenEnrollModal(true);
     }
 
-    const handleCloseEnrollModal = async (event, data) => {
+    const handleCloseEnrollModal = async (event, data, eKit) => {
         if (!!data && data === "E-KIT_CARD") {
-            console.log(data);
+            createCustomerPrintData(eKit);
+            setOpenPrintModal(true);
         }
         if (!!data && data === "GENERATE_CIID") {
             try {
@@ -67,9 +66,7 @@ const Home = ({configData}) => {
                 console.log(error);
             }
             setOpenPrintModal(true);
-
         }
-
         setOpenEnrollModal(false);
     }
 
@@ -138,6 +135,7 @@ const Home = ({configData}) => {
                           onClearForm={clearForm}
                           onNewRegistration={newRegistration}/>
             <EnrollModal openEnrollModal={openEnrollModal}
+                         configData={configData}
                          onHandleCloseEnrollModal={handleCloseEnrollModal}/>
             <PrintModal openPrintModal={openPrintModal}
                         onHandleClosePrintModal={handleClosePrintModal}/>

@@ -7,11 +7,12 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
+import {useState} from 'react'
 
 import EnrollModalStyles from './EnrollModalStyles';
+import CustomerService from "../../../shared/services/CustomerService";
 
-const EnrollModal = ({openEnrollModal, onHandleCloseEnrollModal}) => {
-
+const EnrollModal = ({openEnrollModal, configData, onHandleCloseEnrollModal}) => {
     const styles = (theme) => ({
         root: {
             margin: 0,
@@ -45,10 +46,31 @@ const EnrollModal = ({openEnrollModal, onHandleCloseEnrollModal}) => {
             padding: theme.spacing(4),
         },
     }))(MuiDialogContent);
-
     const classes = EnrollModalStyles();
+    const [eKit, setEKit] = useState('');
+    const [eKitValid, setEKitValid] = useState(false);
+
+    const handleKit = async (eKitValue) => {
+        setEKit(eKitValue);
+        if (CustomerService.isClubCardNumberFormatValid(eKitValue, configData.salesDivision, configData.subsidiary)) {
+            try {
+                let data = {
+                    ciid: eKitValue,
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                }
+                const validCard = await CustomerService.validateCardNumber(data);
+                setEKitValid(validCard.data.code === "SUCCESS");
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            setEKitValid(false);
+        }
+    }
+
     return (
-        <div>
+        <>
             <Dialog onClose={onHandleCloseEnrollModal}
                     fullWidth
                     maxWidth='md'
@@ -61,15 +83,17 @@ const EnrollModal = ({openEnrollModal, onHandleCloseEnrollModal}) => {
                     <Typography className={classes.infoText}>
                         Use an e-kit to register a new customer card.
                     </Typography>
-                    <form>
-                        <TextField id="outlined-basic" fullWidth label="Enter the e-kit number" variant="outlined"/>
-                    </form>
+                    <TextField fullWidth
+                               label="Enter the e-kit number"
+                               variant="outlined"
+                               value={eKit}
+                               onChange={event => handleKit(event.target.value)}/>
                     <Button className={classes.buttonRegistration}
                             size="large"
                             variant="contained"
                             fullWidth
-                            disabled
-                            onClick={(event) => onHandleCloseEnrollModal(event, "E-KIT_CARD")}
+                            disabled={!eKitValid}
+                            onClick={event => onHandleCloseEnrollModal(event, "E-KIT_CARD", eKit)}
                             color="secondary">Continue with the registration
                     </Button>
                     <Typography className={classes.divider}>
@@ -82,12 +106,13 @@ const EnrollModal = ({openEnrollModal, onHandleCloseEnrollModal}) => {
                             size="large"
                             variant="contained"
                             fullWidth
+                            disabled={eKitValid}
                             onClick={(event) => onHandleCloseEnrollModal(event, "GENERATE_CIID")}
                             color="secondary">Generate Club card number
                     </Button>
                 </DialogContent>
             </Dialog>
-        </div>
+        </>
     );
 }
 
