@@ -1,4 +1,3 @@
-import {withStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -7,6 +6,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import DialogActions from "@material-ui/core/DialogActions";
+import {withStyles} from '@material-ui/core/styles';
 
 import PrintModalStyle from './PrintModalStyle'
 

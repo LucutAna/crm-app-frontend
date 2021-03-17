@@ -72,6 +72,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
         },
         enableReinitialize: true,
         validationSchema: validationSchema,
+
     });
 
     useEffect(() => {
@@ -248,8 +249,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                 color="primary"
                                 type="submit"
                                 onClick={() => onNewRegistration({...formik.values, country, birthDate, salutation})}>
-                            New
-                            Club Registration
+                            New Club Registration
                         </Button>
                         <Button size="large"
                                 className={classes.buttons}
