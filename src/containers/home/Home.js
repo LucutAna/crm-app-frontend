@@ -8,7 +8,7 @@ import EnrollModal from "../../components/modals/enrollModal/EnrollModal";
 import CustomerService from "../../shared/services/CustomerService";
 import PrintModal from "../../components/modals/printModal/PrintModal";
 
-const Home = ({configData}) => {
+const Home = ({configData, onSetOpenSnackbar}) => {
     const [ciid, setCiid] = useState('');
     const [customerData, setCustomerData] = useState('');
     const [openEnrollModal, setOpenEnrollModal] = useState(false);
@@ -33,7 +33,10 @@ const Home = ({configData}) => {
                 console.log(error)
             }
         } else {
-            console.log('error');
+            let message = 'For the search, please use a valid Club Card Number';
+            let open = true;
+            let code = 'warning'
+            onSetOpenSnackbar({open, message, code});
         }
     }
 
