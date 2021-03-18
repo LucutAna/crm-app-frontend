@@ -62,7 +62,7 @@ function App() {
     const [open, setOpen] = useState(false);
     const [configData, setConfigData] = useState([]);
     const [outletID, setOutletID] = useState('');
-    const [openSnackbar, setOpenSnackbar] = useState({open:false, message: ''});
+    const [openSnackbar, setOpenSnackbar] = useState({open:false, message: '', code: ''});
     const classes = useStyles();
 
     useEffect(() => {

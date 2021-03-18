@@ -33,9 +33,10 @@ const Home = ({configData, onSetOpenSnackbar}) => {
                 console.log(error)
             }
         } else {
-            let message = 'Please fill with a valid Club Card Number';
+            let message = 'For the search, please use a valid Club Card Number';
             let open = true;
-            onSetOpenSnackbar({open, message});
+            let code = 'warning'
+            onSetOpenSnackbar({open, message, code});
         }
     }
 

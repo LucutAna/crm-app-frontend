@@ -1,46 +1,47 @@
-import React, {useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
-import Slide from '@material-ui/core/Slide';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import MuiAlert from '@material-ui/lab/Alert';
 
-const SnackbarComponent = ({openSnackbar, onSetOpenSnackbar}) => {
-    const [open, setOpen] = React.useState(false);
-    const [transition, setTransition] = React.useState(undefined);
+const SnackbarComponent = ({openSnackbar}) => {
+    const [open, setOpen] = useState(false);
 
-    const TransitionUp = (props) => {
-        return <Slide {...props} direction="up" />;
+    function Alert(props) {
+        return <MuiAlert elevation={6} variant="filled" {...props} />;
     }
 
     useEffect(() => {
         if (openSnackbar.open) {
-            setTransition(() => TransitionUp);
             setOpen(true);
         }
-    },[openSnackbar])
+    }, [openSnackbar])
 
-    const handleClose = () => {
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
         setOpen(false);
-        onSetOpenSnackbar(false);
     };
 
+    /*
+            There are four types of alert messages:
+             - error
+             - warning
+             - info
+             - success
+             https://material-ui.com/components/snackbars/
+    */
     return (
         <div>
-            <Snackbar
-                open={open}
-                onClose={handleClose}
-                TransitionComponent={transition}
-                autoHideDuration={4000}
-                message={openSnackbar.message}
-                key={transition ? transition.name : ''}
-                action={
-                    <React.Fragment>
-                        <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
-                            <CloseIcon fontSize="small" />
-                        </IconButton>
-                    </React.Fragment>
-                }
-            />
+            <Snackbar open={open}
+                      anchorOrigin={{vertical:'bottom', horizontal:'left'}}
+                      autoHideDuration={4000}
+                      onClose={handleClose}>
+                <Alert onClose={handleClose}
+                       severity={openSnackbar.code}>
+                    {openSnackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }
