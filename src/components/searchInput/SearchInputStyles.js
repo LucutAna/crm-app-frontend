@@ -6,8 +6,7 @@ const SearchInputStyles = makeStyles((theme) => ({
         paddingBottom: 50
     },
     textField: {
-        marginLeft: theme.spacing(10),
-        marginRight: theme.spacing(10),
+        width: '65%'
     },
 }));
 

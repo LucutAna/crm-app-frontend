@@ -14,6 +14,8 @@ import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+import SearchIcon from '@material-ui/icons/Search';
+import CreditCardIcon from '@material-ui/icons/CreditCard';
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
@@ -51,7 +53,7 @@ const validationSchema = yup.object({
 });
 
 const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCustomer, onClearForm}) => {
-    
+
     const classes = CustomerFormStyles();
     const [salutation, setSalutation] = useState('');
     const [country, setCountry] = useState('');
@@ -114,7 +116,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                 fullWidth
                                 id="firstName"
                                 name="firstName"
-                                label="First name"
+                                label="First name*"
                                 value={formik.values.firstName}
                                 onChange={formik.handleChange}
                                 error={formik.touched.firstName && Boolean(formik.errors.firstName)}
@@ -127,7 +129,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                 fullWidth
                                 id="lastName"
                                 name="lastName"
-                                label="Last name"
+                                label="Last name*"
                                 value={formik.values.lastName}
                                 onChange={formik.handleChange}
                                 error={formik.touched.lastName && Boolean(formik.errors.lastName)}
@@ -140,7 +142,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                         fullWidth
                         id="street1"
                         name="street1"
-                        label="Street"
+                        label="Street*"
                         value={formik.values.street1}
                         onChange={formik.handleChange}
                         error={formik.touched.street1 && Boolean(formik.errors.street1)}
@@ -153,7 +155,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                 fullWidth
                                 id="zipcode"
                                 name="zipcode"
-                                label="Zip Code"
+                                label="Zip Code*"
                                 value={formik.values.zipcode}
                                 onChange={formik.handleChange}
                                 error={formik.touched.zipcode && Boolean(formik.errors.zipcode)}
@@ -166,7 +168,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                 fullWidth
                                 id="city"
                                 name="city"
-                                label="City"
+                                label="City*"
                                 value={formik.values.city}
                                 onChange={formik.handleChange}
                                 error={formik.touched.city && Boolean(formik.errors.city)}
@@ -177,7 +179,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                     <Grid container spacing={4}>
                         <Grid item xs={12} sm={8}>
                             <FormControl className={classes.country} fullWidth>
-                                <InputLabel shrink>Country</InputLabel>
+                                <InputLabel shrink>Country*</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-placeholder-label-label"
                                     id='country'
@@ -201,7 +203,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                     className={classes.birthDate}
                                     margin="normal"
                                     id="date-picker-dialog"
-                                    label="Birthday"
+                                    label="Birthday*"
                                     format="dd/MM/yyyy"
                                     value={birthDate}
                                     onChange={handleBirthDate}
@@ -232,7 +234,7 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                 fullWidth
                                 id="email"
                                 name="email"
-                                label="Email"
+                                label="Email*"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 error={formik.touched.email && Boolean(formik.errors.email)}
@@ -247,15 +249,18 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
                                 variant="contained"
                                 color="primary"
                                 type="submit">
+                            <CreditCardIcon fontSize="small"/>
                             New Club Registration
                         </Button>
                         <Button size="large"
                                 className={classes.buttons}
                                 variant="contained"
                                 color="secondary"
-                                onClick={onSelectCustomer}>Search
+                                onClick={onSelectCustomer}>
+                            <SearchIcon fontSize="small"/>
+                            Search
                         </Button>
-                        <Button size="large"
+                        <Button variant="contained" size="large"
                                 className={classes.buttons}
                                 onClick={onClearForm}>
                             <DeleteForeverIcon fontSize="small"/>
