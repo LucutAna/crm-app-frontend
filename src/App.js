@@ -119,8 +119,7 @@ function App() {
                             <Route path='/coupons' component={Coupons}/>
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                         </main>
-                        <SnackbarComponent openSnackbar={openSnackbar}
-                                           onSetOpenSnackbar={setOpenSnackbar}/>
+                        <SnackbarComponent openSnackbar={openSnackbar}/>
                     </div>
                 </Router>
             </GlobalProvider>
