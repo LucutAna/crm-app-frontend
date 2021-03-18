@@ -17,16 +17,24 @@ const Home = ({configData}) => {
     const [redirect, setRedirect] = useState(null);
 
     const selectCustomerByCiid = async () => {
-        let data = {
-            ciid,
-            searchCiid: ciid,
-            storeId: configData.storeNumber,
-            salesDivision: configData.salesDivision,
-            subsidiary: configData.subsidiary
-        };
-        const customer = await CustomerService.selectCustomer(data);
-        setCustomerData(customer.data);
-        setCiid(customer.data.cardCiid[0]);
+        if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
+            try {
+                let data = {
+                    ciid,
+                    searchCiid: ciid,
+                    storeId: configData.storeNumber,
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                };
+                const customer = await CustomerService.selectCustomer(data);
+                setCustomerData(customer.data);
+                setCiid(customer.data.cardCiid[0]);
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            console.log('error');
+        }
     }
 
     const handleCiid = (searchCiid) => {
@@ -128,7 +136,9 @@ const Home = ({configData}) => {
     return (
         <>
             {redirect ? <Redirect to={{pathname: "/success", state: {customerRegistration}}}/> : null}
-            <SearchInput onHandleCiid={handleCiid} ciid={ciid}/>
+            <SearchInput onHandleCiid={handleCiid}
+                         onSelectCustomer={selectCustomerByCiid}
+                         ciid={ciid}/>
             <CustomerForm customerData={customerData}
                           configData={configData}
                           onSelectCustomer={selectCustomerByCiid}
