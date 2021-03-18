@@ -15,6 +15,7 @@ import ConfigService from './shared/services/ConfigService'
 import {GlobalProvider} from './context/GlobalState';
 import Header from "./components/header/Header";
 import SideBarNav from "./components/sideBarNav/SideBarNav";
+import SnackbarComponent from "./components/snackbar/SnackbarComponent";
 
 function App() {
     const drawerWidth = 240;
@@ -61,6 +62,7 @@ function App() {
     const [open, setOpen] = useState(false);
     const [configData, setConfigData] = useState([]);
     const [outletID, setOutletID] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState({open:false, message: ''});
     const classes = useStyles();
 
     useEffect(() => {
@@ -110,12 +112,15 @@ function App() {
                         >
                             <div className={classes.drawerHeader}/>
                             <Route path={['/', '/crm', `/crm/?outletId=${outletID}`]} exact
-                                   component={() => <Home configData={configData}/>}/>
+                                   component={() => <Home configData={configData}
+                                                          onSetOpenSnackbar={setOpenSnackbar}/>}/>
                             <Route path='/dashboard' component={Dashboard}/>
                             <Route path='/order-history' component={OrderHistory}/>
                             <Route path='/coupons' component={Coupons}/>
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                         </main>
+                        <SnackbarComponent openSnackbar={openSnackbar}
+                                           onSetOpenSnackbar={setOpenSnackbar}/>
                     </div>
                 </Router>
             </GlobalProvider>
