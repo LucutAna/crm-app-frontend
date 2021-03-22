@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {useFormik} from 'formik';
+import {Formik, Form} from 'formik';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -21,6 +21,7 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import CustomerFormStyles from './CustomerFormStyles'
+import CustomerService from "../../shared/services/CustomerService";
 
 const validationSchema = yup.object({
     firstName: yup
@@ -52,41 +53,104 @@ const validationSchema = yup.object({
         .required('Email is required')
 });
 
-const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCustomer, onClearForm}) => {
+const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
 
     const classes = CustomerFormStyles();
     const [salutation, setSalutation] = useState('');
     const [country, setCountry] = useState('');
     const [birthDate, setBirthDate] = useState(new Date());
+    const [customerInfo, setCustomerInfo] = useState('');
 
-    const formik = useFormik({
-        initialValues: {
-            firstName: !!customerData ? customerData.firstName : '',
-            lastName: !!customerData ? customerData.lastName : '',
-            street1: !!customerData ? customerData.street1 : '',
-            zipcode: !!customerData ? customerData.zipcode : '',
-            city: !!customerData ? customerData.city : '',
-            mobile: !!customerData ? customerData.mobile : '',
-            email: !!customerData ? customerData.email : ''
-        },
-        enableReinitialize: true,
-        validationSchema: validationSchema,
-        onSubmit: (values) => {
-            onNewRegistration({...values, country, birthDate, salutation})
-        },
-    });
+    const initialValues = {
+        firstName: '',
+        lastName: '',
+        street1: '',
+        zipcode: '',
+        city: '',
+        mobile: '',
+        email: ''
+    };
+    // const formik = useFormik({
+    //     initialValues: {
+    //         firstName: !!customerData ? customerData.firstName : '',
+    //         lastName: !!customerData ? customerData.lastName : '',
+    //         street1: !!customerData ? customerData.street1 : '',
+    //         zipcode: !!customerData ? customerData.zipcode : '',
+    //         city: !!customerData ? customerData.city : '',
+    //         mobile: !!customerData ? customerData.mobile : '',
+    //         email: !!customerData ? customerData.email : ''
+    //     },
+    //     enableReinitialize: true,
+    //     validationSchema: validationSchema,
+    //     onSubmit: (values) => {
+    //         onNewRegistration({...values, country, birthDate, salutation})
+    //     },
+    // });
 
-    useEffect(() => {
-        if (!!customerData) {
-            setSalutation(customerData.salutation);
-            setBirthDate(customerData.birthDate);
-            setCountry(customerData.country);
-        } else if (Object.entries(configData).length !== 0) {
-            setSalutation('');
-            setBirthDate(new Date());
-            setCountry(configData.locales[0].split('_')[1]);
+    // const [user, setUser] = useState({});
+    // const [showPassword, setShowPassword] = useState(false);
+    //
+    // useEffect(() => {
+    //     if (!isAddMode) {
+    //         // get user and set form fields
+    //         userService.getById(id).then(user => {
+    //             const fields = ['title', 'firstName', 'lastName', 'email', 'role'];
+    //             fields.forEach(field => setFieldValue(field, user[field], false));
+    //             setUser(user);
+    //         });
+    //     }
+    // }, []);
+
+    const search = async (props) => {
+        if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
+            try {
+                let data = {
+                    ciid,
+                    searchCiid: ciid,
+                    storeId: configData.storeNumber,
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                };
+                const customer = await CustomerService.selectCustomer(data);
+                let customerResult = removeEmpty(customer.data);
+                const fields = ['firstName', 'lastName', 'email', 'street1', 'zipcode', 'city', 'mobile'];
+                fields.forEach(field => props.setFieldValue(field, customerResult[field], false));
+            } catch (error) {
+                console.log(error)
+            }
+
         }
-    }, [customerData, configData])
+    }
+
+
+    // const search = async (props) => {
+    //     await onSelectCustomer();
+    //     const fields = ['firstName', 'lastName', 'email', 'street1', 'zipcode', 'city', 'mobile'];
+    //     if (!!customerData) {
+    //         const data = customerData;
+    //         console.log('DATA', data);
+    //     }
+    //     //fields.forEach(field => props.setFieldValue(field, customerData[field], false));
+    // }
+
+    const removeEmpty = (data) => {
+        Object.entries(data).forEach(([key, val]) =>
+            (val && typeof val === 'object') && removeEmpty(val) || (val === null || val === "") && delete data[key]
+        );
+        return data;
+    };
+
+    // useEffect(() => {
+    //     if (!!customerData) {
+    //         setSalutation(customerData.salutation);
+    //         setBirthDate(customerData.birthDate);
+    //         setCountry(customerData.country);
+    //     } else if (Object.entries(configData).length !== 0) {
+    //         setSalutation('');
+    //         setBirthDate(new Date());
+    //         setCountry(configData.locales[0].split('_')[1]);
+    //     }
+    // }, [customerData, configData])
 
     const handleChangeCountry = (event) => {
         setCountry(event.target.value);
@@ -97,179 +161,192 @@ const CustomerForm = ({customerData, configData, onNewRegistration, onSelectCust
     const handleChangeSalutation = (event) => {
         setSalutation(event.target.value);
     };
+
+    const onSubmit = (values, actions) => {
+        console.log(values);
+        console.log(1111, actions);
+        onNewRegistration({...values, country, birthDate, salutation})
+    };
+
     return (
-        <form onSubmit={formik.handleSubmit}>
-            <Grid container spacing={8}>
-                <Grid item xs={12} sm={8}>
-                    <RadioGroup className={classes.gender}
-                                aria-label="gender"
-                                name="salutation"
-                                value={salutation}
-                                onChange={handleChangeSalutation}>
-                        <FormControlLabel value="Mrs." control={<Radio/>} label="Mrs."/>
-                        <FormControlLabel value="Mr." control={<Radio/>} label="Mr."/>
-                    </RadioGroup>
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                className={classes.inputText}
-                                fullWidth
-                                id="firstName"
-                                name="firstName"
-                                label="First name*"
-                                value={formik.values.firstName}
-                                onChange={formik.handleChange}
-                                error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                                helperText={formik.touched.firstName && formik.errors.firstName}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                className={classes.inputText}
-                                fullWidth
-                                id="lastName"
-                                name="lastName"
-                                label="Last name*"
-                                value={formik.values.lastName}
-                                onChange={formik.handleChange}
-                                error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-                                helperText={formik.touched.lastName && formik.errors.lastName}
-                            />
-                        </Grid>
-                    </Grid>
-                    <TextField
-                        className={classes.inputText}
-                        fullWidth
-                        id="street1"
-                        name="street1"
-                        label="Street*"
-                        value={formik.values.street1}
-                        onChange={formik.handleChange}
-                        error={formik.touched.street1 && Boolean(formik.errors.street1)}
-                        helperText={formik.touched.street1 && formik.errors.street1}
-                    />
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                className={classes.inputText}
-                                fullWidth
-                                id="zipcode"
-                                name="zipcode"
-                                label="Zip Code*"
-                                value={formik.values.zipcode}
-                                onChange={formik.handleChange}
-                                error={formik.touched.zipcode && Boolean(formik.errors.zipcode)}
-                                helperText={formik.touched.zipcode && formik.errors.zipcode}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                className={classes.inputText}
-                                fullWidth
-                                id="city"
-                                name="city"
-                                label="City*"
-                                value={formik.values.city}
-                                onChange={formik.handleChange}
-                                error={formik.touched.city && Boolean(formik.errors.city)}
-                                helperText={formik.touched.city && formik.errors.city}
-                            />
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={4}>
+        <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
+            {props => (
+                <Form>
+                    <Grid container spacing={8}>
                         <Grid item xs={12} sm={8}>
-                            <FormControl className={classes.country} fullWidth>
-                                <InputLabel shrink>Country*</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-placeholder-label-label"
-                                    id='country'
-                                    value={country}
-                                    onChange={handleChangeCountry}
-                                    displayEmpty
-                                    className={classes.selectEmpty}
-                                >
-                                    <MenuItem value="DE">
-                                        <em>DE</em>
-                                    </MenuItem>
-                                    <MenuItem value='CH'>CH</MenuItem>
-                                    <MenuItem value='AT'>AT</MenuItem>
-                                    <MenuItem value='PL'>PL</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                <KeyboardDatePicker
-                                    className={classes.birthDate}
-                                    margin="normal"
-                                    id="date-picker-dialog"
-                                    label="Birthday*"
-                                    format="dd/MM/yyyy"
-                                    value={birthDate}
-                                    onChange={handleBirthDate}
-                                    KeyboardButtonProps={{
-                                        'aria-label': 'change date',
-                                    }}
-                                />
-                            </MuiPickersUtilsProvider>
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} sm={6}>
+                            <RadioGroup className={classes.gender}
+                                        aria-label="gender"
+                                        name="salutation"
+                                        value={salutation}
+                                        onChange={handleChangeSalutation}>
+                                <FormControlLabel value="Mrs." control={<Radio/>} label="Mrs."/>
+                                <FormControlLabel value="Mr." control={<Radio/>} label="Mr."/>
+                            </RadioGroup>
+                            <Grid container spacing={4}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
+                                        id="firstName"
+                                        name="firstName"
+                                        label="First name*"
+                                        value={props.values.firstName}
+                                        onChange={props.handleChange}
+                                        error={props.touched.firstName && Boolean(props.errors.firstName)}
+                                        helperText={props.touched.firstName && props.errors.firstName}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
+                                        id="lastName"
+                                        name="lastName"
+                                        label="Last name*"
+                                        value={props.values.lastName}
+                                        onChange={props.handleChange}
+                                        error={props.touched.lastName && Boolean(props.errors.lastName)}
+                                        helperText={props.touched.lastName && props.errors.lastName}
+                                    />
+                                </Grid>
+                            </Grid>
                             <TextField
                                 className={classes.inputText}
                                 fullWidth
-                                id="mobile"
-                                name="mobile"
-                                label="Phone number"
-                                value={formik.values.mobile}
-                                onChange={formik.handleChange}
-                                error={formik.touched.mobile && Boolean(formik.errors.mobile)}
-                                helperText={formik.touched.mobile && formik.errors.mobile}
+                                id="street1"
+                                name="street1"
+                                label="Street*"
+                                value={props.values.street1}
+                                onChange={props.handleChange}
+                                error={props.touched.street1 && Boolean(props.errors.street1)}
+                                helperText={props.touched.street1 && props.errors.street1}
                             />
+                            <Grid container spacing={4}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
+                                        id="zipcode"
+                                        name="zipcode"
+                                        label="Zip Code*"
+                                        value={props.values.zipcode}
+                                        onChange={props.handleChange}
+                                        error={props.touched.zipcode && Boolean(props.errors.zipcode)}
+                                        helperText={props.touched.zipcode && props.errors.zipcode}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
+                                        id="city"
+                                        name="city"
+                                        label="City*"
+                                        value={props.values.city}
+                                        onChange={props.handleChange}
+                                        error={props.touched.city && Boolean(props.errors.city)}
+                                        helperText={props.touched.city && props.errors.city}
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={4}>
+                                <Grid item xs={12} sm={8}>
+                                    <FormControl className={classes.country} fullWidth>
+                                        <InputLabel shrink>Country*</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-placeholder-label-label"
+                                            id='country'
+                                            value={country}
+                                            onChange={handleChangeCountry}
+                                            displayEmpty
+                                            className={classes.selectEmpty}
+                                        >
+                                            <MenuItem value="DE">
+                                                <em>DE</em>
+                                            </MenuItem>
+                                            <MenuItem value='CH'>CH</MenuItem>
+                                            <MenuItem value='AT'>AT</MenuItem>
+                                            <MenuItem value='PL'>PL</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                        <KeyboardDatePicker
+                                            className={classes.birthDate}
+                                            margin="normal"
+                                            id="date-picker-dialog"
+                                            label="Birthday*"
+                                            format="dd/MM/yyyy"
+                                            value={birthDate}
+                                            onChange={handleBirthDate}
+                                            KeyboardButtonProps={{
+                                                'aria-label': 'change date',
+                                            }}
+                                        />
+                                    </MuiPickersUtilsProvider>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={4}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
+                                        id="mobile"
+                                        name="mobile"
+                                        label="Phone number"
+                                        value={props.values.mobile}
+                                        onChange={props.handleChange}
+                                        error={props.touched.mobile && Boolean(props.errors.mobile)}
+                                        helperText={props.touched.mobile && props.errors.mobile}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
+                                        id="email"
+                                        name="email"
+                                        label="Email*"
+                                        value={props.values.email}
+                                        onChange={props.handleChange}
+                                        error={props.touched.email && Boolean(props.errors.email)}
+                                        helperText={props.touched.email && props.errors.email}
+                                    />
+                                </Grid>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                className={classes.inputText}
-                                fullWidth
-                                id="email"
-                                name="email"
-                                label="Email*"
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                error={formik.touched.email && Boolean(formik.errors.email)}
-                                helperText={formik.touched.email && formik.errors.email}
-                            />
+                        <Grid item xs={12} sm={4} className={classes.wrapperButtons}>
+                            <Paper className={classes.paper}>
+                                <Button size="large"
+                                        variant="contained"
+                                        color="primary"
+                                        type="submit">
+                                    <CreditCardIcon fontSize="small"/>
+                                    New Club Registration
+                                </Button>
+                                <Button size="large"
+                                        className={classes.buttons}
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={() => search(props)}>
+                                    <SearchIcon fontSize="small"/>
+                                    Search
+                                </Button>
+                                <Button variant="contained" size="large"
+                                        className={classes.buttons}
+                                        onClick={onClearForm}>
+                                    <DeleteForeverIcon fontSize="small"/>
+                                    Clear
+                                </Button>
+                            </Paper>
                         </Grid>
                     </Grid>
-                </Grid>
-                <Grid item xs={12} sm={4} className={classes.wrapperButtons}>
-                    <Paper className={classes.paper}>
-                        <Button size="large"
-                                variant="contained"
-                                color="primary"
-                                type="submit">
-                            <CreditCardIcon fontSize="small"/>
-                            New Club Registration
-                        </Button>
-                        <Button size="large"
-                                className={classes.buttons}
-                                variant="contained"
-                                color="secondary"
-                                onClick={onSelectCustomer}>
-                            <SearchIcon fontSize="small"/>
-                            Search
-                        </Button>
-                        <Button variant="contained" size="large"
-                                className={classes.buttons}
-                                onClick={onClearForm}>
-                            <DeleteForeverIcon fontSize="small"/>
-                            Clear
-                        </Button>
-                    </Paper>
-                </Grid>
-            </Grid>
-        </form>
+                </Form>
+            )}
+
+        </Formik>
+
     );
 };
 

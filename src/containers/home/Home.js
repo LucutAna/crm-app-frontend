@@ -16,33 +16,42 @@ const Home = ({configData, onSetOpenSnackbar}) => {
     const [customerRegistration, setCustomerRegistration] = useState({});
     const [redirect, setRedirect] = useState(null);
 
-    const selectCustomerByCiid = async () => {
-        if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
-            try {
-                let data = {
-                    ciid,
-                    searchCiid: ciid,
-                    storeId: configData.storeNumber,
-                    salesDivision: configData.salesDivision,
-                    subsidiary: configData.subsidiary
-                };
-                const customer = await CustomerService.selectCustomer(data);
-                setCustomerData(customer.data);
-                setCiid(customer.data.cardCiid[0]);
-            } catch (error) {
-                console.log(error)
-            }
-        } else {
-            let message = 'For the search, please use a valid Club Card Number';
-            let open = true;
-            let code = 'warning'
-            onSetOpenSnackbar({open, message, code});
-        }
-    }
+    // const selectCustomerByCiid = async () => {
+    //     if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
+    //         try {
+    //             let data = {
+    //                 ciid,
+    //                 searchCiid: ciid,
+    //                 storeId: configData.storeNumber,
+    //                 salesDivision: configData.salesDivision,
+    //                 subsidiary: configData.subsidiary
+    //             };
+    //             const customer = await CustomerService.selectCustomer(data);
+    //             setCustomerData(removeEmpty(customer.data));
+    //
+    //             setCiid(customer.data.cardCiid[0]);
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+    //     } else {
+    //         let message = 'For the search, please use a valid Club Card Number';
+    //         let open = true;
+    //         let code = 'warning'
+    //         onSetOpenSnackbar({open, message, code});
+    //     }
+    // }
+
 
     const handleCiid = (searchCiid) => {
         setCiid(searchCiid);
     }
+
+    // const removeEmpty = (data) => {
+    //     Object.entries(data).forEach(([key, val]) =>
+    //         (val && typeof val === 'object') && removeEmpty(val) || (val === null || val === "") && delete data[key]
+    //     );
+    //     return data;
+    // };
 
     const clearForm = () => {
         setCustomerData('');
@@ -140,11 +149,11 @@ const Home = ({configData, onSetOpenSnackbar}) => {
         <>
             {redirect ? <Redirect to={{pathname: "/success", state: {customerRegistration}}}/> : null}
             <SearchInput onHandleCiid={handleCiid}
-                         onSelectCustomer={selectCustomerByCiid}
+
                          ciid={ciid}/>
             <CustomerForm customerData={customerData}
                           configData={configData}
-                          onSelectCustomer={selectCustomerByCiid}
+                          ciid={ciid}
                           onClearForm={clearForm}
                           onNewRegistration={newRegistration}/>
             <EnrollModal openEnrollModal={openEnrollModal}
