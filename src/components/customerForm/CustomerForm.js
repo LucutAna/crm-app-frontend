@@ -174,6 +174,21 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                     <TextField
                                         className={classes.inputText}
                                         fullWidth
+                                        id="street1"
+                                        name="street1"
+                                        label="Street*"
+                                        value={customerForm.values.street1}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
+                                        helperText={customerForm.touched.street1 && customerForm.errors.street1}
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={4}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
                                         id="lastName"
                                         name="lastName"
                                         label="Last name*"
@@ -183,19 +198,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         helperText={customerForm.touched.lastName && customerForm.errors.lastName}
                                     />
                                 </Grid>
-                            </Grid>
-                            <TextField
-                                className={classes.inputText}
-                                fullWidth
-                                id="street1"
-                                name="street1"
-                                label="Street*"
-                                value={customerForm.values.street1}
-                                onChange={customerForm.handleChange}
-                                error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
-                                helperText={customerForm.touched.street1 && customerForm.errors.street1}
-                            />
-                            <Grid container spacing={4}>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
                                         className={classes.inputText}
@@ -208,6 +210,26 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         error={customerForm.touched.zipcode && Boolean(customerForm.errors.zipcode)}
                                         helperText={customerForm.touched.zipcode && customerForm.errors.zipcode}
                                     />
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={4}>
+                                <Grid item xs={12} sm={6}>
+                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                        <KeyboardDatePicker
+                                            className={classes.birthDate}
+                                            margin="normal"
+                                            id="date-picker-dialog"
+                                            label="Birthday*"
+                                            format="dd/MM/yyyy"
+                                            value={customerForm.values.birthDate}
+                                            onChange={value => customerForm.setFieldValue("birthDate", value)}
+                                            KeyboardButtonProps={{
+                                                'aria-label': 'change date',
+                                            }}
+                                            error={customerForm.touched.birthDate && Boolean(customerForm.errors.birthDate)}
+                                            helperText={customerForm.touched.birthDate && customerForm.errors.birthDate}
+                                        />
+                                    </MuiPickersUtilsProvider>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
@@ -224,7 +246,33 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                 </Grid>
                             </Grid>
                             <Grid container spacing={4}>
-                                <Grid item xs={12} sm={8}>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
+                                        id="email"
+                                        name="email"
+                                        label="Email*"
+                                        value={customerForm.values.email}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.email && Boolean(customerForm.errors.email)}
+                                        helperText={customerForm.touched.email && customerForm.errors.email}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        className={classes.inputText}
+                                        fullWidth
+                                        id="mobile"
+                                        name="mobile"
+                                        label="Phone number"
+                                        value={customerForm.values.mobile}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.mobile && Boolean(customerForm.errors.mobile)}
+                                        helperText={customerForm.touched.mobile && customerForm.errors.mobile}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
                                     <TextField
                                         className={classes.country}
                                         fullWidth
@@ -245,52 +293,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         ))
                                         }
                                     </TextField>
-                                </Grid>
-                                <Grid item xs={12} sm={4}>
-                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                        <KeyboardDatePicker
-                                            className={classes.birthDate}
-                                            margin="normal"
-                                            id="date-picker-dialog"
-                                            label="Birthday*"
-                                            format="dd/MM/yyyy"
-                                            value={customerForm.values.birthDate}
-                                            onChange={value => customerForm.setFieldValue("birthDate", value)}
-                                            KeyboardButtonProps={{
-                                                'aria-label': 'change date',
-                                            }}
-                                            error={customerForm.touched.birthDate && Boolean(customerForm.errors.birthDate)}
-                                            helperText={customerForm.touched.birthDate && customerForm.errors.birthDate}
-                                        />
-                                    </MuiPickersUtilsProvider>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={4}>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="mobile"
-                                        name="mobile"
-                                        label="Phone number"
-                                        value={customerForm.values.mobile}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.mobile && Boolean(customerForm.errors.mobile)}
-                                        helperText={customerForm.touched.mobile && customerForm.errors.mobile}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="email"
-                                        name="email"
-                                        label="Email*"
-                                        value={customerForm.values.email}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.email && Boolean(customerForm.errors.email)}
-                                        helperText={customerForm.touched.email && customerForm.errors.email}
-                                    />
                                 </Grid>
                             </Grid>
                         </Grid>

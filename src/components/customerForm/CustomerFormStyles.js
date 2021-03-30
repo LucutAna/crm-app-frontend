@@ -2,11 +2,10 @@ import {makeStyles} from '@material-ui/core/styles';
 
 const CustomerFormStyles = makeStyles((theme) => ({
     country: {
-        marginTop: theme.spacing(4),
+        marginTop: theme.spacing(2),
         marginRight: theme.spacing(2)
     },
     birthDate: {
-        marginTop: theme.spacing(4),
         width: '100%'
     },
     selectEmpty: {
