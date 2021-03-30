@@ -50,58 +50,38 @@ const validationSchema = yup.object({
     email: yup
         .string('Enter your email')
         .email('Enter a valid email')
-        .required('Email is required')
+        .required('Email is required'),
+    salutation: yup
+        .string('Enter salutation')
+        .required('Salutation is required'),
+    country: yup
+        .string('Enter your country')
+        .required('Country is required')
 });
 
-const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
+const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
 
-    const classes = CustomerFormStyles();
-    const [salutation, setSalutation] = useState('');
-    const [country, setCountry] = useState('');
-    const [birthDate, setBirthDate] = useState(new Date());
-    const [customerInfo, setCustomerInfo] = useState('');
-
-    const initialValues = {
+    const formFields = {
         firstName: '',
         lastName: '',
         street1: '',
         zipcode: '',
         city: '',
         mobile: '',
-        email: ''
+        email: '',
+        salutation: '',
+        country: Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : ''
     };
-    // const formik = useFormik({
-    //     initialValues: {
-    //         firstName: !!customerData ? customerData.firstName : '',
-    //         lastName: !!customerData ? customerData.lastName : '',
-    //         street1: !!customerData ? customerData.street1 : '',
-    //         zipcode: !!customerData ? customerData.zipcode : '',
-    //         city: !!customerData ? customerData.city : '',
-    //         mobile: !!customerData ? customerData.mobile : '',
-    //         email: !!customerData ? customerData.email : ''
-    //     },
-    //     enableReinitialize: true,
-    //     validationSchema: validationSchema,
-    //     onSubmit: (values) => {
-    //         onNewRegistration({...values, country, birthDate, salutation})
-    //     },
-    // });
 
-    // const [user, setUser] = useState({});
-    // const [showPassword, setShowPassword] = useState(false);
-    //
-    // useEffect(() => {
-    //     if (!isAddMode) {
-    //         // get user and set form fields
-    //         userService.getById(id).then(user => {
-    //             const fields = ['title', 'firstName', 'lastName', 'email', 'role'];
-    //             fields.forEach(field => setFieldValue(field, user[field], false));
-    //             setUser(user);
-    //         });
-    //     }
-    // }, []);
+    const classes = CustomerFormStyles();
+    const [birthDate, setBirthDate] = useState(new Date());
 
-    const search = async (props) => {
+    useEffect(() => {
+        console.log(configData);
+
+    }, [configData])
+
+    const search = async (customerForm) => {
         if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
             try {
                 let data = {
@@ -111,34 +91,26 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                     salesDivision: configData.salesDivision,
                     subsidiary: configData.subsidiary
                 };
-                const customer = await CustomerService.selectCustomer(data);
-                let customerResult = removeEmpty(customer.data);
-                const fields = ['firstName', 'lastName', 'email', 'street1', 'zipcode', 'city', 'mobile'];
-                fields.forEach(field => props.setFieldValue(field, customerResult[field], false));
+                const customerSelected = await CustomerService.selectCustomer(data);
+                const customer = removeEmpty(customerSelected.data)
+                Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
+                ;
             } catch (error) {
                 console.log(error)
             }
-
+        } else {
+            let message = 'For the search, please use a valid Club Card Number';
+            let open = true;
+            let code = 'warning'
+            onSetOpenSnackbar({open, message, code});
         }
     }
 
+    const clearFormFields = (customerForm) => {
+        onClearSearchInput();
+        customerForm.resetForm(formFields);
+    }
 
-    // const search = async (props) => {
-    //     await onSelectCustomer();
-    //     const fields = ['firstName', 'lastName', 'email', 'street1', 'zipcode', 'city', 'mobile'];
-    //     if (!!customerData) {
-    //         const data = customerData;
-    //         console.log('DATA', data);
-    //     }
-    //     //fields.forEach(field => props.setFieldValue(field, customerData[field], false));
-    // }
-
-    const removeEmpty = (data) => {
-        Object.entries(data).forEach(([key, val]) =>
-            (val && typeof val === 'object') && removeEmpty(val) || (val === null || val === "") && delete data[key]
-        );
-        return data;
-    };
 
     // useEffect(() => {
     //     if (!!customerData) {
@@ -152,33 +124,39 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
     //     }
     // }, [customerData, configData])
 
-    const handleChangeCountry = (event) => {
-        setCountry(event.target.value);
-    };
+    // const handleChangeCountry = (event) => {
+    //     setCountry(event.target.value);
+    // };
     const handleBirthDate = (date) => {
         setBirthDate(date.toISOString());
-    };
-    const handleChangeSalutation = (event) => {
-        setSalutation(event.target.value);
     };
 
     const onSubmit = (values, actions) => {
         console.log(values);
         console.log(1111, actions);
-        onNewRegistration({...values, country, birthDate, salutation})
+        onNewRegistration({...values, birthDate})
+    };
+
+    const removeEmpty = (data) => {
+        Object.entries(data).forEach(([key, val]) =>
+            (val && typeof val === 'object') && removeEmpty(val) || (val === null || val === "") && delete data[key]
+        );
+        return data;
     };
 
     return (
-        <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-            {props => (
+        <Formik initialValues={formFields} validationSchema={validationSchema} onSubmit={onSubmit}>
+            {customerForm => (
                 <Form>
                     <Grid container spacing={8}>
                         <Grid item xs={12} sm={8}>
                             <RadioGroup className={classes.gender}
                                         aria-label="gender"
                                         name="salutation"
-                                        value={salutation}
-                                        onChange={handleChangeSalutation}>
+                                        value={customerForm.values.salutation}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.salutation && Boolean(customerForm.errors.salutation)}
+                            >
                                 <FormControlLabel value="Mrs." control={<Radio/>} label="Mrs."/>
                                 <FormControlLabel value="Mr." control={<Radio/>} label="Mr."/>
                             </RadioGroup>
@@ -190,10 +168,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                                         id="firstName"
                                         name="firstName"
                                         label="First name*"
-                                        value={props.values.firstName}
-                                        onChange={props.handleChange}
-                                        error={props.touched.firstName && Boolean(props.errors.firstName)}
-                                        helperText={props.touched.firstName && props.errors.firstName}
+                                        value={customerForm.values.firstName}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.firstName && Boolean(customerForm.errors.firstName)}
+                                        helperText={customerForm.touched.firstName && customerForm.errors.firstName}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
@@ -203,10 +181,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                                         id="lastName"
                                         name="lastName"
                                         label="Last name*"
-                                        value={props.values.lastName}
-                                        onChange={props.handleChange}
-                                        error={props.touched.lastName && Boolean(props.errors.lastName)}
-                                        helperText={props.touched.lastName && props.errors.lastName}
+                                        value={customerForm.values.lastName}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.lastName && Boolean(customerForm.errors.lastName)}
+                                        helperText={customerForm.touched.lastName && customerForm.errors.lastName}
                                     />
                                 </Grid>
                             </Grid>
@@ -216,10 +194,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                                 id="street1"
                                 name="street1"
                                 label="Street*"
-                                value={props.values.street1}
-                                onChange={props.handleChange}
-                                error={props.touched.street1 && Boolean(props.errors.street1)}
-                                helperText={props.touched.street1 && props.errors.street1}
+                                value={customerForm.values.street1}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
+                                helperText={customerForm.touched.street1 && customerForm.errors.street1}
                             />
                             <Grid container spacing={4}>
                                 <Grid item xs={12} sm={6}>
@@ -229,10 +207,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                                         id="zipcode"
                                         name="zipcode"
                                         label="Zip Code*"
-                                        value={props.values.zipcode}
-                                        onChange={props.handleChange}
-                                        error={props.touched.zipcode && Boolean(props.errors.zipcode)}
-                                        helperText={props.touched.zipcode && props.errors.zipcode}
+                                        value={customerForm.values.zipcode}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.zipcode && Boolean(customerForm.errors.zipcode)}
+                                        helperText={customerForm.touched.zipcode && customerForm.errors.zipcode}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
@@ -242,33 +220,35 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                                         id="city"
                                         name="city"
                                         label="City*"
-                                        value={props.values.city}
-                                        onChange={props.handleChange}
-                                        error={props.touched.city && Boolean(props.errors.city)}
-                                        helperText={props.touched.city && props.errors.city}
+                                        value={customerForm.values.city}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.city && Boolean(customerForm.errors.city)}
+                                        helperText={customerForm.touched.city && customerForm.errors.city}
                                     />
                                 </Grid>
                             </Grid>
                             <Grid container spacing={4}>
                                 <Grid item xs={12} sm={8}>
-                                    <FormControl className={classes.country} fullWidth>
-                                        <InputLabel shrink>Country*</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-placeholder-label-label"
-                                            id='country'
-                                            value={country}
-                                            onChange={handleChangeCountry}
-                                            displayEmpty
-                                            className={classes.selectEmpty}
-                                        >
-                                            <MenuItem value="DE">
-                                                <em>DE</em>
+                                    <TextField
+                                        className={classes.country}
+                                        fullWidth
+                                        id="standard-select-currency"
+                                        name="country"
+                                        select
+                                        label="Country*"
+                                        value={customerForm.values.country}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.country && Boolean(customerForm.errors.country)}
+                                        helperText={customerForm.touched.country && customerForm.errors.country}
+                                    >
+                                        { Object.entries(configData).length !== 0 &&
+                                            configData.allowedCountries.map((option, index) => (
+                                            <MenuItem key={index} value={option}>
+                                            {option}
                                             </MenuItem>
-                                            <MenuItem value='CH'>CH</MenuItem>
-                                            <MenuItem value='AT'>AT</MenuItem>
-                                            <MenuItem value='PL'>PL</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                            ))
+                                        }
+                                    </TextField>
                                 </Grid>
                                 <Grid item xs={12} sm={4}>
                                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -295,10 +275,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                                         id="mobile"
                                         name="mobile"
                                         label="Phone number"
-                                        value={props.values.mobile}
-                                        onChange={props.handleChange}
-                                        error={props.touched.mobile && Boolean(props.errors.mobile)}
-                                        helperText={props.touched.mobile && props.errors.mobile}
+                                        value={customerForm.values.mobile}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.mobile && Boolean(customerForm.errors.mobile)}
+                                        helperText={customerForm.touched.mobile && customerForm.errors.mobile}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
@@ -308,10 +288,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                                         id="email"
                                         name="email"
                                         label="Email*"
-                                        value={props.values.email}
-                                        onChange={props.handleChange}
-                                        error={props.touched.email && Boolean(props.errors.email)}
-                                        helperText={props.touched.email && props.errors.email}
+                                        value={customerForm.values.email}
+                                        onChange={customerForm.handleChange}
+                                        error={customerForm.touched.email && Boolean(customerForm.errors.email)}
+                                        helperText={customerForm.touched.email && customerForm.errors.email}
                                     />
                                 </Grid>
                             </Grid>
@@ -329,13 +309,13 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearForm}) => {
                                         className={classes.buttons}
                                         variant="contained"
                                         color="secondary"
-                                        onClick={() => search(props)}>
+                                        onClick={() => search(customerForm)}>
                                     <SearchIcon fontSize="small"/>
                                     Search
                                 </Button>
                                 <Button variant="contained" size="large"
                                         className={classes.buttons}
-                                        onClick={onClearForm}>
+                                        onClick={() => clearFormFields(customerForm)}>
                                     <DeleteForeverIcon fontSize="small"/>
                                     Clear
                                 </Button>
