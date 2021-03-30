@@ -13,6 +13,7 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import ReceiptIcon from "@material-ui/icons/Receipt";
 import CreditCardIcon from "@material-ui/icons/CreditCard";
 import React from "react";
+import clsx from 'clsx';
 import {useTheme} from "@material-ui/core/styles";
 
 import SideBarNavStyles from './SideBarNavStyles'
@@ -20,16 +21,21 @@ import SideBarNavStyles from './SideBarNavStyles'
 const SideBarNav = ({open, onHandleDrawerClose}) => {
     const classes = SideBarNavStyles();
     const theme = useTheme();
-
     return (
-        <Drawer className={classes.drawer}
-                variant="persistent"
-                anchor="left"
-                open={open}
-                classes={{
-                    paper: classes.drawerPaper,
-                }}>
-            <div className={classes.drawerHeader}>
+        <Drawer
+            variant="permanent"
+            className={clsx(classes.drawer, {
+                [classes.drawerOpen]: open,
+                [classes.drawerClose]: !open,
+            })}
+            classes={{
+                paper: clsx({
+                    [classes.drawerOpen]: open,
+                    [classes.drawerClose]: !open,
+                }),
+            }}
+            >
+            <div className={classes.toolbar}>
                 <IconButton onClick={onHandleDrawerClose}>
                     {theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                 </IconButton>
@@ -69,7 +75,6 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                     </NavLink>
                 </MenuItem>
             </MenuList>
-            <Divider/>
         </Drawer>
     )
 }

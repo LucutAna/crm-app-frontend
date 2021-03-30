@@ -1,9 +1,5 @@
-import {useState, useEffect} from 'react';
 import {Formik, Form} from 'formik';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import * as yup from 'yup';
 import TextField from '@material-ui/core/TextField';
 import DateFnsUtils from '@date-io/date-fns';
@@ -56,10 +52,38 @@ const validationSchema = yup.object({
         .required('Salutation is required'),
     country: yup
         .string('Enter your country')
-        .required('Country is required')
+        .required('Country is required'),
+    birthDate: yup
+        .date()
+        .nullable()
+        .required("Data deve ser informada")
+        .test('test-name', 'The customer must be over 18 years old ',
+            value => {
+                const age = getAge(value);
+                const minAge = 18;
+                return age >= minAge
+            })
+        .required('Birth Date is requierd')
 });
 
+
+const getAge = value => {
+    let today = new Date();
+    let birthDate = new Date(value);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    let m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--
+    return age;
+};
+
+//TODO for CH
+// const getMinAge = country => {
+//     if (country === "CH") return 16;
+//     return 18;
+//};
+
 const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
+    const classes = CustomerFormStyles();
 
     const formFields = {
         firstName: '',
@@ -70,16 +94,9 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
         mobile: '',
         email: '',
         salutation: '',
-        country: Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : ''
+        country: Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '',
+        birthDate: new Date()
     };
-
-    const classes = CustomerFormStyles();
-    const [birthDate, setBirthDate] = useState(new Date());
-
-    useEffect(() => {
-        console.log(configData);
-
-    }, [configData])
 
     const search = async (customerForm) => {
         if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
@@ -111,30 +128,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
         customerForm.resetForm(formFields);
     }
 
-
-    // useEffect(() => {
-    //     if (!!customerData) {
-    //         setSalutation(customerData.salutation);
-    //         setBirthDate(customerData.birthDate);
-    //         setCountry(customerData.country);
-    //     } else if (Object.entries(configData).length !== 0) {
-    //         setSalutation('');
-    //         setBirthDate(new Date());
-    //         setCountry(configData.locales[0].split('_')[1]);
-    //     }
-    // }, [customerData, configData])
-
-    // const handleChangeCountry = (event) => {
-    //     setCountry(event.target.value);
-    // };
-    const handleBirthDate = (date) => {
-        setBirthDate(date.toISOString());
-    };
-
     const onSubmit = (values, actions) => {
         console.log(values);
         console.log(1111, actions);
-        onNewRegistration({...values, birthDate})
+        onNewRegistration({...values})
     };
 
     const removeEmpty = (data) => {
@@ -155,7 +152,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         name="salutation"
                                         value={customerForm.values.salutation}
                                         onChange={customerForm.handleChange}
-                                        error={customerForm.touched.salutation && Boolean(customerForm.errors.salutation)}
                             >
                                 <FormControlLabel value="Mrs." control={<Radio/>} label="Mrs."/>
                                 <FormControlLabel value="Mr." control={<Radio/>} label="Mr."/>
@@ -241,12 +237,12 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         error={customerForm.touched.country && Boolean(customerForm.errors.country)}
                                         helperText={customerForm.touched.country && customerForm.errors.country}
                                     >
-                                        { Object.entries(configData).length !== 0 &&
-                                            configData.allowedCountries.map((option, index) => (
+                                        {Object.entries(configData).length !== 0 &&
+                                        configData.allowedCountries.map((option, index) => (
                                             <MenuItem key={index} value={option}>
-                                            {option}
+                                                {option}
                                             </MenuItem>
-                                            ))
+                                        ))
                                         }
                                     </TextField>
                                 </Grid>
@@ -258,11 +254,13 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             id="date-picker-dialog"
                                             label="Birthday*"
                                             format="dd/MM/yyyy"
-                                            value={birthDate}
-                                            onChange={handleBirthDate}
+                                            value={customerForm.values.birthDate}
+                                            onChange={value => customerForm.setFieldValue("birthDate", value)}
                                             KeyboardButtonProps={{
                                                 'aria-label': 'change date',
                                             }}
+                                            error={customerForm.touched.birthDate && Boolean(customerForm.errors.birthDate)}
+                                            helperText={customerForm.touched.birthDate && customerForm.errors.birthDate}
                                         />
                                     </MuiPickersUtilsProvider>
                                 </Grid>
