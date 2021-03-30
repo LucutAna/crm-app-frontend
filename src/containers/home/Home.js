@@ -10,48 +10,24 @@ import PrintModal from "../../components/modals/printModal/PrintModal";
 
 const Home = ({configData, onSetOpenSnackbar}) => {
     const [ciid, setCiid] = useState('');
-    const [customerData, setCustomerData] = useState('');
+    const [customerRegistrationData, setCustomerRegistrationData] = useState('');
     const [openEnrollModal, setOpenEnrollModal] = useState(false);
     const [openPrintModal, setOpenPrintModal] = useState(false);
     const [customerRegistration, setCustomerRegistration] = useState({});
     const [redirect, setRedirect] = useState(null);
 
-    const selectCustomerByCiid = async () => {
-        if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
-            try {
-                let data = {
-                    ciid,
-                    searchCiid: ciid,
-                    storeId: configData.storeNumber,
-                    salesDivision: configData.salesDivision,
-                    subsidiary: configData.subsidiary
-                };
-                const customer = await CustomerService.selectCustomer(data);
-                setCustomerData(customer.data);
-                setCiid(customer.data.cardCiid[0]);
-            } catch (error) {
-                console.log(error)
-            }
-        } else {
-            let message = 'For the search, please use a valid Club Card Number';
-            let open = true;
-            let code = 'warning'
-            onSetOpenSnackbar({open, message, code});
-        }
-    }
 
     const handleCiid = (searchCiid) => {
         setCiid(searchCiid);
     }
 
-    const clearForm = () => {
-        setCustomerData('');
+    const clearSearchInput = () => {
         setCiid('');
     }
 
     const newRegistration = (customer) => {
-        setCustomerData(customer)
-        if (!!ciid && !!customerData) {
+        setCustomerRegistrationData(customer)
+        if (!!ciid) {
             setOpenPrintModal(true);
             createCustomerPrintData(ciid);
         } else {
@@ -98,34 +74,34 @@ const Home = ({configData, onSetOpenSnackbar}) => {
             subsidiary: configData.subsidiary,
             cardCiid: ciid,
             crefid: null,
-            birthDate: customerData.birthDate,
-            email: customerData.email,
-            firstName: customerData.firstName,
-            lastName: customerData.lastName,
+            birthDate: customerRegistrationData.birthDate,
+            email: customerRegistrationData.email,
+            firstName: customerRegistrationData.firstName,
+            lastName: customerRegistrationData.lastName,
             memberCardFlag: true,
             clubMemberActiveFlag: true,
             customerConsentFlag: true,
             outletId: configData.storeNumber,
-            preferredOutlet: customerData.preferredOutlet || configData.storeNumber,
+            preferredOutlet: customerRegistrationData.preferredOutlet || configData.storeNumber,
             salesDivision: configData.salesDivision,
-            salutation: customerData.salutation,
-            street1: customerData.street1,
-            city: customerData.city,
-            zipcode: customerData.zipcode,
-            mobile: customerData.mobile,
-            country: customerData.country,
+            salutation: customerRegistrationData.salutation,
+            street1: customerRegistrationData.street1,
+            city: customerRegistrationData.city,
+            zipcode: customerRegistrationData.zipcode,
+            mobile: customerRegistrationData.mobile,
+            country: customerRegistrationData.country,
             language: configData.locales[0],
             generateExternalKey: true,
             legalAgreementVersion: "1.2",
             systemName: "KONYWWS",
-            updateCustomerFlag: !!customerData.partyId || !!customerData.partyUid ? true : null,
-            partyId: !!customerData.partyId ? customerData.partyId : null,
-            partyUid: !!customerData.partyUid ? customerData.partyUid : null,
+            updateCustomerFlag: !!customerRegistrationData.partyId || !!customerRegistrationData.partyUid ? true : null,
+            partyId: !!customerRegistrationData.partyId ? customerRegistrationData.partyId : null,
+            partyUid: !!customerRegistrationData.partyUid ? customerRegistrationData.partyUid : null,
             loyaltyActiveFlag: true,
             legalAgreements: [],
             customerCards: [],
             activationDate: moment().format('YYYY-MM-DDThh:mm:ss'),
-            clubDateOfEntry: customerData.clubDateOfEntry || moment().format('YYYY-MM-DDThh:mm:ss'),
+            clubDateOfEntry: customerRegistrationData.clubDateOfEntry || moment().format('YYYY-MM-DDThh:mm:ss'),
             mailConsentFlag: true,
             emailConsentFlag: true,
             phoneConsentFlag: true,
@@ -140,13 +116,12 @@ const Home = ({configData, onSetOpenSnackbar}) => {
         <>
             {redirect ? <Redirect to={{pathname: "/success", state: {customerRegistration}}}/> : null}
             <SearchInput onHandleCiid={handleCiid}
-                         onSelectCustomer={selectCustomerByCiid}
                          ciid={ciid}/>
-            <CustomerForm customerData={customerData}
-                          configData={configData}
-                          onSelectCustomer={selectCustomerByCiid}
-                          onClearForm={clearForm}
-                          onNewRegistration={newRegistration}/>
+            <CustomerForm configData={configData}
+                          ciid={ciid}
+                          onClearSearchInput={clearSearchInput}
+                          onNewRegistration={newRegistration}
+                          onSetOpenSnackbar={onSetOpenSnackbar}/>
             <EnrollModal openEnrollModal={openEnrollModal}
                          configData={configData}
                          onHandleCloseEnrollModal={handleCloseEnrollModal}/>

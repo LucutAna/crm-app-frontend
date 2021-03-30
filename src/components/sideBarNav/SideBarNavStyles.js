@@ -25,8 +25,26 @@ const SideBarNavStyles = makeStyles((theme) => ({
         overflowX: 'hidden',
         width: theme.spacing(7) + 1,
         [theme.breakpoints.up('sm')]: {
-            width: theme.spacing(9) + 1,
+            width: theme.spacing(7) + 1,
         }
+    },
+    toolbar: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        padding: theme.spacing(0, 1),
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+    },
+    listItemIcon: {
+        textDecoration: 'none',
+        '&.active': {
+            color: 'red',
+            fontWeight: 'bold',
+        }
+    },
+    svgIcon: {
+       fill: 'red'
     }
 }));
 

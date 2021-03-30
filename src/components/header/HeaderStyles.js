@@ -23,6 +23,7 @@ const HeaderStyles = makeStyles((theme) => ({
     },
     menuButton: {
         marginRight: 36,
+        marginLeft: -22,
     },
     hide: {
         display: 'none',

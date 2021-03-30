@@ -21,7 +21,6 @@ import SideBarNavStyles from './SideBarNavStyles'
 const SideBarNav = ({open, onHandleDrawerClose}) => {
     const classes = SideBarNavStyles();
     const theme = useTheme();
-
     return (
         <Drawer
             variant="permanent"
@@ -36,7 +35,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                 }),
             }}
             >
-            <div className={classes.drawerHeader}>
+            <div className={classes.toolbar}>
                 <IconButton onClick={onHandleDrawerClose}>
                     {theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                 </IconButton>
@@ -44,7 +43,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
             <Divider/>
             <MenuList>
                 <MenuItem>
-                    <NavLink to='/crm'>
+                    <NavLink className={classes.listItemIcon} to='/crm'>
                         <ListItemIcon>
                             <HomeIcon fontSize="small"/>
                         </ListItemIcon>
@@ -52,7 +51,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                     </NavLink>
                 </MenuItem>
                 <MenuItem>
-                    <NavLink to='/dashboard'>
+                    <NavLink className={classes.listItemIcon} to='/dashboard'>
                         <ListItemIcon>
                             <DashboardIcon fontSize="small"/>
                         </ListItemIcon>
@@ -60,7 +59,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                     </NavLink>
                 </MenuItem>
                 <MenuItem>
-                    <NavLink to='/order-history'>
+                    <NavLink className={classes.listItemIcon} to='/order-history'>
                         <ListItemIcon>
                             <ReceiptIcon fontSize="small"/>
                         </ListItemIcon>
@@ -68,7 +67,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                     </NavLink>
                 </MenuItem>
                 <MenuItem>
-                    <NavLink to='/coupons'>
+                    <NavLink className={classes.listItemIcon} to='/coupons'>
                         <ListItemIcon>
                             <CreditCardIcon fontSize="small"/>
                         </ListItemIcon>
@@ -76,7 +75,6 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                     </NavLink>
                 </MenuItem>
             </MenuList>
-            <Divider/>
         </Drawer>
     )
 }
