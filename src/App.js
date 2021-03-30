@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import {BrowserRouter as Router, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {makeStyles} from "@material-ui/core/styles";
-import {createMuiTheme} from '@material-ui/core/styles';
 import {ThemeProvider} from '@material-ui/styles';
 
-import './App.css';
+
+import AppStyles from './AppStyles';
+import ThemeCRMApp from './ThemeCRMApp';
 import Home from "./containers/home/Home";
 import Dashboard from "./containers/dashboard/Dashboard";
 import OrderHistory from "./containers/order-history/OrderHistory";
@@ -19,51 +19,11 @@ import SnackbarComponent from "./components/snackbar/SnackbarComponent";
 
 function App() {
     const drawerWidth = 240;
-    const theme = createMuiTheme({
-        palette: {
-            primary: {
-                main: '#DF0000',
-            },
-            secondary: {
-                main: '#333',
-            },
-        },
-    });
-
-    const useStyles = makeStyles((theme) => ({
-        root: {
-            display: 'flex',
-        },
-        drawerHeader: {
-            display: 'flex',
-            alignItems: 'center',
-            padding: theme.spacing(0, 1),
-            // necessary for content to be below app bar
-            ...theme.mixins.toolbar,
-            justifyContent: 'flex-end',
-        },
-        content: {
-            flexGrow: 1,
-            padding: theme.spacing(10),
-            transition: theme.transitions.create('margin', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-            marginLeft: -drawerWidth,
-        },
-        contentShift: {
-            transition: theme.transitions.create('margin', {
-                easing: theme.transitions.easing.easeOut,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-            marginLeft: 0,
-        },
-    }));
+    const classes = AppStyles();
     const [open, setOpen] = useState(false);
     const [configData, setConfigData] = useState([]);
     const [outletID, setOutletID] = useState('');
-    const [openSnackbar, setOpenSnackbar] = useState({open:false, message: '', code: ''});
-    const classes = useStyles();
+    const [openSnackbar, setOpenSnackbar] = useState({open: false, message: '', code: ''});
 
     useEffect(() => {
         const getStoreConfig = async () => {
@@ -95,7 +55,7 @@ function App() {
     };
 
     return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={ThemeCRMApp}>
             <GlobalProvider>
                 <Router>
                     <div className={classes.root}>

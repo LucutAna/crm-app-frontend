@@ -19,6 +19,13 @@ const SideBarNavStyles = makeStyles((theme) => ({
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
         justifyContent: 'flex-end',
+    },
+    listItemIcon: {
+        textDecoration: 'none',
+        '&.active': {
+          color: 'red',
+          fontWeight: 'bold'
+        }
     }
 }));
 
