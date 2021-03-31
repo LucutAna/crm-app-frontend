@@ -26,6 +26,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
     }
 
     const newRegistration = (customer) => {
+        console.log('customer', customer);
         setCustomerRegistrationData(customer)
         if (!!ciid) {
             setOpenPrintModal(true);

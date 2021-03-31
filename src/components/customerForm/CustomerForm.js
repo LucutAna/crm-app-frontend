@@ -18,6 +18,7 @@ import Button from "@material-ui/core/Button";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import CustomerFormStyles from './CustomerFormStyles'
 import CustomerService from "../../shared/services/CustomerService";
+import {isEmpty} from 'lodash';
 
 const validationSchema = yup.object({
     firstName: yup
@@ -42,6 +43,7 @@ const validationSchema = yup.object({
         .required('City is required'),
     mobile: yup
         .number('Enter your phone')
+        .nullable()
         .min(5, 'Phone should be of minimum 5 digits length'),
     email: yup
         .string('Enter your email')
@@ -76,6 +78,17 @@ const getAge = value => {
     return age;
 };
 
+const diasbleUserInput = (form) => {
+    if (isEmpty(form.partyUid)) {
+        return false;
+    } else if (form.firstName && form.lastName && form.birthDate) {
+        // this flag is used by backend to be aware that it is an existing customer
+        form.updateCustomerFlag = true;
+        return true;
+    }
+    return false;
+};
+
 //TODO for CH
 // const getMinAge = country => {
 //     if (country === "CH") return 16;
@@ -95,7 +108,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
         email: '',
         salutation: '',
         country: Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '',
-        birthDate: new Date()
+        birthDate: new Date(),
+        partyUid: null,
+        partyId: null,
+        updateCustomerFlag: false
     };
 
     const search = async (customerForm) => {
@@ -111,7 +127,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 const customerSelected = await CustomerService.selectCustomer(data);
                 const customer = removeEmpty(customerSelected.data)
                 Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
-                ;
             } catch (error) {
                 console.log(error)
             }
@@ -129,8 +144,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     }
 
     const onSubmit = (values, actions) => {
-        console.log(values);
-        console.log(1111, actions);
         onNewRegistration({...values})
     };
 
@@ -153,8 +166,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         value={customerForm.values.salutation}
                                         onChange={customerForm.handleChange}
                             >
-                                <FormControlLabel value="Mrs." control={<Radio/>} label="Mrs."/>
-                                <FormControlLabel value="Mr." control={<Radio/>} label="Mr."/>
+                                <FormControlLabel value="Mrs." disabled={diasbleUserInput(customerForm.values)}
+                                                  control={<Radio/>} label="Mrs."/>
+                                <FormControlLabel value="Mr." disabled={diasbleUserInput(customerForm.values)}
+                                                  control={<Radio/>} label="Mr."/>
                             </RadioGroup>
                             <Grid container spacing={4}>
                                 <Grid item xs={12} sm={6}>
@@ -164,6 +179,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         id="firstName"
                                         name="firstName"
                                         label="First name*"
+                                        disabled={diasbleUserInput(customerForm.values)}
                                         value={customerForm.values.firstName}
                                         onChange={customerForm.handleChange}
                                         error={customerForm.touched.firstName && Boolean(customerForm.errors.firstName)}
@@ -192,6 +208,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         id="lastName"
                                         name="lastName"
                                         label="Last name*"
+                                        disabled={diasbleUserInput(customerForm.values)}
                                         value={customerForm.values.lastName}
                                         onChange={customerForm.handleChange}
                                         error={customerForm.touched.lastName && Boolean(customerForm.errors.lastName)}
@@ -221,6 +238,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             id="date-picker-dialog"
                                             label="Birthday*"
                                             format="dd/MM/yyyy"
+                                            disabled={diasbleUserInput(customerForm.values)}
                                             value={customerForm.values.birthDate}
                                             onChange={value => customerForm.setFieldValue("birthDate", value)}
                                             KeyboardButtonProps={{
@@ -253,6 +271,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                         id="email"
                                         name="email"
                                         label="Email*"
+                                        disabled={diasbleUserInput(customerForm.values)}
                                         value={customerForm.values.email}
                                         onChange={customerForm.handleChange}
                                         error={customerForm.touched.email && Boolean(customerForm.errors.email)}
@@ -324,7 +343,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                     </Grid>
                 </Form>
             )}
-
         </Formik>
 
     );
