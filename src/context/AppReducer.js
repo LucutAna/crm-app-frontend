@@ -1,9 +1,14 @@
 const AppReducer = (state, action) => {
     switch (action.type) {
-        case 'ADD_CONFIG':
+        case 'ADD_CUSTOMER':
             return {
                 ...state,
-                configData: {...action.payload, ...state.configData}
+                customerData: {...action.payload, ...state.customerData}
+            }
+        case 'DELETE_CUSTOMER':
+            return {
+                ...state,
+                customerData: {}
             }
         default:
             return state;

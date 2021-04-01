@@ -1,4 +1,5 @@
 import axiosInstance from '../../axiosInstance';
+import moment from 'moment';
 
 const selectCustomer = (data) => {
     return axiosInstance.post(`/crm-customer/selectCustomer/`, data);
@@ -9,6 +10,10 @@ const generateCiid = (data) => {
 }
 const upsertCustomer = (data) => {
     return axiosInstance.post(`/crm-customer/upsertCustomer/`, data);
+}
+
+const validateCardNumber = (data) => {
+    return axiosInstance.post(`/crm-customer/cards/validate`, data)
 }
 
 const isClubCardNumberFormatValid = (clubCardNumber, salesDivision, subsidiary) => {
@@ -41,15 +46,56 @@ const isClubCardNumberFormatValid = (clubCardNumber, salesDivision, subsidiary) 
     return 9 - ((even * 3 + odd) % 10) === checksum;
 }
 
-const validateCardNumber = (data) => {
-  return axiosInstance.post(`/crm-customer/cards/validate`, data)
+const createCustomerPrintData = (form, configData) => {
+    const customerEnrollData = {
+        cardCiid: !!form.cardCiid ? form.cardCiid[0] : '',
+        subsidiary: configData.subsidiary,
+        crefid: null,
+        birthDate: form.birthDate,
+        email: form.email,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        memberCardFlag: true,
+        clubMemberActiveFlag: true,
+        customerConsentFlag: form.updateCustomerFlag,
+        outletId: configData.storeNumber,
+        preferredOutlet: form.preferredOutlet || configData.storeNumber,
+        salesDivision: configData.salesDivision,
+        salutation: form.salutation,
+        street1: form.street1,
+        city: form.city,
+        zipcode: form.zipcode,
+        mobile: form.mobile,
+        country: form.country,
+        language: configData.locales[0],
+        generateExternalKey: true,
+        legalAgreementVersion: "1.2",
+        systemName: "KONYWWS",
+        updateCustomerFlag: form.updateCustomerFlag,
+        partyId: !!form.partyId ? form.partyId : null,
+        partyUid: !!form.partyUid ? form.partyUid : null,
+        loyaltyActiveFlag: true,
+        legalAgreements: [],
+        customerCards: [],
+        activationDate: moment().format('YYYY-MM-DDThh:mm:ss'),
+        clubDateOfEntry: form.clubDateOfEntry || moment().format('YYYY-MM-DDThh:mm:ss'),
+        mailConsentFlag: true,
+        emailConsentFlag: true,
+        phoneConsentFlag: true,
+        smsConsentFlag: true,
+        emailAddressAdded: false,
+        phoneNumberAdded: false
+    }
+    return customerEnrollData;
 }
+
 const CustomerService = {
     selectCustomer,
     generateCiid,
     upsertCustomer,
     isClubCardNumberFormatValid,
-    validateCardNumber
+    validateCardNumber,
+    createCustomerPrintData
 };
 
 export default CustomerService;

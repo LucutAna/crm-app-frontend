@@ -18,7 +18,9 @@ import Button from "@material-ui/core/Button";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import CustomerFormStyles from './CustomerFormStyles'
 import CustomerService from "../../shared/services/CustomerService";
-import {isEmpty} from 'lodash';
+import {isEmpty, pickBy} from 'lodash';
+import {useContext} from 'react';
+import {GlobalContext} from '../../context/GlobalState';
 
 const validationSchema = yup.object({
     firstName: yup
@@ -97,6 +99,9 @@ const diasbleUserInput = (form) => {
 
 const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
     const classes = CustomerFormStyles();
+    const {addCustomer} = useContext(GlobalContext);
+    const {customerData} = useContext(GlobalContext);
+    const {deleteCustomerData} = useContext(GlobalContext);
 
     const formFields = {
         firstName: '',
@@ -125,7 +130,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                     subsidiary: configData.subsidiary
                 };
                 const customerSelected = await CustomerService.selectCustomer(data);
-                const customer = removeEmpty(customerSelected.data)
+                const customer = pickBy(customerSelected.data);
+                addCustomer({...customerSelected.data});
+                customerForm.resetForm(formFields);
+                //fil customer for with data from CCR
                 Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
             } catch (error) {
                 console.log(error)
@@ -139,19 +147,23 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     }
 
     const clearFormFields = (customerForm) => {
+        deleteCustomerData();
         onClearSearchInput();
         customerForm.resetForm(formFields);
     }
 
     const onSubmit = (values, actions) => {
-        onNewRegistration({...values})
-    };
 
-    const removeEmpty = (data) => {
-        Object.entries(data).forEach(([key, val]) =>
-            (val && typeof val === 'object') && removeEmpty(val) || (val === null || val === "") && delete data[key]
-        );
-        return data;
+        const enrollCustomer = !values.updateCustomerFlag ? CustomerService.createCustomerPrintData(values, configData) : CustomerService.createCustomerPrintData({
+            ...customerData,
+            street1: values.street1,
+            zipcode: values.zipcode,
+            city: values.city,
+            mobile: values.mobile,
+            country: values.country,
+            updateCustomerFlag: values.updateCustomerFlag
+        }, configData);
+        onNewRegistration({...enrollCustomer})
     };
 
     return (
@@ -344,7 +356,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 </Form>
             )}
         </Formik>
-
     );
 };
 
