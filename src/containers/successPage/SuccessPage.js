@@ -3,6 +3,8 @@ import {makeStyles} from '@material-ui/core/styles';
 import SuccessClub from './../../assets/images/club.png';
 
 const SuccessPage = (customer) => {
+    const updateFlag = !customer.location.state.customerRegistrationData.updateCustomerFlag;
+    const ciid = customer.location.state.customerRegistrationData.cardCiid;
     const useStyles = makeStyles((theme) => ({
         root: {
             display: 'flex',
@@ -11,7 +13,8 @@ const SuccessPage = (customer) => {
             paddingTop: theme.spacing(6)
         },
         wrapperCardLogo: {
-            display: 'block'
+            display: 'block',
+            paddingRight: '80px'
         },
         ciidColor: {
             color: '#DF0000'
@@ -20,11 +23,11 @@ const SuccessPage = (customer) => {
     const classes = useStyles();
     return (
         <div className={classes.root}>
-            <h3>Club Card registration successful </h3>
+            {updateFlag ? <h3>Club Card registration successful</h3> : <h3>Club Card was successfully updated</h3>}
             <div className={classes.wrapperCardLogo}>
                 <img className={classes.log} src={SuccessClub} alt="success"/>
             </div>
-            <h3>The Club number is: <span className={classes.ciidColor}> {!!customer.location.state ? customer.location.state.customerRegistration.cardCiid : ''} </span></h3>
+            {updateFlag ? <h3 className={classes.ciidColor}>{ciid}</h3> : ''}
         </div>
     )
 }

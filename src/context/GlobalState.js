@@ -2,7 +2,7 @@ import React, {createContext, useReducer} from 'react';
 import AppReducer from './AppReducer';
 
 const initialState = {
-    configData: {}
+    customerData: {}
 }
 
 export const GlobalContext = createContext(initialState);
@@ -10,16 +10,23 @@ export const GlobalContext = createContext(initialState);
 export const GlobalProvider = ({children}) => {
     const [state, dispatch] = useReducer(AppReducer, initialState);
 
-    function addConfig(configData) {
+    function addCustomer(customerData) {
         dispatch({
-            type: 'ADD_CONFIG',
-            payload: configData
+            type: 'ADD_CUSTOMER',
+            payload: customerData
         });
     }
 
+    function deleteCustomerData(customerData) {
+        dispatch({
+            type: 'DELETE_CUSTOMER',
+            payload: customerData
+        });
+    }
     return (<GlobalContext.Provider value={{
-        configData: state.configData,
-        addConfig
+        customerData: state.customerData,
+        addCustomer,
+        deleteCustomerData
     }}>
         {children}
     </GlobalContext.Provider>);
