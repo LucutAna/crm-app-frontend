@@ -43,7 +43,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
                     subsidiary: configData.subsidiary
                 }
                 const card = await CustomerService.generateCiid(data);
-                setCustomerRegistrationData({...customerRegistrationData, cardCiid: card.data.ciid})
+                setCustomerRegistrationData({...customerRegistrationData, cardCiid: card.data.ciid});
             } catch (error) {
                 console.log(error);
             }
