@@ -11,7 +11,7 @@ import {withStyles} from '@material-ui/core/styles';
 import PrintModalStyle from './PrintModalStyle'
 
 
-const PrintModal = ({openPrintModal, onHandleClosePrintModal}) => {
+const PrintModal = ({openPrintModal, onHandleClosePrintModal, pdfUrl}) => {
 
     const styles = (theme) => ({
         root: {
@@ -26,7 +26,6 @@ const PrintModal = ({openPrintModal, onHandleClosePrintModal}) => {
             color: theme.palette.grey[500],
         }
     });
-
     const DialogTitle = withStyles(styles)((props) => {
         const {children, classes, onClose, ...other} = props;
         return (
@@ -40,14 +39,13 @@ const PrintModal = ({openPrintModal, onHandleClosePrintModal}) => {
             </MuiDialogTitle>
         );
     });
-
     const DialogContent = withStyles((theme) => ({
         root: {
             padding: theme.spacing(4),
         },
     }))(MuiDialogContent);
-
     const classes = PrintModalStyle();
+    console.log(pdfUrl);
     return (
         <div>
             <Dialog onClose={onHandleClosePrintModal}

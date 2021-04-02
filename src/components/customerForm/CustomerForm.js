@@ -154,7 +154,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
 
     const onSubmit = (values, actions) => {
 
-        const enrollCustomer = !values.updateCustomerFlag ? CustomerService.createCustomerPrintData(values, configData) : CustomerService.createCustomerPrintData({
+        const enrollCustomer = !values.updateCustomerFlag ? CustomerService.createCustomerUpsertData(values, configData) : CustomerService.createCustomerUpsertData({
             ...customerData,
             street1: values.street1,
             zipcode: values.zipcode,

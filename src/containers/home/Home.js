@@ -15,6 +15,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
     const [openPrintModal, setOpenPrintModal] = useState(false);
     const [redirect, setRedirect] = useState(null);
     const {deleteCustomerData} = useContext(GlobalContext);
+    const [pdfUrl, setPdfUrl] = useState('');
 
 
     const handleCiid = (searchCiid) => {
@@ -31,8 +32,13 @@ const Home = ({configData, onSetOpenSnackbar}) => {
     }
 
     const handleCloseEnrollModal = async (event, data, eKit) => {
+
+        
         if (!!data && data === "E-KIT_CARD") {
             setCustomerRegistrationData({...customerRegistrationData, cardCiid: eKit})
+            const printData = CustomerService.createCustomerPrintData(customerRegistrationData, configData, eKit);
+            const url = CustomerService.getRegistrationPdfUrlInternal(printData);
+            setPdfUrl(url);
             setOpenPrintModal(true);
         }
         if (!!data && data === "GENERATE_CIID") {
@@ -80,7 +86,8 @@ const Home = ({configData, onSetOpenSnackbar}) => {
                          configData={configData}
                          onHandleCloseEnrollModal={handleCloseEnrollModal}/>
             <PrintModal openPrintModal={openPrintModal}
-                        onHandleClosePrintModal={handleClosePrintModal}/>
+                        onHandleClosePrintModal={handleClosePrintModal}
+                        pdfUrl={pdfUrl}/>
         </>
     )
 }
