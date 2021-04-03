@@ -18,7 +18,7 @@ const validateCardNumber = (data) => {
 }
 
 const getRegistrationPdfUrlInternal = (customerData) => {
-    let url = `/crm-sales/getRegistrationPDF/`;
+    let url = `https://crm-app.dev.crm.d-p.io/crm-sales/getRegistrationPDF/`;
     url = url + '?' + Object.keys(customerData).map(function (key) {
         return key + '=' + encodeURIComponent(customerData[key]);
     }).join('&');
