@@ -45,7 +45,6 @@ const PrintModal = ({openPrintModal, onHandleClosePrintModal, pdfUrl}) => {
         },
     }))(MuiDialogContent);
     const classes = PrintModalStyle();
-    console.log(pdfUrl);
     return (
         <div>
             <Dialog onClose={onHandleClosePrintModal}
