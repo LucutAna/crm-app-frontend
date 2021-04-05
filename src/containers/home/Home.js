@@ -8,7 +8,7 @@ import CustomerService from "../../shared/services/CustomerService";
 import PrintModal from "../../components/modals/printModal/PrintModal";
 import {GlobalContext} from '../../context/GlobalState';
 
-const Home = ({configData, onSetOpenSnackbar}) => {
+const Home = ({configData, onSetOpenSnackbar, setOpenSpinner}) => {
     const [ciid, setCiid] = useState('');
     const [customerRegistrationData, setCustomerRegistrationData] = useState('');
     const [openEnrollModal, setOpenEnrollModal] = useState(false);
@@ -73,6 +73,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
                          ciid={ciid}/>
             <CustomerForm configData={configData}
                           ciid={ciid}
+                          setOpenSpinner={setOpenSpinner}
                           onClearSearchInput={clearSearchInput}
                           onNewRegistration={newRegistration}
                           onSetOpenSnackbar={onSetOpenSnackbar}/>

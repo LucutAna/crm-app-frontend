@@ -97,7 +97,7 @@ const diasbleUserInput = (form) => {
 //     return 18;
 //};
 
-const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
+const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar, setOpenSpinner}) => {
     const classes = CustomerFormStyles();
     const {addCustomer} = useContext(GlobalContext);
     const {customerData} = useContext(GlobalContext);
@@ -120,6 +120,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     };
 
     const search = async (customerForm) => {
+        //setOpenSpinner(true);
         if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
             try {
                 let data = {
@@ -135,6 +136,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 customerForm.resetForm(formFields);
                 //fil customer for with data from CCR
                 Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
+              //  setOpenSpinner(false);
             } catch (error) {
                 console.log(error)
             }

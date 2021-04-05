@@ -2,6 +2,8 @@ import clsx from "clsx";
 import {BrowserRouter as Router, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {ThemeProvider} from '@material-ui/styles';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 import AppStyles from './AppStyles';
@@ -24,15 +26,19 @@ function App() {
     const [configData, setConfigData] = useState([]);
     const [outletID, setOutletID] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState({open: false, message: '', code: ''});
+    const [openSpinner, setOpenSpinner] = useState(false);
 
     useEffect(() => {
-        const getStoreConfig = async () => {
-            const storeConfig = await ConfigService.getStore(getOutletId());
-            const dataConfig = await ConfigService.getConfigData({...storeConfig.data});
-            setConfigData({...dataConfig.data, ...storeConfig.data});
-        };
-        getStoreConfig();
-
+        try {
+            const getStoreConfig = async () => {
+                const storeConfig = await ConfigService.getStore(getOutletId());
+                const dataConfig = await ConfigService.getConfigData({...storeConfig.data});
+                setConfigData({...dataConfig.data, ...storeConfig.data});
+            };
+            getStoreConfig();
+        } catch (error) {
+            console.log(error);
+        }
     }, []);
 
     const getOutletId = () => {
@@ -73,6 +79,7 @@ function App() {
                             <div className={classes.drawerHeader}/>
                             <Route path={['/', '/crm', `/crm/?outletId=${outletID}`]} exact
                                    component={() => <Home configData={configData}
+                                                          setOpenSpinner={setOpenSpinner}
                                                           onSetOpenSnackbar={setOpenSnackbar}/>}/>
                             <Route path='/dashboard' component={Dashboard}/>
                             <Route path='/order-history' component={OrderHistory}/>
@@ -80,6 +87,9 @@ function App() {
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                         </main>
                         <SnackbarComponent openSnackbar={openSnackbar}/>
+                        <Backdrop className={classes.backdrop} open={openSpinner}>
+                            <CircularProgress color="inherit"/>
+                        </Backdrop>
                     </div>
                 </Router>
             </GlobalProvider>
