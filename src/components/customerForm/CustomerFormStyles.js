@@ -34,7 +34,10 @@ const CustomerFormStyles = makeStyles((theme) => ({
     },
     buttons: {
         marginTop: 20
-    }
+    },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+    },
 }));
 
 export default CustomerFormStyles; 
