@@ -19,7 +19,10 @@ import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import CustomerFormStyles from './CustomerFormStyles'
 import CustomerService from "../../shared/services/CustomerService";
 import {isEmpty, pickBy} from 'lodash';
-import {useContext} from 'react';
+import {useContext, useState} from 'react';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import {GlobalContext} from '../../context/GlobalState';
 
 const validationSchema = yup.object({
@@ -97,11 +100,12 @@ const diasbleUserInput = (form) => {
 //     return 18;
 //};
 
-const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar, setOpenSpinner}) => {
+const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
     const classes = CustomerFormStyles();
     const {addCustomer} = useContext(GlobalContext);
     const {customerData} = useContext(GlobalContext);
     const {deleteCustomerData} = useContext(GlobalContext);
+    const [openSpinner, setOpenSpinner] = useState(false);
 
     const formFields = {
         firstName: '',
@@ -120,7 +124,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     };
 
     const search = async (customerForm) => {
-        //setOpenSpinner(true);
+        setOpenSpinner(true);
         if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
             try {
                 let data = {
@@ -136,14 +140,15 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 customerForm.resetForm(formFields);
                 //fil customer for with data from CCR
                 Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
-              //  setOpenSpinner(false);
+                setOpenSpinner(false);
             } catch (error) {
                 console.log(error)
             }
         } else {
             let message = 'For the search, please use a valid Club Card Number';
             let open = true;
-            let code = 'warning'
+            let code = 'warning';
+            setOpenSpinner(false);
             onSetOpenSnackbar({open, message, code});
         }
     }
@@ -169,195 +174,201 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     };
 
     return (
-        <Formik initialValues={formFields} validationSchema={validationSchema} onSubmit={onSubmit}>
-            {customerForm => (
-                <Form>
-                    <Grid container spacing={8}>
-                        <Grid item xs={12} sm={8}>
-                            <RadioGroup className={classes.gender}
-                                        aria-label="gender"
-                                        name="salutation"
-                                        value={customerForm.values.salutation}
-                                        onChange={customerForm.handleChange}
-                            >
-                                <FormControlLabel value="Mrs." disabled={diasbleUserInput(customerForm.values)}
-                                                  control={<Radio/>} label="Mrs."/>
-                                <FormControlLabel value="Mr." disabled={diasbleUserInput(customerForm.values)}
-                                                  control={<Radio/>} label="Mr."/>
-                            </RadioGroup>
-                            <Grid container spacing={4}>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="firstName"
-                                        name="firstName"
-                                        label="First name*"
-                                        disabled={diasbleUserInput(customerForm.values)}
-                                        value={customerForm.values.firstName}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.firstName && Boolean(customerForm.errors.firstName)}
-                                        helperText={customerForm.touched.firstName && customerForm.errors.firstName}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="street1"
-                                        name="street1"
-                                        label="Street*"
-                                        value={customerForm.values.street1}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
-                                        helperText={customerForm.touched.street1 && customerForm.errors.street1}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={4}>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="lastName"
-                                        name="lastName"
-                                        label="Last name*"
-                                        disabled={diasbleUserInput(customerForm.values)}
-                                        value={customerForm.values.lastName}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.lastName && Boolean(customerForm.errors.lastName)}
-                                        helperText={customerForm.touched.lastName && customerForm.errors.lastName}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="zipcode"
-                                        name="zipcode"
-                                        label="Zip Code*"
-                                        value={customerForm.values.zipcode}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.zipcode && Boolean(customerForm.errors.zipcode)}
-                                        helperText={customerForm.touched.zipcode && customerForm.errors.zipcode}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={4}>
-                                <Grid item xs={12} sm={6}>
-                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                        <KeyboardDatePicker
-                                            className={classes.birthDate}
-                                            margin="normal"
-                                            id="date-picker-dialog"
-                                            label="Birthday*"
-                                            format="dd/MM/yyyy"
+        <>
+            <Formik initialValues={formFields} validationSchema={validationSchema} onSubmit={onSubmit}>
+                {customerForm => (
+                    <Form>
+                        <Grid container spacing={8}>
+                            <Grid item xs={12} sm={8}>
+                                <RadioGroup className={classes.gender}
+                                            aria-label="gender"
+                                            name="salutation"
+                                            value={customerForm.values.salutation}
+                                            onChange={customerForm.handleChange}
+                                >
+                                    <FormControlLabel value="Mrs." disabled={diasbleUserInput(customerForm.values)}
+                                                      control={<Radio/>} label="Mrs."/>
+                                    <FormControlLabel value="Mr." disabled={diasbleUserInput(customerForm.values)}
+                                                      control={<Radio/>} label="Mr."/>
+                                </RadioGroup>
+                                <Grid container spacing={4}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            className={classes.inputText}
+                                            fullWidth
+                                            id="firstName"
+                                            name="firstName"
+                                            label="First name*"
                                             disabled={diasbleUserInput(customerForm.values)}
-                                            value={customerForm.values.birthDate}
-                                            onChange={value => customerForm.setFieldValue("birthDate", value)}
-                                            KeyboardButtonProps={{
-                                                'aria-label': 'change date',
-                                            }}
-                                            error={customerForm.touched.birthDate && Boolean(customerForm.errors.birthDate)}
-                                            helperText={customerForm.touched.birthDate && customerForm.errors.birthDate}
+                                            value={customerForm.values.firstName}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.firstName && Boolean(customerForm.errors.firstName)}
+                                            helperText={customerForm.touched.firstName && customerForm.errors.firstName}
                                         />
-                                    </MuiPickersUtilsProvider>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            className={classes.inputText}
+                                            fullWidth
+                                            id="street1"
+                                            name="street1"
+                                            label="Street*"
+                                            value={customerForm.values.street1}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
+                                            helperText={customerForm.touched.street1 && customerForm.errors.street1}
+                                        />
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="city"
-                                        name="city"
-                                        label="City*"
-                                        value={customerForm.values.city}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.city && Boolean(customerForm.errors.city)}
-                                        helperText={customerForm.touched.city && customerForm.errors.city}
-                                    />
+                                <Grid container spacing={4}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            className={classes.inputText}
+                                            fullWidth
+                                            id="lastName"
+                                            name="lastName"
+                                            label="Last name*"
+                                            disabled={diasbleUserInput(customerForm.values)}
+                                            value={customerForm.values.lastName}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.lastName && Boolean(customerForm.errors.lastName)}
+                                            helperText={customerForm.touched.lastName && customerForm.errors.lastName}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            className={classes.inputText}
+                                            fullWidth
+                                            id="zipcode"
+                                            name="zipcode"
+                                            label="Zip Code*"
+                                            value={customerForm.values.zipcode}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.zipcode && Boolean(customerForm.errors.zipcode)}
+                                            helperText={customerForm.touched.zipcode && customerForm.errors.zipcode}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container spacing={4}>
+                                    <Grid item xs={12} sm={6}>
+                                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                            <KeyboardDatePicker
+                                                className={classes.birthDate}
+                                                margin="normal"
+                                                id="date-picker-dialog"
+                                                label="Birthday*"
+                                                format="dd/MM/yyyy"
+                                                disabled={diasbleUserInput(customerForm.values)}
+                                                value={customerForm.values.birthDate}
+                                                onChange={value => customerForm.setFieldValue("birthDate", value)}
+                                                KeyboardButtonProps={{
+                                                    'aria-label': 'change date',
+                                                }}
+                                                error={customerForm.touched.birthDate && Boolean(customerForm.errors.birthDate)}
+                                                helperText={customerForm.touched.birthDate && customerForm.errors.birthDate}
+                                            />
+                                        </MuiPickersUtilsProvider>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            className={classes.inputText}
+                                            fullWidth
+                                            id="city"
+                                            name="city"
+                                            label="City*"
+                                            value={customerForm.values.city}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.city && Boolean(customerForm.errors.city)}
+                                            helperText={customerForm.touched.city && customerForm.errors.city}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container spacing={4}>
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            className={classes.inputText}
+                                            fullWidth
+                                            id="email"
+                                            name="email"
+                                            label="Email*"
+                                            disabled={diasbleUserInput(customerForm.values)}
+                                            value={customerForm.values.email}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.email && Boolean(customerForm.errors.email)}
+                                            helperText={customerForm.touched.email && customerForm.errors.email}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            className={classes.inputText}
+                                            fullWidth
+                                            id="mobile"
+                                            name="mobile"
+                                            label="Phone number"
+                                            value={customerForm.values.mobile}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.mobile && Boolean(customerForm.errors.mobile)}
+                                            helperText={customerForm.touched.mobile && customerForm.errors.mobile}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            className={classes.country}
+                                            fullWidth
+                                            id="standard-select-currency"
+                                            name="country"
+                                            select
+                                            label="Country*"
+                                            value={customerForm.values.country}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.country && Boolean(customerForm.errors.country)}
+                                            helperText={customerForm.touched.country && customerForm.errors.country}
+                                        >
+                                            <children/>
+                                            {Object.entries(configData).length !== 0 &&
+                                            configData.allowedCountries.map((option, index) => (
+                                                <MenuItem key={index} value={option}>
+                                                    {option}
+                                                </MenuItem>
+                                            ))
+                                            }
+                                        </TextField>
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                            <Grid container spacing={4}>
-                                <Grid item xs={12} sm={4}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="email"
-                                        name="email"
-                                        label="Email*"
-                                        disabled={diasbleUserInput(customerForm.values)}
-                                        value={customerForm.values.email}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.email && Boolean(customerForm.errors.email)}
-                                        helperText={customerForm.touched.email && customerForm.errors.email}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={4}>
-                                    <TextField
-                                        className={classes.inputText}
-                                        fullWidth
-                                        id="mobile"
-                                        name="mobile"
-                                        label="Phone number"
-                                        value={customerForm.values.mobile}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.mobile && Boolean(customerForm.errors.mobile)}
-                                        helperText={customerForm.touched.mobile && customerForm.errors.mobile}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={4}>
-                                    <TextField
-                                        className={classes.country}
-                                        fullWidth
-                                        id="standard-select-currency"
-                                        name="country"
-                                        select
-                                        label="Country*"
-                                        value={customerForm.values.country}
-                                        onChange={customerForm.handleChange}
-                                        error={customerForm.touched.country && Boolean(customerForm.errors.country)}
-                                        helperText={customerForm.touched.country && customerForm.errors.country}
-                                    >
-                                        {Object.entries(configData).length !== 0 &&
-                                        configData.allowedCountries.map((option, index) => (
-                                            <MenuItem key={index} value={option}>
-                                                {option}
-                                            </MenuItem>
-                                        ))
-                                        }
-                                    </TextField>
-                                </Grid>
+                            <Grid item xs={12} sm={4} className={classes.wrapperButtons}>
+                                <Paper className={classes.paper}>
+                                    <Button size="large"
+                                            variant="contained"
+                                            color="primary"
+                                            type="submit">
+                                        <CreditCardIcon fontSize="small"/>
+                                        New Club Registration
+                                    </Button>
+                                    <Button size="large"
+                                            className={classes.buttons}
+                                            variant="contained"
+                                            color="secondary"
+                                            onClick={() => search(customerForm)}>
+                                        <SearchIcon fontSize="small"/>
+                                        Search
+                                    </Button>
+                                    <Button variant="contained" size="large"
+                                            className={classes.buttons}
+                                            onClick={() => clearFormFields(customerForm)}>
+                                        <DeleteForeverIcon fontSize="small"/>
+                                        Clear
+                                    </Button>
+                                </Paper>
                             </Grid>
                         </Grid>
-                        <Grid item xs={12} sm={4} className={classes.wrapperButtons}>
-                            <Paper className={classes.paper}>
-                                <Button size="large"
-                                        variant="contained"
-                                        color="primary"
-                                        type="submit">
-                                    <CreditCardIcon fontSize="small"/>
-                                    New Club Registration
-                                </Button>
-                                <Button size="large"
-                                        className={classes.buttons}
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={() => search(customerForm)}>
-                                    <SearchIcon fontSize="small"/>
-                                    Search
-                                </Button>
-                                <Button variant="contained" size="large"
-                                        className={classes.buttons}
-                                        onClick={() => clearFormFields(customerForm)}>
-                                    <DeleteForeverIcon fontSize="small"/>
-                                    Clear
-                                </Button>
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                </Form>
-            )}
-        </Formik>
+                    </Form>
+                )}
+            </Formik>
+            <Backdrop className={classes.backdrop} open={openSpinner}>
+                <CircularProgress size='160px' color="primary" thickness={7}/>
+            </Backdrop>
+        </>
     );
 };
 
