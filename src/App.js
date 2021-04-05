@@ -26,13 +26,16 @@ function App() {
     const [openSnackbar, setOpenSnackbar] = useState({open: false, message: '', code: ''});
 
     useEffect(() => {
-        const getStoreConfig = async () => {
-            const storeConfig = await ConfigService.getStore(getOutletId());
-            const dataConfig = await ConfigService.getConfigData({...storeConfig.data});
-            setConfigData({...dataConfig.data, ...storeConfig.data});
-        };
-        getStoreConfig();
-
+        try {
+            const getStoreConfig = async () => {
+                const storeConfig = await ConfigService.getStore(getOutletId());
+                const dataConfig = await ConfigService.getConfigData({...storeConfig.data});
+                setConfigData({...dataConfig.data, ...storeConfig.data});
+            };
+            getStoreConfig();
+        } catch (error) {
+            console.log(error);
+        }
     }, []);
 
     const getOutletId = () => {
