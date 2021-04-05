@@ -18,7 +18,10 @@ const validateCardNumber = (data) => {
 }
 
 const getRegistrationPdfUrlInternal = (customerData) => {
-    let url = `https://crm-app.dev.crm.d-p.io/crm-sales/getRegistrationPDF/`;
+    const urlProd = 'https://crm-app.prod.crm.d-p.io';
+    const urlDev = 'https://crm-app.dev.crm.d-p.io';
+    const env = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+    let url = env ? `${urlDev}/crm-sales/getRegistrationPDF/` : `${urlProd}/crm-sales/getRegistrationPDF/`;
     url = url + '?' + Object.keys(customerData).map(function (key) {
         return key + '=' + encodeURIComponent(customerData[key]);
     }).join('&');
