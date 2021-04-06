@@ -67,7 +67,7 @@ const createCustomerUpsertData = (form, configData) => {
         lastName: form.lastName,
         memberCardFlag: true,
         clubMemberActiveFlag: true,
-        customerConsentFlag: form.updateCustomerFlag,
+        customerConsentFlag: form.customerConsentFlag,
         outletId: configData.storeNumber,
         preferredOutlet: form.preferredOutlet || configData.storeNumber,
         salesDivision: configData.salesDivision,
@@ -99,7 +99,7 @@ const createCustomerUpsertData = (form, configData) => {
     return customerEnrollData;
 };
 
-const createCustomerPrintData = (customer, configData, cardCiid) => {
+const createCustomerPrintData = (customer, configData, cardCiid, consentFlag) => {
     let storeStreet2 = "";
     let storeTelNumber = "";
     const pdfSettings = configData.pdfSettings;
@@ -130,7 +130,7 @@ const createCustomerPrintData = (customer, configData, cardCiid) => {
     else
         fieldMobile = customer.mobile;
 
-    let emailPermission = false;
+    //let emailPermission = false;
     //TODO for update customer
     // if ($rootScope.form.permissions) {
     //     let permissionsKey = lodash.find(Object.keys($rootScope.form.permissions), (key) => {
@@ -173,7 +173,7 @@ const createCustomerPrintData = (customer, configData, cardCiid) => {
         fieldCardNumber: cardCiid,
         fieldStore: storeValues,
         'marketingContactPermitted.newCustomer': isEmpty(customer.ccrCiid),
-        'marketingContactPermitted.customerConsentFlag': customer.customerConsentFlag || emailPermission,
+        'marketingContactPermitted.customerConsentFlag': isNil(consentFlag) ? customer.customerConsentFlag : consentFlag,
         'marketingContactPermitted.emailAddressAdded': !isEmpty(customer.email),
         'marketingContactPermitted.phoneNumberAdded': !isEmpty(customer.mobile),
         'marketingContactPermitted.emailPending': pendingEmailPermission,

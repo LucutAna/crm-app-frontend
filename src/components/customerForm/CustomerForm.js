@@ -18,7 +18,7 @@ import Button from "@material-ui/core/Button";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import CustomerFormStyles from './CustomerFormStyles'
 import CustomerService from "../../shared/services/CustomerService";
-import {isEmpty, pickBy} from 'lodash';
+import {isEmpty, pickBy, find} from 'lodash';
 import {useContext, useState} from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -125,6 +125,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
 
     const search = async (customerForm) => {
         setOpenSpinner(true);
+        deleteCustomerData();
         if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
             try {
                 let data = {
@@ -160,7 +161,14 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     }
 
     const onSubmit = (values, actions) => {
-
+        //use consent flag from selectCustomer response
+        let consentFlag = false;
+        if (!isEmpty(customerData)) {
+            let permissionsKey = find(Object.keys(customerData.permissions), (key) => {
+                return key.indexOf('CLUB') >= 0
+            });
+            consentFlag = customerData.permissions[permissionsKey].permissionChannels.customerConsentFlag;
+        }
         const enrollCustomer = !values.updateCustomerFlag ? CustomerService.createCustomerUpsertData(values, configData) : CustomerService.createCustomerUpsertData({
             ...customerData,
             street1: values.street1,
@@ -168,7 +176,8 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             city: values.city,
             mobile: values.mobile,
             country: values.country,
-            updateCustomerFlag: values.updateCustomerFlag
+            updateCustomerFlag: values.updateCustomerFlag,
+            customerConsentFlag: consentFlag
         }, configData);
         onNewRegistration({...enrollCustomer})
     };

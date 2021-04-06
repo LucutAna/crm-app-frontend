@@ -1,7 +1,12 @@
 import {makeStyles} from '@material-ui/core/styles';
 
 const EnrollModalStyles = makeStyles((theme) => ({
-    root: {},
+    dialogContent: {
+        paddingTop: '5px !important'
+    },
+    wrapperCheckbox: {
+        paddingBottom: '10px'
+    },
     buttonRegistration: {
         marginTop: theme.spacing(3),
         marginBottom: theme.spacing(3),
