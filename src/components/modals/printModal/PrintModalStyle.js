@@ -13,6 +13,11 @@ const PrintModalStyles = makeStyles((theme) => ({
     },
     buttonWrapper: {
         justifyContent: 'space-around',
+    },
+    pdfFile: {
+        marginLeft: '10%',
+        width: '80%',
+        height: '420px'
     }
 }));
 

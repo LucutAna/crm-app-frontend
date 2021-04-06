@@ -15,6 +15,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
     const [openPrintModal, setOpenPrintModal] = useState(false);
     const [redirect, setRedirect] = useState(null);
     const {deleteCustomerData} = useContext(GlobalContext);
+    const [pdfUrl, setPdfUrl] = useState('');
 
 
     const handleCiid = (searchCiid) => {
@@ -27,12 +28,18 @@ const Home = ({configData, onSetOpenSnackbar}) => {
 
     const newRegistration = (customer) => {
         setCustomerRegistrationData(customer);
+        if (customer.updateCustomerFlag) {
+            const url = CustomerService.getRegistrationPdfUrlInternal(CustomerService.createCustomerPrintData(customer, configData, customer.cardCiid));
+            setPdfUrl(url);
+        }
         customer.updateCustomerFlag ? setOpenPrintModal(true) : setOpenEnrollModal(true);
     }
 
-    const handleCloseEnrollModal = async (event, data, eKit) => {
+    const handleCloseEnrollModal = async (event, data, eKit, consentFlag) => {
+        let url = '';
         if (!!data && data === "E-KIT_CARD") {
-            setCustomerRegistrationData({...customerRegistrationData, cardCiid: eKit})
+            setCustomerRegistrationData({...customerRegistrationData, cardCiid: eKit, customerConsentFlag: consentFlag})
+            url = CustomerService.getRegistrationPdfUrlInternal(CustomerService.createCustomerPrintData(customerRegistrationData, configData, eKit, consentFlag));
             setOpenPrintModal(true);
         }
         if (!!data && data === "GENERATE_CIID") {
@@ -43,10 +50,12 @@ const Home = ({configData, onSetOpenSnackbar}) => {
                     subsidiary: configData.subsidiary
                 }
                 const card = await CustomerService.generateCiid(data);
-                setCustomerRegistrationData({...customerRegistrationData, cardCiid: card.data.ciid});
+                setCustomerRegistrationData({...customerRegistrationData, cardCiid: card.data.ciid, customerConsentFlag: consentFlag});
+                url = CustomerService.getRegistrationPdfUrlInternal(CustomerService.createCustomerPrintData(customerRegistrationData, configData, card.data.ciid, consentFlag));
             } catch (error) {
                 console.log(error);
             }
+            setPdfUrl(url);
             setOpenPrintModal(true);
         }
         setOpenEnrollModal(false);
@@ -80,7 +89,8 @@ const Home = ({configData, onSetOpenSnackbar}) => {
                          configData={configData}
                          onHandleCloseEnrollModal={handleCloseEnrollModal}/>
             <PrintModal openPrintModal={openPrintModal}
-                        onHandleClosePrintModal={handleClosePrintModal}/>
+                        onHandleClosePrintModal={handleClosePrintModal}
+                        pdfUrl={pdfUrl}/>
         </>
     )
 }

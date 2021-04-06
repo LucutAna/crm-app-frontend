@@ -11,7 +11,7 @@ import {withStyles} from '@material-ui/core/styles';
 import PrintModalStyle from './PrintModalStyle'
 
 
-const PrintModal = ({openPrintModal, onHandleClosePrintModal}) => {
+const PrintModal = ({openPrintModal, onHandleClosePrintModal, pdfUrl}) => {
 
     const styles = (theme) => ({
         root: {
@@ -26,7 +26,6 @@ const PrintModal = ({openPrintModal, onHandleClosePrintModal}) => {
             color: theme.palette.grey[500],
         }
     });
-
     const DialogTitle = withStyles(styles)((props) => {
         const {children, classes, onClose, ...other} = props;
         return (
@@ -40,13 +39,11 @@ const PrintModal = ({openPrintModal, onHandleClosePrintModal}) => {
             </MuiDialogTitle>
         );
     });
-
     const DialogContent = withStyles((theme) => ({
         root: {
             padding: theme.spacing(4),
         },
     }))(MuiDialogContent);
-
     const classes = PrintModalStyle();
     return (
         <div>
@@ -60,32 +57,8 @@ const PrintModal = ({openPrintModal, onHandleClosePrintModal}) => {
                 </DialogTitle>
                 <DialogContent dividers>
                     <Typography className={classes.infoText}>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae consequuntur corporis
-                        dignissimos eaque, labore necessitatibus nobis, officiis perspiciatis quaerat qui sed soluta
-                        voluptatum. Atque, ducimus, minima neque nostrum nulla officia provident quam quidem rem soluta
-                        suscipit tenetur unde vero. Delectus deleniti dolor doloribus eligendi eos et, repellat.
-                        Accusamus adipisci consequuntur cumque deserunt ducimus earum enim ex explicabo fugiat id
-                        maiores maxime minima, minus nam neque nihil officia perferendis placeat quaerat quidem quis
-                        rem, saepe sed sunt tempore temporibus ut velit? A accusamus accusantium aliquid asperiores at
-                        consequatur cum debitis deserunt dolore eaque eligendi est excepturi, facere fuga illo incidunt
-                        magni maiores molestiae natus necessitatibus nostrum obcaecati pariatur quam, quibusdam quis
-                        quisquam quos recusandae repudiandae saepe similique soluta suscipit tempore tenetur totam ullam
-                        velit voluptas! Debitis exercitationem fuga fugiat illo libero modi nisi pariatur porro
-                        praesentium voluptates. Aliquam deleniti dolores ea earum excepturi facere, impedit molestias
-                        nam necessitatibus omnis, placeat quidem repellendus vero? A ducimus in porro repellendus.
-                        Architecto aut corporis dolor doloremque dolorum eligendi esse eveniet impedit modi molestias
-                        mollitia nisi nulla perspiciatis sapiente sequi, ullam, vel. Et excepturi expedita, facere harum
-                        illo impedit ipsa iste iusto mollitia possimus qui recusandae reprehenderit saepe similique
-                        tempora tenetur vitae? Accusantium deleniti dolorum ex fugiat praesentium quibusdam quidem rerum
-                        sequi tempora voluptatum! Consequatur debitis deleniti, doloremque dolores est facere fugiat
-                        harum ipsum laudantium necessitatibus nesciunt numquam provident quaerat recusandae
-                        reprehenderit repudiandae, velit. Accusamus cupiditate dolorem enim fuga illo minus, molestiae
-                        non odit quae quos reprehenderit sunt unde velit vitae voluptatibus. Ad aperiam impedit libero
-                        obcaecati, optio praesentium quae qui totam unde? A amet eveniet facilis, id incidunt magnam
-                        minus molestias necessitatibus nostrum possimus reprehenderit sed sint, sunt voluptate
-                        voluptatibus. Alias eius facere itaque rem repudiandae? Accusamus animi dolorum natus neque
-                        omnis quasi quis similique tempora temporibus voluptas? Eligendi expedita nisi qui ratione
-                        sequi.
+                        <embed type="application/pdf" src={pdfUrl}
+                               className={classes.pdfFile}/>
                     </Typography>
                 </DialogContent>
                 <DialogActions className={classes.buttonWrapper}>

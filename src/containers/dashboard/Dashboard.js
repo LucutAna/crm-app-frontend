@@ -20,6 +20,8 @@ const Dashboard = (props) => {
     const classes = DashboardStyles();
     const {customerData} = useContext(GlobalContext);
     const customerLable = ['Club card number', 'Club market', 'Newsletter Sign up', 'Member since', 'Mobile no.'];
+    // TODO for birth date
+    //moment(customer.birthDate).format(configData.modules.DATE_FORMAT.toUpperCase()),
     const cusomerDetails = [
         customerData.cardCiid[0],
         'MEDIA MARKT ESSEN',
