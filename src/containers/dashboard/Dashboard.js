@@ -1,12 +1,13 @@
 import Paper from '@material-ui/core/Paper';
-import Grid from "@material-ui/core/Grid";
-import {useContext} from 'react';
+import {useContext, useState, useEffect} from 'react';
+import moment from 'moment';
 import {find, clone, isEmpty} from 'lodash';
 
 
 import DashboardStyles from './DashboardStyles';
 import {GlobalContext} from '../../context/GlobalState';
-import CardCard from './../../assets/images/Club_Card_MM.png';
+import ConfigService from './../../shared/services/ConfigService';
+import CustomerDataInfo from './../../components/customerDataInfo/CustomerDataInfo'
 
 const permissions = (customerPermision) => {
     const permissionsKey = find(Object.keys(customerPermision), (key) => {
@@ -16,47 +17,47 @@ const permissions = (customerPermision) => {
     return initialPermissions.emailConsentFlag ? 'Yes' : 'No';
 }
 
-const Dashboard = (props) => {
+const Dashboard = ({configData}) => {
     const classes = DashboardStyles();
     const {customerData} = useContext(GlobalContext);
-    const customerLable = ['Club card number', 'Club market', 'Newsletter Sign up', 'Member since', 'Mobile no.'];
-    let customerDetails = [];
-    // TODO for birth date
-    //moment(customer.birthDate).format(configData.modules.DATE_FORMAT.toUpperCase()),
-    if (!isEmpty(customerData))
-        customerDetails = [
-            customerData.cardCiid[0],
-            'MEDIA MARKT ESSEN',
-            permissions(customerData.permissions),
-            customerData.clubDateOfEntry.split('T')[0],
-            customerData.mobile
-        ];
+    const [customerInfo, setCustomerInfo] = useState('');
+
+    useEffect(() => {
+        if (!isEmpty(customerData)) {
+            try {
+                const getPreferredOutletName = async () => {
+                    const preferredOutletName = await ConfigService.getStore(customerData.preferredOutlet);
+                    const customer = {
+                        ciid: customerData.cardCiid[0],
+                        preferredOutlet: preferredOutletName.data.storeName,
+                        consent: permissions(customerData.permissions),
+                        activationDate: moment(customerData.clubDateOfEntry).format(configData.modules.DATE_FORMAT.toUpperCase()),
+                        phoneNumber: customerData.mobile,
+                        firstName: customerData.firstName,
+                        lastName: customerData.lastName,
+                        salutation: customerData.salutation
+                    }
+                    setCustomerInfo(customer)
+                }
+                getPreferredOutletName();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }, [customerData, configData])
+
     return (
         <div className={classes.root}>
             {!isEmpty(customerData) ?
-            <>
-                <Paper elevation={3}>
-                    <h3 className={classes.paperHeader}>Customer - Club data</h3>
-                    <h2 className={classes.customerName}>{`${customerData.salutation} ${customerData.lastName} ${customerData.firstName}`}</h2>
-                    <Grid container spacing={1}>
-                        <Grid item xs={12} sm={4}>
-                            <img className={classes.cardImage} src={CardCard} alt="card"/>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            {customerLable.map(lable => <h4 key={lable}>{lable}</h4>)}
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            {customerDetails.map(info => <h4 key={info} className={classes.cusomerDetails}>{info}</h4>)}
-                        </Grid>
-                    </Grid>
-                </Paper>
-                <Paper elevation={3}>
-                    <h3 className={classes.paperHeader}>Purchases history</h3>
-                </Paper>
-                <Paper elevation={3}>
-                    <h3 className={classes.paperHeader}>Coupons</h3>
-                </Paper>
-            </> : null}
+                <>
+                    <CustomerDataInfo customer={customerInfo}/>
+                    <Paper elevation={3}>
+                        <h3 className={classes.paperHeader}>Purchases history</h3>
+                    </Paper>
+                    <Paper elevation={3}>
+                        <h3 className={classes.paperHeader}>Coupons</h3>
+                    </Paper>
+                </> : null}
         </div>
     )
 }

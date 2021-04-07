@@ -77,7 +77,7 @@ function App() {
                             <Route path={['/', '/crm', `/crm/?outletId=${outletID}`]} exact
                                    component={() => <Home configData={configData}
                                                           onSetOpenSnackbar={setOpenSnackbar}/>}/>
-                            <Route path='/dashboard' component={Dashboard}/>
+                            <Route path='/dashboard' component={() => <Dashboard configData={configData}/>}/>
                             <Route path='/order-history' component={OrderHistory}/>
                             <Route path='/coupons' component={Coupons}/>
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
