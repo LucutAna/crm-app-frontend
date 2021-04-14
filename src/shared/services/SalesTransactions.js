@@ -2,6 +2,19 @@ import axiosInstance from '../../axiosInstance';
 import ConfigService from './ConfigService';
 import {isEmpty} from 'lodash';
 
+const storeConfigData = {};
+const storesInfo = [];
+
+const getStoreDetails = async (sale) => {
+    const storeDetails = await ConfigService.getStore(sale.orderOutletId);
+    const store = {
+        storeNumber: storeDetails.data.storeNumber.toString(),
+        storeName: storeDetails.data.storeName,
+        sapCode: storeDetails.data.sapCode
+    };
+    storesInfo.push(store);
+};
+
 const getSalesOrderHistoryAtStore = async (loyaltyNumber) => {
     const result = await axiosInstance.get(`/crm-sales/orderHistory/${loyaltyNumber}`);
     if (!result || result.status !== 200)
@@ -12,13 +25,8 @@ const getSalesOrderHistoryAtStore = async (loyaltyNumber) => {
             sale.type = 'store';
             sale.isNavCollapsed = false;
             sale.loyaltyNumber = loyaltyNumber;
-
-            const getStoreDetails = async () => {
-                const storeConfig = await ConfigService.getStore(sale.orderOutletId);
-                sale.storeName = storeConfig.data.storeName;
-                sale.storeSapId = storeConfig.data.sapCode;
-            };
-            getStoreDetails();
+            if (!storeConfigData.hasOwnProperty(sale.orderOutletId))
+                storeConfigData[sale.orderOutletId] = getStoreDetails(sale);
             return sale;
         });
     return result.data;
@@ -34,13 +42,8 @@ const getSalesOrderHistoryOnlineByCiid = async (loyaltyNumber) => {
             sale.type = 'online';
             sale.isNavCollapsed = false;
             sale.loyaltyNumber = loyaltyNumber;
-
-            const getStoreDetails = async () => {
-                const storeConfig = await ConfigService.getStore(sale.orderOutletId);
-                sale.storeName = storeConfig.data.storeName;
-                sale.storeSapId = storeConfig.data.sapCode;
-            };
-            getStoreDetails();
+            if (!storeConfigData.hasOwnProperty(sale.orderOutletId))
+                storeConfigData[sale.orderOutletId] = getStoreDetails(sale);
             return sale;
         });
     return result.data;
@@ -55,13 +58,8 @@ const getSalesOrderHistory = async (partyUUID) => {
             sale.date = new Date(sale.orderTime);
             sale.type = 'online';
             sale.isNavCollapsed = false;
-
-            const getStoreDetails = async () => {
-                const storeConfig = await ConfigService.getStore(sale.orderOutletId);
-                sale.storeName = storeConfig.data.storeName;
-                sale.storeSapId = storeConfig.data.sapCode;
-            };
-            getStoreDetails();
+            if (!storeConfigData.hasOwnProperty(sale.orderOutletId))
+                storeConfigData[sale.orderOutletId] = getStoreDetails(sale);
             return sale;
         });
     return result.data;
@@ -117,7 +115,8 @@ const SalesTransactions = {
     getSalesOrderHistoryAtStore,
     getSalesOrderHistoryOnlineByCiid,
     getSalesOrderHistory,
-    getSalesOrderHistoryFom
+    getSalesOrderHistoryFom,
+    storesInfo,
 };
 
 export default SalesTransactions;

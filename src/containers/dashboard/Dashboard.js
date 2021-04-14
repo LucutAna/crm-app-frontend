@@ -1,7 +1,21 @@
 import Paper from '@material-ui/core/Paper';
 import {useContext, useState, useEffect} from 'react';
 import moment from 'moment';
-import {find, clone, isEmpty, flatten, concat, each, pullAt, values, filter, isNil, orderBy} from 'lodash';
+import {
+    find,
+    clone,
+    isEmpty,
+    flatten,
+    concat,
+    each,
+    pullAt,
+    values,
+    filter,
+    isNil,
+    orderBy,
+    chain,
+    toInteger
+} from 'lodash';
 
 
 import DashboardStyles from './DashboardStyles';
@@ -28,7 +42,16 @@ const Dashboard = ({configData}) => {
 
     const showSalesOrderHistory = (ordersResponse) => {
         let orderHistory = flatten(ordersResponse[0]);
-        let orderHistoryOnline = ordersResponse[1];
+        let orderHistoryOnline = chain(ordersResponse[1])
+            .groupBy('orderNumber')
+            .map(gol => {
+                return chain(gol)
+                    .filter(ol => toInteger(ol.orderDetails[0].status) < 9999)
+                    .orderBy("orderDetails[0].status", "desc")
+                    .head()
+                    .value();
+            })
+            .value();
 
         let orderHistoryFom = [];
         if (ordersResponse.length > 2)
@@ -66,13 +89,24 @@ const Dashboard = ({configData}) => {
         const orders = filter(deduplicatedOrders, function (o) {
             return o.orderGrossTotal >= 0;
         });
+
+        const storesInfo = SalesTransactions.storesInfo;
+        orders.map(sale => {
+            storesInfo.forEach(store => {
+                if (sale.orderOutletId === store.storeNumber) {
+                    sale.storeName = store.storeName;
+                    sale.storeSapId = store.sapCode;
+                }
+            })
+            return sale;
+        });
         setSalesOrderHistory(orderBy(orders, ['date', 'orderNumber'], ['desc', 'desc']));
         //$scope.customer.showOrdersSpinner = false;
     };
 
     useEffect(() => {
         if (!isEmpty(customerData)) {
-            const initializeTransactionsPanel = () => {
+            const initializeTransactionsPanel = async () => {
                 let partyUUID = customerData.partyUid;
                 let wcsUserId = customerData.wcsUserId || "";
                 let orderHistorySettings = configData.orderHistorySettings;
@@ -96,18 +130,15 @@ const Dashboard = ({configData}) => {
                     ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(customerData.ccrCiid));
                 }
 
-                Promise.all([
+                const result = await Promise.all([
                     // firing all in store orders calls
                     Promise.all(ciidPromises),
                     // firing the online orders from car call if enabled
                     getOrdersFromCar ? SalesTransactions.getSalesOrderHistory(partyUUID) : [],
                     // firing the online orders from fom call if enabled
                     getOrdersFromFom ? SalesTransactions.getSalesOrderHistoryFom(configData, wcsUserId) : []
-                ]).then(result => {
-                    showSalesOrderHistory(result);
-                }).catch((error) => {
-                    console.log(error);
-                });
+                ])
+                showSalesOrderHistory(result);
             };
             initializeTransactionsPanel();
         }
@@ -136,7 +167,7 @@ const Dashboard = ({configData}) => {
             }
         }
     }, [customerData, configData]);
-    
+
     return (
         <div className={classes.root}>
             {!isEmpty(customerData) ?
