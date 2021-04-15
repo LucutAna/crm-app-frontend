@@ -1,4 +1,3 @@
-import Paper from '@material-ui/core/Paper';
 import {useContext, useState, useEffect} from 'react';
 import moment from 'moment';
 import {
@@ -20,10 +19,12 @@ import {
 
 import DashboardStyles from './DashboardStyles';
 import {GlobalContext} from '../../context/GlobalState';
-import ConfigService from './../../shared/services/ConfigService';
-import CustomerDataInfo from './../../components/customerDataInfo/CustomerDataInfo';
-import HistoryPurchases from './../../components/historyPurchases/HistoryPurchases';
-import SalesTransactions from './../../shared/services/SalesTransactions';
+import ConfigService from '../../shared/services/ConfigService';
+import MemberService from '../../shared/services/MemberService';
+import SalesTransactions from '../../shared/services/SalesTransactions';
+import CustomerDataInfo from '../../components/customerDataInfo/CustomerDataInfo';
+import HistoryPurchases from '../../components/historyPurchases/HistoryPurchases';
+import Coupons from '../../components/Coupons/Coupons';
 
 
 const permissions = (customerPermision) => {
@@ -38,7 +39,80 @@ const Dashboard = ({configData}) => {
     const classes = DashboardStyles();
     const {customerData} = useContext(GlobalContext);
     const [customerInfo, setCustomerInfo] = useState('');
-    const [salesOrderHistory, setSalesOrderHistory] = useState('')
+    const [salesOrderHistory, setSalesOrderHistory] = useState('');
+    const [customerCoupons, setCustomerCoupons] = useState([]);
+
+    // initialize panels
+    useEffect(() => {
+        if (!isEmpty(customerData)) {
+            //customer info
+            try {
+                const getPreferredOutletName = async () => {
+                    const preferredOutletName = await ConfigService.getStore(customerData.preferredOutlet);
+                    const customer = {
+                        ciid: customerData.cardCiid[0],
+                        preferredOutlet: preferredOutletName.data.storeName,
+                        consent: permissions(customerData.permissions),
+                        activationDate: moment(customerData.clubDateOfEntry).format(configData.modules.DATE_FORMAT.toUpperCase()),
+                        phoneNumber: customerData.mobile,
+                        firstName: customerData.firstName,
+                        lastName: customerData.lastName,
+                        salutation: customerData.salutation
+                    }
+                    setCustomerInfo(customer)
+                }
+                getPreferredOutletName();
+            } catch (error) {
+                console.log(error);
+            }
+
+            //order history
+            const initializeTransactionsPanel = async () => {
+                let partyUUID = customerData.partyUid;
+                let wcsUserId = customerData.wcsUserId || "";
+                let orderHistorySettings = configData.orderHistorySettings;
+                let getOrdersFromCar = true;
+                let getOrdersFromFom = false;
+                if (orderHistorySettings) {
+                    getOrdersFromCar = orderHistorySettings.getOrdersFromCar;
+                    getOrdersFromFom = orderHistorySettings.getOrdersFromFom;
+                }
+                let ciidPromises = [];
+
+                if (customerData.cardCiid) {
+                    customerData.cardCiid.forEach(ciid => {
+                        ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(ciid));
+                        ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(ciid));
+                    });
+                }
+
+                if (!isNil(customerData.ccrCiid)) {
+                    ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(customerData.ccrCiid));
+                    ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(customerData.ccrCiid));
+                }
+
+                const result = await Promise.all([
+                    // firing all in store orders calls
+                    Promise.all(ciidPromises),
+                    // firing the online orders from car call if enabled
+                    getOrdersFromCar ? SalesTransactions.getSalesOrderHistory(partyUUID) : [],
+                    // firing the online orders from fom call if enabled
+                    getOrdersFromFom ? SalesTransactions.getSalesOrderHistoryFom(configData, wcsUserId) : []
+                ])
+                showSalesOrderHistory(result);
+            };
+            initializeTransactionsPanel();
+
+            // cupons
+            const couponsPayload = {
+                partyUid: customerData.partyUid,
+                locale: configData.locales[0],
+                salesDivision: configData.salesDivision,
+                subsidiary: configData.subsidiary
+            };
+            getCouponsCustomer(couponsPayload);
+        }
+    }, [customerData, configData]);
 
     const showSalesOrderHistory = (ordersResponse) => {
         let orderHistory = flatten(ordersResponse[0]);
@@ -104,69 +178,49 @@ const Dashboard = ({configData}) => {
         //$scope.customer.showOrdersSpinner = false;
     };
 
-    useEffect(() => {
-        if (!isEmpty(customerData)) {
-            const initializeTransactionsPanel = async () => {
-                let partyUUID = customerData.partyUid;
-                let wcsUserId = customerData.wcsUserId || "";
-                let orderHistorySettings = configData.orderHistorySettings;
-                let getOrdersFromCar = true;
-                let getOrdersFromFom = false;
-                if (orderHistorySettings) {
-                    getOrdersFromCar = orderHistorySettings.getOrdersFromCar;
-                    getOrdersFromFom = orderHistorySettings.getOrdersFromFom;
-                }
-                let ciidPromises = [];
-
-                if (customerData.cardCiid) {
-                    customerData.cardCiid.forEach(ciid => {
-                        ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(ciid));
-                        ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(ciid));
-                    });
-                }
-
-                if (!isNil(customerData.ccrCiid)) {
-                    ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(customerData.ccrCiid));
-                    ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(customerData.ccrCiid));
-                }
-
-                const result = await Promise.all([
-                    // firing all in store orders calls
-                    Promise.all(ciidPromises),
-                    // firing the online orders from car call if enabled
-                    getOrdersFromCar ? SalesTransactions.getSalesOrderHistory(partyUUID) : [],
-                    // firing the online orders from fom call if enabled
-                    getOrdersFromFom ? SalesTransactions.getSalesOrderHistoryFom(configData, wcsUserId) : []
-                ])
-                showSalesOrderHistory(result);
-            };
-            initializeTransactionsPanel();
+    const getCouponsCustomer = async (data) => {
+        try {
+            const coupons = await MemberService.getCoupons(data);
+            //TODO: check if the logic above is deprecated
+            // map(coupons.data, (coupon) => {
+            //     if (isNil(coupon.couponTypeName_de_DE))
+            //         coupon.typeName = coupon.couponTypeName;
+            //     else
+            //         coupon.typeName = coupon.couponTypeName_de_DE;
+            //     if (isNil(coupon.couponTypeDescription_de_DE))
+            //         coupon.typeDescription = coupon.couponTypeDescription;
+            //     else
+            //         coupon.typeDescription = coupon.couponTypeDescription_de_DE;
+            // });
+            setCustomerCoupons(coupons.data);
+        } catch (error) {
+            console.log(error);
         }
-    }, [customerData, configData])
+    };
 
-    useEffect(() => {
-        if (!isEmpty(customerData)) {
-            try {
-                const getPreferredOutletName = async () => {
-                    const preferredOutletName = await ConfigService.getStore(customerData.preferredOutlet);
-                    const customer = {
-                        ciid: customerData.cardCiid[0],
-                        preferredOutlet: preferredOutletName.data.storeName,
-                        consent: permissions(customerData.permissions),
-                        activationDate: moment(customerData.clubDateOfEntry).format(configData.modules.DATE_FORMAT.toUpperCase()),
-                        phoneNumber: customerData.mobile,
-                        firstName: customerData.firstName,
-                        lastName: customerData.lastName,
-                        salutation: customerData.salutation
-                    }
-                    setCustomerInfo(customer)
-                }
-                getPreferredOutletName();
-            } catch (error) {
-                console.log(error);
+    const changeStatusCoupon = async (couponSelected) => {
+        const data = {
+            activationStatusCode: couponSelected.couponActivationCode === 'I' ? 'A' : 'I',
+            couponCode: couponSelected.couponCode,
+            partyUid: customerData.partyUid,
+            salesDivision: configData.salesDivision,
+            subsidiary: configData.subsidiary
+        }
+        try {
+            const activateDeactivate = await MemberService.activateDeactivateCoupons(data);
+            if (activateDeactivate.data.status === 'SUCCESS') {
+                const couponsPayload = {
+                    partyUid: customerData.partyUid,
+                    locale: configData.locales[0],
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                };
+                getCouponsCustomer(couponsPayload);
             }
+        } catch (error) {
+            console.log(error);
         }
-    }, [customerData, configData]);
+    };
 
     return (
         <div className={classes.root}>
@@ -174,9 +228,7 @@ const Dashboard = ({configData}) => {
                 <>
                     <CustomerDataInfo customer={customerInfo}/>
                     <HistoryPurchases salesOrderHistory={salesOrderHistory} configData={configData}/>
-                    <Paper elevation={3}>
-                        <h3 className={classes.paperHeader}>Coupons</h3>
-                    </Paper>
+                    <Coupons coupons={customerCoupons} onChangeStatusCoupon={changeStatusCoupon}/>
                 </> : null}
         </div>
     )

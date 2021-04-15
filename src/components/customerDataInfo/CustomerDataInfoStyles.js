@@ -16,7 +16,7 @@ const CustomerDataInfoStyles = makeStyles((theme) => ({
         paddingTop: '22px',
         paddingLeft: '15px'
     },
-    cusomerDetails: {
+    customerDetails: {
         fontWeight: 400
     }
 }));
