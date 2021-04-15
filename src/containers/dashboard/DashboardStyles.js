@@ -18,19 +18,7 @@ const DashboardStyles = makeStyles((theme) => ({
         backgroundColor: '#DF0000',
         color: '#fff',
         fontWeight: 400
-    },
-    customerName: {
-        paddingLeft: '15px'
-    },
-    cardImage: {
-        height: '80px',
-        paddingTop: '22px',
-        paddingLeft: '15px'
-    },
-    cusomerDetails: {
-        fontWeight: 400
     }
-
 }));
 
 export default DashboardStyles;

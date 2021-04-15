@@ -1,12 +1,30 @@
 import Paper from '@material-ui/core/Paper';
-import Grid from "@material-ui/core/Grid";
-import {useContext} from 'react';
-import {find, clone, isEmpty} from 'lodash';
+import {useContext, useState, useEffect} from 'react';
+import moment from 'moment';
+import {
+    find,
+    clone,
+    isEmpty,
+    flatten,
+    concat,
+    each,
+    pullAt,
+    values,
+    filter,
+    isNil,
+    orderBy,
+    chain,
+    toInteger
+} from 'lodash';
 
 
 import DashboardStyles from './DashboardStyles';
 import {GlobalContext} from '../../context/GlobalState';
-import CardCard from './../../assets/images/Club_Card_MM.png';
+import ConfigService from './../../shared/services/ConfigService';
+import CustomerDataInfo from './../../components/customerDataInfo/CustomerDataInfo';
+import HistoryPurchases from './../../components/historyPurchases/HistoryPurchases';
+import SalesTransactions from './../../shared/services/SalesTransactions';
+
 
 const permissions = (customerPermision) => {
     const permissionsKey = find(Object.keys(customerPermision), (key) => {
@@ -16,47 +34,150 @@ const permissions = (customerPermision) => {
     return initialPermissions.emailConsentFlag ? 'Yes' : 'No';
 }
 
-const Dashboard = (props) => {
+const Dashboard = ({configData}) => {
     const classes = DashboardStyles();
     const {customerData} = useContext(GlobalContext);
-    const customerLable = ['Club card number', 'Club market', 'Newsletter Sign up', 'Member since', 'Mobile no.'];
-    let customerDetails = [];
-    // TODO for birth date
-    //moment(customer.birthDate).format(configData.modules.DATE_FORMAT.toUpperCase()),
-    if (!isEmpty(customerData))
-        customerDetails = [
-            customerData.cardCiid[0],
-            'MEDIA MARKT ESSEN',
-            permissions(customerData.permissions),
-            customerData.clubDateOfEntry.split('T')[0],
-            customerData.mobile
-        ];
+    const [customerInfo, setCustomerInfo] = useState('');
+    const [salesOrderHistory, setSalesOrderHistory] = useState('')
+
+    const showSalesOrderHistory = (ordersResponse) => {
+        let orderHistory = flatten(ordersResponse[0]);
+        let orderHistoryOnline = chain(ordersResponse[1])
+            .groupBy('orderNumber')
+            .map(gol => {
+                return chain(gol)
+                    .filter(ol => toInteger(ol.orderDetails[0].status) < 9999)
+                    .orderBy("orderDetails[0].status", "desc")
+                    .head()
+                    .value();
+            })
+            .value();
+
+        let orderHistoryFom = [];
+        if (ordersResponse.length > 2)
+            orderHistoryFom = ordersResponse[2];
+
+        const allOrders = concat(orderHistory, orderHistoryOnline, orderHistoryFom);
+        // if (allOrders.length === 0) {
+        //     $scope.customer.showOrdersSpinner = false;
+        //     return;
+        // }
+
+        let filteredOrders = {};
+        each(allOrders, function (myOrder, i) {
+            if (myOrder.type === 'online') {
+                if (!filteredOrders[myOrder.orderNumber]) {
+                    filteredOrders[myOrder.orderNumber] = i;
+                }
+            } else if (myOrder.type === 'FOM') {
+                filteredOrders[`${myOrder.orderNumber}_${myOrder.orderOutletId}}`] = i;
+            } else {
+                filteredOrders[`${myOrder.orderNumber}_${myOrder.orderOutletId}_${myOrder.date.getTime()}`] = i;
+            }
+
+            each(myOrder.orderDetails, function (details) {
+                if (details.itemSet !== undefined) {
+                    each(details.itemSet, function (item) {
+                        myOrder.orderDetails.push(item);
+                    });
+                    myOrder.orderDetails.splice(i, 1);
+                }
+            });
+        });
+
+        const deduplicatedOrders = pullAt(allOrders, values(filteredOrders));
+        const orders = filter(deduplicatedOrders, function (o) {
+            return o.orderGrossTotal >= 0;
+        });
+
+        const storesInfo = SalesTransactions.storesInfo;
+        orders.map(sale => {
+            storesInfo.forEach(store => {
+                if (sale.orderOutletId === store.storeNumber) {
+                    sale.storeName = store.storeName;
+                    sale.storeSapId = store.sapCode;
+                }
+            })
+            return sale;
+        });
+        setSalesOrderHistory(orderBy(orders, ['date', 'orderNumber'], ['desc', 'desc']));
+        //$scope.customer.showOrdersSpinner = false;
+    };
+
+    useEffect(() => {
+        if (!isEmpty(customerData)) {
+            const initializeTransactionsPanel = async () => {
+                let partyUUID = customerData.partyUid;
+                let wcsUserId = customerData.wcsUserId || "";
+                let orderHistorySettings = configData.orderHistorySettings;
+                let getOrdersFromCar = true;
+                let getOrdersFromFom = false;
+                if (orderHistorySettings) {
+                    getOrdersFromCar = orderHistorySettings.getOrdersFromCar;
+                    getOrdersFromFom = orderHistorySettings.getOrdersFromFom;
+                }
+                let ciidPromises = [];
+
+                if (customerData.cardCiid) {
+                    customerData.cardCiid.forEach(ciid => {
+                        ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(ciid));
+                        ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(ciid));
+                    });
+                }
+
+                if (!isNil(customerData.ccrCiid)) {
+                    ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(customerData.ccrCiid));
+                    ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(customerData.ccrCiid));
+                }
+
+                const result = await Promise.all([
+                    // firing all in store orders calls
+                    Promise.all(ciidPromises),
+                    // firing the online orders from car call if enabled
+                    getOrdersFromCar ? SalesTransactions.getSalesOrderHistory(partyUUID) : [],
+                    // firing the online orders from fom call if enabled
+                    getOrdersFromFom ? SalesTransactions.getSalesOrderHistoryFom(configData, wcsUserId) : []
+                ])
+                showSalesOrderHistory(result);
+            };
+            initializeTransactionsPanel();
+        }
+    }, [customerData, configData])
+
+    useEffect(() => {
+        if (!isEmpty(customerData)) {
+            try {
+                const getPreferredOutletName = async () => {
+                    const preferredOutletName = await ConfigService.getStore(customerData.preferredOutlet);
+                    const customer = {
+                        ciid: customerData.cardCiid[0],
+                        preferredOutlet: preferredOutletName.data.storeName,
+                        consent: permissions(customerData.permissions),
+                        activationDate: moment(customerData.clubDateOfEntry).format(configData.modules.DATE_FORMAT.toUpperCase()),
+                        phoneNumber: customerData.mobile,
+                        firstName: customerData.firstName,
+                        lastName: customerData.lastName,
+                        salutation: customerData.salutation
+                    }
+                    setCustomerInfo(customer)
+                }
+                getPreferredOutletName();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }, [customerData, configData]);
+
     return (
         <div className={classes.root}>
             {!isEmpty(customerData) ?
-            <>
-                <Paper elevation={3}>
-                    <h3 className={classes.paperHeader}>Customer - Club data</h3>
-                    <h2 className={classes.customerName}>{`${customerData.salutation} ${customerData.lastName} ${customerData.firstName}`}</h2>
-                    <Grid container spacing={1}>
-                        <Grid item xs={12} sm={4}>
-                            <img className={classes.cardImage} src={CardCard} alt="card"/>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            {customerLable.map(lable => <h4 key={lable}>{lable}</h4>)}
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            {customerDetails.map(info => <h4 key={info} className={classes.cusomerDetails}>{info}</h4>)}
-                        </Grid>
-                    </Grid>
-                </Paper>
-                <Paper elevation={3}>
-                    <h3 className={classes.paperHeader}>Purchases history</h3>
-                </Paper>
-                <Paper elevation={3}>
-                    <h3 className={classes.paperHeader}>Coupons</h3>
-                </Paper>
-            </> : null}
+                <>
+                    <CustomerDataInfo customer={customerInfo}/>
+                    <HistoryPurchases salesOrderHistory={salesOrderHistory} configData={configData}/>
+                    <Paper elevation={3}>
+                        <h3 className={classes.paperHeader}>Coupons</h3>
+                    </Paper>
+                </> : null}
         </div>
     )
 }

@@ -96,7 +96,7 @@ const EnrollModal = ({openEnrollModal, configData, onHandleCloseEnrollModal}) =>
                                 onChange={handleChange}
                                 color="primary"
                                 name="consent" />}
-                                label="Customer wants more information"
+                                label="Advertising consent granted"
                         />
                     </FormGroup>
                     <Typography className={classes.infoText}>

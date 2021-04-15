@@ -2,7 +2,7 @@
   "name": "crm-app-frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://crm-app.dev.crm.d-p.io",
+  "proxy": "https://crm-app.prod.crm.d-p.io",
   "dependencies": {
     "@date-io/moment": "^2.10.8",
     "@material-ui/core": "^4.11.3",
