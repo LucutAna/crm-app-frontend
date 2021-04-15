@@ -41,6 +41,8 @@ const Dashboard = ({configData}) => {
     const [customerInfo, setCustomerInfo] = useState('');
     const [salesOrderHistory, setSalesOrderHistory] = useState('');
     const [customerCoupons, setCustomerCoupons] = useState([]);
+    const [openSpinnerHistoryPurchase, setOpenSpinnerHistoryPurchase] = useState(false);
+    const [openSpinnerCoupons, setOpenSpinnerCoupons] = useState(false);
 
     // initialize panels
     useEffect(() => {
@@ -68,6 +70,7 @@ const Dashboard = ({configData}) => {
 
             //order history
             const initializeTransactionsPanel = async () => {
+                setOpenSpinnerHistoryPurchase(true);
                 let partyUUID = customerData.partyUid;
                 let wcsUserId = customerData.wcsUserId || "";
                 let orderHistorySettings = configData.orderHistorySettings;
@@ -104,6 +107,7 @@ const Dashboard = ({configData}) => {
             initializeTransactionsPanel();
 
             // cupons
+            setOpenSpinnerCoupons(true);
             const couponsPayload = {
                 partyUid: customerData.partyUid,
                 locale: configData.locales[0],
@@ -132,10 +136,10 @@ const Dashboard = ({configData}) => {
             orderHistoryFom = ordersResponse[2];
 
         const allOrders = concat(orderHistory, orderHistoryOnline, orderHistoryFom);
-        // if (allOrders.length === 0) {
-        //     $scope.customer.showOrdersSpinner = false;
-        //     return;
-        // }
+        if (allOrders.length === 0) {
+            setOpenSpinnerHistoryPurchase(false);
+            return;
+        }
 
         let filteredOrders = {};
         each(allOrders, function (myOrder, i) {
@@ -175,7 +179,7 @@ const Dashboard = ({configData}) => {
             return sale;
         });
         setSalesOrderHistory(orderBy(orders, ['date', 'orderNumber'], ['desc', 'desc']));
-        //$scope.customer.showOrdersSpinner = false;
+        setOpenSpinnerHistoryPurchase(false);
     };
 
     const getCouponsCustomer = async (data) => {
@@ -193,8 +197,10 @@ const Dashboard = ({configData}) => {
             //         coupon.typeDescription = coupon.couponTypeDescription_de_DE;
             // });
             setCustomerCoupons(coupons.data);
+            setOpenSpinnerCoupons(false);
         } catch (error) {
             console.log(error);
+            setOpenSpinnerCoupons(false);
         }
     };
 
@@ -227,8 +233,10 @@ const Dashboard = ({configData}) => {
             {!isEmpty(customerData) ?
                 <>
                     <CustomerDataInfo customer={customerInfo}/>
-                    <HistoryPurchases salesOrderHistory={salesOrderHistory} configData={configData}/>
-                    <Coupons coupons={customerCoupons} onChangeStatusCoupon={changeStatusCoupon}/>
+                    <HistoryPurchases salesOrderHistory={salesOrderHistory} configData={configData}
+                                      openSpinnerHistoryPurchase={openSpinnerHistoryPurchase}/>
+                    <Coupons coupons={customerCoupons} onChangeStatusCoupon={changeStatusCoupon}
+                             openSpinnerCoupons={openSpinnerCoupons}/>
                 </> : null}
         </div>
     )
