@@ -21,11 +21,11 @@ const CustomerDataInfo = ({customer}) => {
                         {customerLable.map(lable => <h4 key={lable}>{lable}</h4>)}
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                        <h4 className={classes.cusomerDetails}>{customer.ciid}</h4>
-                        <h4 className={classes.cusomerDetails}>{customer.preferredOutlet}</h4>
-                        <h4 className={classes.cusomerDetails}>{customer.consent}</h4>
-                        <h4 className={classes.cusomerDetails}>{customer.activationDate}</h4>
-                        <h4 className={classes.cusomerDetails}>{customer.phoneNumber}</h4>
+                        <h4 className={classes.customerDetails}>{customer.ciid}</h4>
+                        <h4 className={classes.customerDetails}>{customer.preferredOutlet}</h4>
+                        <h4 className={classes.customerDetails}>{customer.consent}</h4>
+                        <h4 className={classes.customerDetails}>{customer.activationDate}</h4>
+                        <h4 className={classes.customerDetails}>{customer.phoneNumber}</h4>
                     </Grid>
                 </Grid>
             </Paper>
