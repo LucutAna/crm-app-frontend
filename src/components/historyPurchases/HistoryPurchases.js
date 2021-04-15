@@ -8,12 +8,12 @@ import Paper from '@material-ui/core/Paper';
 import {isEmpty} from 'lodash';
 import moment from 'moment';
 import {useState, useEffect} from 'react';
-
 import HistoryPurchasesStyles from './HistoryPurchasesStayles';
 import StoreIconMM from '../../assets/images/paperless_life_store.png';
 import OnlineIconMM from '../../assets/images/paperless_life_online.png';
+import Spinner from '../../components/spinners/customSpinner/CustomSpinner';
 
-const HistoryPurchases = ({salesOrderHistory, configData}) => {
+const HistoryPurchases = ({salesOrderHistory, configData, openSpinnerHistoryPurchase}) => {
     const classes = HistoryPurchasesStyles();
     const [rows, setRows] = useState([]);
     const createData = (date, market, currency, orderNumber, type) => {
@@ -33,33 +33,34 @@ const HistoryPurchases = ({salesOrderHistory, configData}) => {
     return (
         <Paper elevation={3}>
             <h3 className={classes.paperHeader}>Purchases history</h3>
-            {!isEmpty(salesOrderHistory) && !isEmpty(configData) ? <TableContainer className={classes.container}>
-                <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Date </TableCell>
-                            <TableCell></TableCell>
-                            <TableCell align="left">Market</TableCell>
-                            <TableCell align="right">EUR</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rows.map((row) => (
-                            <TableRow key={row.orderNumber}>
-                                <TableCell component="th" scope="row">
-                                    {row.date}
-                                </TableCell>
-                                <TableCell align="center">
-                                    <img src={row.type === 'store' ? StoreIconMM : OnlineIconMM} height="20"
-                                         alt="logo-transaction"/>
-                                </TableCell>
-                                <TableCell align="left">{row.market}</TableCell>
-                                <TableCell align="right">{row.currency}</TableCell>
+            {!isEmpty(salesOrderHistory) && !isEmpty(configData) && !isEmpty(rows) ?
+                <TableContainer className={classes.container}>
+                    <Table stickyHeader aria-label="sticky table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Date </TableCell>
+                                <TableCell></TableCell>
+                                <TableCell align="left">Market</TableCell>
+                                <TableCell align="right">EUR</TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer> : null}
+                        </TableHead>
+                        <TableBody>
+                            {rows.map((row) => (
+                                <TableRow key={row.orderNumber}>
+                                    <TableCell component="th" scope="row">
+                                        {row.date}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <img src={row.type === 'store' ? StoreIconMM : OnlineIconMM} height="20"
+                                             alt="logo-transaction"/>
+                                    </TableCell>
+                                    <TableCell align="left">{row.market}</TableCell>
+                                    <TableCell align="right">{row.currency}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer> : <Spinner openSpinner={openSpinnerHistoryPurchase}/>}
         </Paper>
     );
 }
