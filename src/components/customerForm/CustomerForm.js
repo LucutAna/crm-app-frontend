@@ -18,12 +18,14 @@ import Button from "@material-ui/core/Button";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import CustomerFormStyles from './CustomerFormStyles'
 import CustomerService from "../../shared/services/CustomerService";
-import {isEmpty, pickBy, find} from 'lodash';
+import {isEmpty, pickBy, find, pick, extend, get, cloneDeep, isNil, isUndefined} from 'lodash';
 import {useContext, useState} from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import moment from 'moment';
 
 import {GlobalContext} from '../../context/GlobalState';
+import CustomersModal from '../modals/customersModal/customersModal';
 
 const validationSchema = yup.object({
     firstName: yup
@@ -63,7 +65,6 @@ const validationSchema = yup.object({
     birthDate: yup
         .date()
         .nullable()
-        .required("Data deve ser informada")
         .test('test-name', 'The customer must be over 18 years old ',
             value => {
                 const age = getAge(value);
@@ -100,12 +101,31 @@ const diasbleUserInput = (form) => {
 //     return 18;
 //};
 
+const validateCustomerOnSearchByName = (customer) => {
+    if (!customer)
+        return false;
+
+    if (isEmpty(customer.firstName) || isEmpty(customer.lastName)) {
+        return false;
+    }
+    let hasStreet = get(customer, 'street1', false);
+    let hasStreetSeparated = get(customer, 'streetNameSeparated', false) || get(customer, 'houseNoSeparated ', false);
+    let hasEmail = get(customer, 'email', false);
+    let hasMobile = get(customer, 'mobile', false);
+    let hasBirthDate = get(customer, 'birthDate', false);
+    let hasDobZipCode = get(customer, 'birthDate', false) && get(customer, 'zipcode', false);
+    return hasStreet || hasStreetSeparated || hasEmail || hasMobile || hasDobZipCode || hasBirthDate;
+};
+
 const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
     const classes = CustomerFormStyles();
     const {addCustomer} = useContext(GlobalContext);
     const {customerData} = useContext(GlobalContext);
+    const [customersDataResult, setCustomersDataResult] = useState([]);
     const {deleteCustomerData} = useContext(GlobalContext);
     const [openSpinner, setOpenSpinner] = useState(false);
+    const [openCustomersModal, setOpenCustomersModal] = useState(false);
+    const [form, setForm] = useState({});
 
     const formFields = {
         firstName: '',
@@ -125,33 +145,120 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
 
     const search = async (customerForm) => {
         setOpenSpinner(true);
-        deleteCustomerData();
-        if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
+        setForm({...customerForm})
+        if (!!ciid) {
+            if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
+                deleteCustomerData();
+                try {
+                    let data = {
+                        ciid,
+                        searchCiid: ciid,
+                        storeId: configData.storeNumber,
+                        salesDivision: configData.salesDivision,
+                        subsidiary: configData.subsidiary
+                    };
+                    const customerSelected = await CustomerService.selectCustomer(data);
+                    const customer = pickBy(customerSelected.data);
+                    if (isUndefined(customer.firstName)) {
+                        let message = 'No customer data could be found with the entered search criteria';
+                        let open = true;
+                        let code = 'warning';
+                        setOpenSpinner(false);
+                        onSetOpenSnackbar({open, message, code});
+                        return
+                    }
+                    ;
+                    addCustomer({...customerSelected.data});
+                    customerForm.resetForm(formFields);
+                    //fil customer for with data from CCR
+                    Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
+                    setOpenSpinner(false);
+                } catch (error) {
+                    console.log(error)
+                }
+            } else {
+                let message = 'Please enter a valid customer card number';
+                let open = true;
+                let code = 'warning';
+                setOpenSpinner(false);
+                onSetOpenSnackbar({open, message, code});
+            }
+        }
+        if (!ciid) {
+            let errCount = 0;
+            let cust = cloneDeep(customerForm.values);
+
+            if (!isNil(customerForm.values.birthDate)) {
+                // Normalize date of birth for CCR and avoid hours set to 23 what causes after ISO conversion that the day is set to one day in the past caused by timezones.
+                customerForm.values.birthDate.setHours(12);
+                cust.birthDate = (moment().format("YYYY/MM/DD") !== moment(customerForm.values.birthDate).format("YYYY/MM/DD")) ? moment(customerForm.values.birthDate).toISOString() : '';
+            }
+
+            if (!validateCustomerOnSearchByName(cust)) {
+                setOpenSpinner(false);
+                let message = 'When searching, please enter at least the first and last name of the customer and at least one additional piece of information (email address, street and house number, date of birth and zip code, mobile number';
+                let open = true;
+                let code = 'warning';
+                onSetOpenSnackbar({open, message, code});
+                errCount++;
+            }
+
+            if (errCount > 0)
+                return;
+
+            cust.phone = customerForm.values.mobile;
             try {
-                let data = {
-                    ciid,
-                    searchCiid: ciid,
-                    storeId: configData.storeNumber,
+                const config = {
                     salesDivision: configData.salesDivision,
                     subsidiary: configData.subsidiary
-                };
-                const customerSelected = await CustomerService.selectCustomer(data);
-                const customer = pickBy(customerSelected.data);
-                addCustomer({...customerSelected.data});
-                customerForm.resetForm(formFields);
-                //fil customer for with data from CCR
-                Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
+                }
+                const searchFields = pick(cust, ['firstName', 'lastName', 'birthDate', 'street1', 'zipcode', 'city', 'email', 'phone']);
+                let data = extend(config, searchFields);
+                const customerResult = await CustomerService.searchCustomer(data);
+                if (isEmpty(customerResult.data)) {
+                    setOpenSpinner(false);
+                    let message = 'No customer data could be found with the entered search criteria';
+                    let open = true;
+                    let code = 'info';
+                    onSetOpenSnackbar({open, message, code});
+                }
+                ;
+                setCustomersDataResult(customerResult.data);
                 setOpenSpinner(false);
+                setOpenCustomersModal(true);
+
             } catch (error) {
-                console.log(error)
+                console.log(error);
+                setOpenSpinner(false);
             }
-        } else {
-            let message = 'For the search, please use a valid Club Card Number';
-            let open = true;
-            let code = 'warning';
-            setOpenSpinner(false);
-            onSetOpenSnackbar({open, message, code});
         }
+    }
+
+    const selectCustomer = async customerInfo => {
+        setOpenCustomersModal(false);
+        setOpenSpinner(true);
+        try {
+            const data = {
+                partyUid: customerInfo.partyUid,
+                partyId: customerInfo.partyId,
+                storeId: configData.storeNumber,
+                salesDivision: configData.salesDivision,
+                subsidiary: configData.subsidiary
+            }
+            const customerSelected = await CustomerService.selectCustomer(data);
+            const customer = pickBy(customerSelected.data);
+            addCustomer({...customerSelected.data});
+            //fil customer for with data from CCR
+            Object.keys(formFields).forEach(field => form.setFieldValue(field, customer[field], false));
+            setOpenSpinner(false);
+        } catch (error) {
+            console.log(error);
+            setOpenSpinner(false);
+        }
+    }
+
+    const handleCloseCustomersModal = () => {
+        setOpenCustomersModal(false);
     }
 
     const clearFormFields = (customerForm) => {
@@ -374,6 +481,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                     </Form>
                 )}
             </Formik>
+            <CustomersModal openCustomersModal={openCustomersModal}
+                            onHandleCloseCustomersModal={handleCloseCustomersModal}
+                            onSelectCustomer={selectCustomer}
+                            customersData={customersDataResult}/>
             <Backdrop className={classes.backdrop} open={openSpinner}>
                 <CircularProgress size='160px' color="primary" thickness={7}/>
             </Backdrop>

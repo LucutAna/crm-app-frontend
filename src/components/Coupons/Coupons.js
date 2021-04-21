@@ -1,7 +1,7 @@
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
+import Button from '@material-ui/core/Button';
 import moment from 'moment';
 
 import CouponsStyles from './CouponsStyles';

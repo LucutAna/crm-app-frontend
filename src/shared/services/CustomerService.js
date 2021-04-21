@@ -3,22 +3,27 @@ import {BASE_URL} from '../utils/constants';
 import moment from 'moment';
 import {map, trim, isEmpty, isNil, omitBy} from 'lodash';
 
-const selectCustomer = (data) => {
+const selectCustomer = data => {
     return axiosInstance.post(`/crm-customer/selectCustomer/`, data);
 }
 
-const generateCiid = (data) => {
+const searchCustomer = data => {
+    return axiosInstance.post(`/crm-customer/searchCustomer/`, data);
+}
+
+const generateCiid = data => {
     return axiosInstance.post(`/crm-customer/cards/generate`, data);
 }
-const upsertCustomer = (data) => {
+
+const upsertCustomer = data => {
     return axiosInstance.post(`/crm-customer/upsertCustomer/`, data);
 }
 
-const validateCardNumber = (data) => {
+const validateCardNumber = data => {
     return axiosInstance.post(`/crm-customer/cards/validate`, data);
 }
 
-const getRegistrationPdfUrlInternal = (customerData) => {
+const getRegistrationPdfUrlInternal = customerData => {
     let url = `${BASE_URL}/crm-sales/getRegistrationPDF/`;
     url = url + '?' + Object.keys(customerData).map(function (key) {
         return key + '=' + encodeURIComponent(customerData[key]);
@@ -186,6 +191,7 @@ const createCustomerPrintData = (customer, configData, cardCiid, consentFlag) =>
 
 const CustomerService = {
     selectCustomer,
+    searchCustomer,
     generateCiid,
     upsertCustomer,
     isClubCardNumberFormatValid,
