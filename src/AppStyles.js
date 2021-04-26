@@ -22,7 +22,7 @@ const AppStyles = makeStyles((ThemeCRMApp) => ({
     },
     content: {
         flexGrow: 1,
-        padding: ThemeCRMApp.spacing(9),
+        padding: ThemeCRMApp.spacing(3),
     },
 }));
 

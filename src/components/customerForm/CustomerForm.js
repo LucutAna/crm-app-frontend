@@ -71,7 +71,7 @@ const validationSchema = yup.object({
                 const minAge = 18;
                 return age >= minAge
             })
-        .required('Birth Date is requierd')
+        .required('Birth Date is required')
 });
 
 
@@ -84,7 +84,7 @@ const getAge = value => {
     return age;
 };
 
-const diasbleUserInput = (form) => {
+const disableUserInput = (form) => {
     if (isEmpty(form.partyUid)) {
         return false;
     } else if (form.firstName && form.lastName && form.birthDate) {
@@ -127,25 +127,25 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
 
-    const formFields = {
-        firstName: '',
-        lastName: '',
-        street1: '',
-        zipcode: '',
-        city: '',
-        mobile: '',
-        email: '',
-        salutation: '',
-        country: Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '',
-        birthDate: new Date(),
-        partyUid: null,
-        partyId: null,
+    let formFields = {
+        firstName: isEmpty(customerData) ? '' : customerData.firstName,
+        lastName: isEmpty(customerData) ? '' : customerData.lastName,
+        street1: isEmpty(customerData) ? '' : customerData.street1,
+        zipcode: isEmpty(customerData) ? '' : customerData.zipcode,
+        city: isEmpty(customerData) ? '' : customerData.city,
+        mobile: isEmpty(customerData) ? '' : customerData.mobile,
+        email: isEmpty(customerData) ? '' : customerData.email,
+        salutation: isEmpty(customerData) ? '' : customerData.salutation,
+        country: isEmpty(customerData) ? Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '' : customerData.country,
+        birthDate: isEmpty(customerData) ? new Date() : customerData.birthDate,
+        partyUid: isEmpty(customerData) ? null : customerData.partyUid,
+        partyId: isEmpty(customerData) ? null: customerData.partyId,
         updateCustomerFlag: false
     };
 
     const search = async (customerForm) => {
         setOpenSpinner(true);
-        setForm({...customerForm})
+        setForm({...customerForm});
         if (!!ciid) {
             if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
                 deleteCustomerData();
@@ -166,8 +166,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                         setOpenSpinner(false);
                         onSetOpenSnackbar({open, message, code});
                         return
-                    }
-                    ;
+                    };
                     addCustomer({...customerSelected.data});
                     customerForm.resetForm(formFields);
                     //fil customer for with data from CCR
@@ -211,7 +210,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 const config = {
                     salesDivision: configData.salesDivision,
                     subsidiary: configData.subsidiary
-                }
+                };
                 const searchFields = pick(cust, ['firstName', 'lastName', 'birthDate', 'street1', 'zipcode', 'city', 'email', 'phone']);
                 let data = extend(config, searchFields);
                 const customerResult = await CustomerService.searchCustomer(data);
@@ -221,8 +220,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                     let open = true;
                     let code = 'info';
                     onSetOpenSnackbar({open, message, code});
-                }
-                ;
+                };
                 setCustomersDataResult(customerResult.data);
                 setOpenSpinner(false);
                 setOpenCustomersModal(true);
@@ -232,7 +230,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 setOpenSpinner(false);
             }
         }
-    }
+    };
 
     const selectCustomer = async customerInfo => {
         setOpenCustomersModal(false);
@@ -244,7 +242,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 storeId: configData.storeNumber,
                 salesDivision: configData.salesDivision,
                 subsidiary: configData.subsidiary
-            }
+            };
             const customerSelected = await CustomerService.selectCustomer(data);
             const customer = pickBy(customerSelected.data);
             addCustomer({...customerSelected.data});
@@ -255,17 +253,33 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             console.log(error);
             setOpenSpinner(false);
         }
-    }
+    };
 
     const handleCloseCustomersModal = () => {
         setOpenCustomersModal(false);
-    }
+    };
 
     const clearFormFields = (customerForm) => {
+        console.log(customerForm);
         deleteCustomerData();
         onClearSearchInput();
         customerForm.resetForm(formFields);
-    }
+        // formFields = {
+        //     firstName: '',
+        //     lastName: '',
+        //     street1: '',
+        //     zipcode: '',
+        //     city: '',
+        //     mobile: '',
+        //     email: '',
+        //     salutation: '',
+        //     country:  Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '',
+        //     birthDate:  new Date(),
+        //     partyUid: null,
+        //     partyId: null,
+        //     updateCustomerFlag: false
+        // }
+    };
 
     const onSubmit = (values, actions) => {
         //use consent flag from selectCustomer response
@@ -302,9 +316,9 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             value={customerForm.values.salutation}
                                             onChange={customerForm.handleChange}
                                 >
-                                    <FormControlLabel value="Mrs." disabled={diasbleUserInput(customerForm.values)}
+                                    <FormControlLabel value="Mrs." disabled={disableUserInput(customerForm.values)}
                                                       control={<Radio/>} label="Mrs."/>
-                                    <FormControlLabel value="Mr." disabled={diasbleUserInput(customerForm.values)}
+                                    <FormControlLabel value="Mr." disabled={disableUserInput(customerForm.values)}
                                                       control={<Radio/>} label="Mr."/>
                                 </RadioGroup>
                                 <Grid container spacing={4}>
@@ -315,7 +329,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             id="firstName"
                                             name="firstName"
                                             label="First name*"
-                                            disabled={diasbleUserInput(customerForm.values)}
+                                            disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.firstName}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.firstName && Boolean(customerForm.errors.firstName)}
@@ -344,7 +358,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             id="lastName"
                                             name="lastName"
                                             label="Last name*"
-                                            disabled={diasbleUserInput(customerForm.values)}
+                                            disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.lastName}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.lastName && Boolean(customerForm.errors.lastName)}
@@ -374,7 +388,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                                 id="date-picker-dialog"
                                                 label="Birthday*"
                                                 format="dd/MM/yyyy"
-                                                disabled={diasbleUserInput(customerForm.values)}
+                                                disabled={disableUserInput(customerForm.values)}
                                                 value={customerForm.values.birthDate}
                                                 onChange={value => customerForm.setFieldValue("birthDate", value)}
                                                 KeyboardButtonProps={{
@@ -407,7 +421,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             id="email"
                                             name="email"
                                             label="Email*"
-                                            disabled={diasbleUserInput(customerForm.values)}
+                                            disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.email}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.email && Boolean(customerForm.errors.email)}
