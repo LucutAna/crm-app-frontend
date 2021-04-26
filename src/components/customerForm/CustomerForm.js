@@ -71,7 +71,7 @@ const validationSchema = yup.object({
                 const minAge = 18;
                 return age >= minAge
             })
-        .required('Birth Date is requierd')
+        .required('Birth Date is required')
 });
 
 
@@ -84,7 +84,7 @@ const getAge = value => {
     return age;
 };
 
-const diasbleUserInput = (form) => {
+const disableUserInput = (form) => {
     if (isEmpty(form.partyUid)) {
         return false;
     } else if (form.firstName && form.lastName && form.birthDate) {
@@ -302,9 +302,9 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             value={customerForm.values.salutation}
                                             onChange={customerForm.handleChange}
                                 >
-                                    <FormControlLabel value="Mrs." disabled={diasbleUserInput(customerForm.values)}
+                                    <FormControlLabel value="Mrs." disabled={disableUserInput(customerForm.values)}
                                                       control={<Radio/>} label="Mrs."/>
-                                    <FormControlLabel value="Mr." disabled={diasbleUserInput(customerForm.values)}
+                                    <FormControlLabel value="Mr." disabled={disableUserInput(customerForm.values)}
                                                       control={<Radio/>} label="Mr."/>
                                 </RadioGroup>
                                 <Grid container spacing={4}>
@@ -315,7 +315,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             id="firstName"
                                             name="firstName"
                                             label="First name*"
-                                            disabled={diasbleUserInput(customerForm.values)}
+                                            disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.firstName}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.firstName && Boolean(customerForm.errors.firstName)}
@@ -344,7 +344,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             id="lastName"
                                             name="lastName"
                                             label="Last name*"
-                                            disabled={diasbleUserInput(customerForm.values)}
+                                            disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.lastName}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.lastName && Boolean(customerForm.errors.lastName)}
@@ -374,7 +374,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                                 id="date-picker-dialog"
                                                 label="Birthday*"
                                                 format="dd/MM/yyyy"
-                                                disabled={diasbleUserInput(customerForm.values)}
+                                                disabled={disableUserInput(customerForm.values)}
                                                 value={customerForm.values.birthDate}
                                                 onChange={value => customerForm.setFieldValue("birthDate", value)}
                                                 KeyboardButtonProps={{
@@ -407,7 +407,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             id="email"
                                             name="email"
                                             label="Email*"
-                                            disabled={diasbleUserInput(customerForm.values)}
+                                            disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.email}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.email && Boolean(customerForm.errors.email)}

@@ -12,7 +12,7 @@ const CustomerDataInfoStyles = makeStyles((theme) => ({
         paddingLeft: '15px'
     },
     cardImage: {
-        height: '80px',
+        height: '60px',
         paddingTop: '22px',
         paddingLeft: '15px'
     },
