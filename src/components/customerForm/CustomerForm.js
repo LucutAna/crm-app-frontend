@@ -23,6 +23,7 @@ import {useContext, useState} from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import moment from 'moment';
+import {Redirect} from "react-router-dom";
 
 import {GlobalContext} from '../../context/GlobalState';
 import CustomersModal from '../modals/customersModal/customersModal';
@@ -126,6 +127,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const [openSpinner, setOpenSpinner] = useState(false);
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
+    const [redirectDashboard, setRedirectDashboard] = useState(null);
 
     const formFields = {
         firstName: '',
@@ -167,8 +169,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                         onSetOpenSnackbar({open, message, code});
                         return
                     }
-                    ;
+
                     addCustomer({...customerSelected.data});
+                    //redirect to dasboard page
+                    setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
                     customerForm.resetForm(formFields);
                     //fil customer for with data from CCR
                     Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
@@ -248,6 +252,8 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             const customerSelected = await CustomerService.selectCustomer(data);
             const customer = pickBy(customerSelected.data);
             addCustomer({...customerSelected.data});
+            //redirect to dasboard page
+            setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
             //fil customer for with data from CCR
             Object.keys(formFields).forEach(field => form.setFieldValue(field, customer[field], false));
             setOpenSpinner(false);
@@ -488,6 +494,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             <Backdrop className={classes.backdrop} open={openSpinner}>
                 <CircularProgress size='160px' color="primary" thickness={7}/>
             </Backdrop>
+            {redirectDashboard ? <Redirect to={{pathname: "/dashboard"}}/> : null}
         </>
     );
 };
