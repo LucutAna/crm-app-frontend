@@ -129,25 +129,25 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const [form, setForm] = useState({});
     const [redirectDashboard, setRedirectDashboard] = useState(null);
 
-    const formFields = {
-        firstName: '',
-        lastName: '',
-        street1: '',
-        zipcode: '',
-        city: '',
-        mobile: '',
-        email: '',
-        salutation: '',
-        country: Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '',
-        birthDate: new Date(),
-        partyUid: null,
-        partyId: null,
+    let formFields = {
+        firstName: isEmpty(customerData) ? '' : customerData.firstName,
+        lastName: isEmpty(customerData) ? '' : customerData.lastName,
+        street1: isEmpty(customerData) ? '' : customerData.street1,
+        zipcode: isEmpty(customerData) ? '' : customerData.zipcode,
+        city: isEmpty(customerData) ? '' : customerData.city,
+        mobile: isEmpty(customerData) ? '' : customerData.mobile,
+        email: isEmpty(customerData) ? '' : customerData.email,
+        salutation: isEmpty(customerData) ? '' : customerData.salutation,
+        country: isEmpty(customerData) ? Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '' : customerData.country,
+        birthDate: isEmpty(customerData) ? new Date() : customerData.birthDate,
+        partyUid: isEmpty(customerData) ? null : customerData.partyUid,
+        partyId: isEmpty(customerData) ? null: customerData.partyId,
         updateCustomerFlag: false
     };
 
     const search = async (customerForm) => {
         setOpenSpinner(true);
-        setForm({...customerForm})
+        setForm({...customerForm});
         if (!!ciid) {
             if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
                 deleteCustomerData();
@@ -169,7 +169,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                         onSetOpenSnackbar({open, message, code});
                         return
                     }
-
+                    ;
                     addCustomer({...customerSelected.data});
                     //redirect to dasboard page
                     setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
@@ -215,7 +215,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 const config = {
                     salesDivision: configData.salesDivision,
                     subsidiary: configData.subsidiary
-                }
+                };
                 const searchFields = pick(cust, ['firstName', 'lastName', 'birthDate', 'street1', 'zipcode', 'city', 'email', 'phone']);
                 let data = extend(config, searchFields);
                 const customerResult = await CustomerService.searchCustomer(data);
@@ -225,8 +225,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                     let open = true;
                     let code = 'info';
                     onSetOpenSnackbar({open, message, code});
-                }
-                ;
+                };
                 setCustomersDataResult(customerResult.data);
                 setOpenSpinner(false);
                 setOpenCustomersModal(true);
@@ -236,7 +235,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 setOpenSpinner(false);
             }
         }
-    }
+    };
 
     const selectCustomer = async customerInfo => {
         setOpenCustomersModal(false);
@@ -248,7 +247,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                 storeId: configData.storeNumber,
                 salesDivision: configData.salesDivision,
                 subsidiary: configData.subsidiary
-            }
+            };
             const customerSelected = await CustomerService.selectCustomer(data);
             const customer = pickBy(customerSelected.data);
             addCustomer({...customerSelected.data});
@@ -261,13 +260,14 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             console.log(error);
             setOpenSpinner(false);
         }
-    }
+    };
 
     const handleCloseCustomersModal = () => {
         setOpenCustomersModal(false);
-    }
+    };
 
     const clearFormFields = (customerForm) => {
+        console.log(customerForm);
         deleteCustomerData();
         onClearSearchInput();
         customerForm.resetForm(formFields);
