@@ -494,6 +494,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             <Backdrop className={classes.backdrop} open={openSpinner}>
                 <CircularProgress size='160px' color="primary" thickness={7}/>
             </Backdrop>
+            {redirectDashboard ? <Redirect to={{pathname: "/dashboard"}}/> : null}
         </>
     );
 };
