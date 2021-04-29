@@ -164,12 +164,12 @@ const Dashboard = ({configData}) => {
         });
 
         const deduplicatedOrders = pullAt(allOrders, values(filteredOrders));
-        const orders = filter(deduplicatedOrders, function (o) {
-            return o.orderGrossTotal >= 0;
+        let orders = filter(deduplicatedOrders, function (order) {
+            return order.orderGrossTotal >= 0;
         });
 
         const storesInfo = SalesTransactions.storesInfo;
-        orders.map(sale => {
+        orders = orders.map(sale => {
             storesInfo.forEach(store => {
                 if (sale.orderOutletId === store.storeNumber) {
                     sale.storeName = store.storeName;

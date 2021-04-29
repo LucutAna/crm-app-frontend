@@ -23,6 +23,7 @@ import {useContext, useState} from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import moment from 'moment';
+import {Redirect} from "react-router-dom";
 
 import {GlobalContext} from '../../context/GlobalState';
 import CustomersModal from '../modals/customersModal/customersModal';
@@ -126,6 +127,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const [openSpinner, setOpenSpinner] = useState(false);
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
+    const [redirectDashboard, setRedirectDashboard] = useState(null);
 
     let formFields = {
         firstName: isEmpty(customerData) ? '' : customerData.firstName,
@@ -166,8 +168,11 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                         setOpenSpinner(false);
                         onSetOpenSnackbar({open, message, code});
                         return
-                    };
+                    }
+                    ;
                     addCustomer({...customerSelected.data});
+                    //redirect to dasboard page
+                    setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
                     customerForm.resetForm(formFields);
                     //fil customer for with data from CCR
                     Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
@@ -246,6 +251,8 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             const customerSelected = await CustomerService.selectCustomer(data);
             const customer = pickBy(customerSelected.data);
             addCustomer({...customerSelected.data});
+            //redirect to dasboard page
+            setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
             //fil customer for with data from CCR
             Object.keys(formFields).forEach(field => form.setFieldValue(field, customer[field], false));
             setOpenSpinner(false);
@@ -264,22 +271,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
         deleteCustomerData();
         onClearSearchInput();
         customerForm.resetForm(formFields);
-        // formFields = {
-        //     firstName: '',
-        //     lastName: '',
-        //     street1: '',
-        //     zipcode: '',
-        //     city: '',
-        //     mobile: '',
-        //     email: '',
-        //     salutation: '',
-        //     country:  Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '',
-        //     birthDate:  new Date(),
-        //     partyUid: null,
-        //     partyId: null,
-        //     updateCustomerFlag: false
-        // }
-    };
+    }
 
     const onSubmit = (values, actions) => {
         //use consent flag from selectCustomer response
