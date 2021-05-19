@@ -4,6 +4,9 @@ const OrderHistoryStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
     },
+    filterTab: {
+        marginBottom: '35px',
+    },
     accordionContainer: {
         marginBottom: '15px',
         transitionDuration: '0.15',
@@ -35,7 +38,23 @@ const OrderHistoryStyles = makeStyles((theme) => ({
         paddingLeft: '15px'
     },
     transactionDetails: {
-        display:'block'
+        display: 'block'
+    },
+    accordionDetails: {
+        padding: '20px 0'
+    },
+    orderDetails: {
+        paddingLeft: '4%',
+        flexBasis: '50%'
+    },
+    productDetails: {
+        fontSize: theme.typography.pxToRem(15),
+        color: theme.palette.text.secondary,
+        paddingLeft: '15px'
+    },
+    btnWrapper: {
+        padding: ' 15px 30px 15px 0',
+        textAlign: 'end'
     }
 }));
 
