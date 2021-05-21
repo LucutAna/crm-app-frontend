@@ -45,7 +45,7 @@ const OrderHistory = ({transactionsHistory, configData}) => {
 
     const filterOrderHistory = (event, newValue) => {
         setValue(newValue);
-
+        setExpanded(false);
         if(newValue === 0) {
             setTransactions(transactionsHistory);
         }
