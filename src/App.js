@@ -25,6 +25,8 @@ function App() {
     const [outletID, setOutletID] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState({open: false, message: '', code: ''});
 
+    let transactionsHistory = [];
+
     useEffect(() => {
         try {
             const getStoreConfig = async () => {
@@ -37,6 +39,11 @@ function App() {
             console.log(error);
         }
     }, []);
+
+    const getTransactions = (transactions) => {
+        if (transactions.length > 0)
+            transactionsHistory = transactions;
+    };
 
     const getOutletId = () => {
         let outletId = window.location.href.split('=')[1];
@@ -77,8 +84,10 @@ function App() {
                             <Route path={['/', '/crm', `/crm/?outletId=${outletID}`]} exact
                                    component={() => <Home configData={configData}
                                                           onSetOpenSnackbar={setOpenSnackbar}/>}/>
-                            <Route path='/dashboard' component={() => <Dashboard configData={configData}/>}/>
-                            <Route path='/order-history' component={OrderHistory}/>
+                            <Route path='/dashboard' component={() => <Dashboard configData={configData}
+                                                                                 onGetTransactions={getTransactions}/>}/>
+                            <Route path='/order-history' component={() => <OrderHistory configData={configData}
+                                                                                        transactionsHistory={transactionsHistory}/>}/>
                             <Route path='/coupons' component={Coupons}/>
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                         </main>

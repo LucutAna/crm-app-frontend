@@ -35,11 +35,11 @@ const permissions = (customerPermision) => {
     return initialPermissions.emailConsentFlag ? 'Yes' : 'No';
 }
 
-const Dashboard = ({configData}) => {
+const Dashboard = ({configData, onGetTransactions}) => {
     const classes = DashboardStyles();
     const {customerData} = useContext(GlobalContext);
     const [customerInfo, setCustomerInfo] = useState('');
-    const [salesOrderHistory, setSalesOrderHistory] = useState('');
+    const [salesOrderHistory, setSalesOrderHistory] = useState([]);
     const [customerCoupons, setCustomerCoupons] = useState([]);
     const [openSpinnerHistoryPurchase, setOpenSpinnerHistoryPurchase] = useState(false);
     const [openSpinnerCoupons, setOpenSpinnerCoupons] = useState(false);
@@ -117,6 +117,10 @@ const Dashboard = ({configData}) => {
             getCouponsCustomer(couponsPayload);
         }
     }, [customerData, configData]);
+
+    useEffect(() => {
+        onGetTransactions(salesOrderHistory);
+    }, [salesOrderHistory, onGetTransactions]);
 
     const showSalesOrderHistory = (ordersResponse) => {
         let orderHistory = flatten(ordersResponse[0]);
