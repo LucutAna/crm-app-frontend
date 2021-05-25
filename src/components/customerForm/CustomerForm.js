@@ -124,6 +124,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const {customerData} = useContext(GlobalContext);
     const [customersDataResult, setCustomersDataResult] = useState([]);
     const {deleteCustomerData} = useContext(GlobalContext);
+    const {deleteTransactions} = useContext(GlobalContext);
     const [openSpinner, setOpenSpinner] = useState(false);
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
@@ -150,7 +151,10 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
         setForm({...customerForm});
         if (!!ciid) {
             if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
+                //clear global objects
                 deleteCustomerData();
+                deleteTransactions();
+
                 try {
                     let data = {
                         ciid,
@@ -269,6 +273,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const clearFormFields = (customerForm) => {
         console.log(customerForm);
         deleteCustomerData();
+        deleteTransactions();
         onClearSearchInput();
         customerForm.resetForm(formFields);
     }

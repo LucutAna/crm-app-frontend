@@ -10,6 +10,16 @@ const AppReducer = (state, action) => {
                 ...state,
                 customerData: {}
             }
+        case 'ADD_TRANSACTIONS':
+            return {
+                ...state,
+                transactionsHistory: {...action.payload, ...state.transactionsHistory}
+            }
+        case 'DELETE_TRANSACTIONS':
+            return {
+                ...state,
+                transactionsHistory: {}
+            }
         default:
             return state;
     }

@@ -35,9 +35,10 @@ const permissions = (customerPermision) => {
     return initialPermissions.emailConsentFlag ? 'Yes' : 'No';
 }
 
-const Dashboard = ({configData, onGetTransactions}) => {
+const Dashboard = ({configData}) => {
     const classes = DashboardStyles();
     const {customerData} = useContext(GlobalContext);
+    const {addTransactions} = useContext(GlobalContext);
     const [customerInfo, setCustomerInfo] = useState('');
     const [salesOrderHistory, setSalesOrderHistory] = useState([]);
     const [customerCoupons, setCustomerCoupons] = useState([]);
@@ -118,10 +119,6 @@ const Dashboard = ({configData, onGetTransactions}) => {
         }
     }, [customerData, configData]);
 
-    useEffect(() => {
-        onGetTransactions(salesOrderHistory);
-    }, [salesOrderHistory, onGetTransactions]);
-
     const showSalesOrderHistory = (ordersResponse) => {
         let orderHistory = flatten(ordersResponse[0]);
         let orderHistoryOnline = chain(ordersResponse[1])
@@ -183,6 +180,7 @@ const Dashboard = ({configData, onGetTransactions}) => {
             return sale;
         });
         setSalesOrderHistory(orderBy(orders, ['date', 'orderNumber'], ['desc', 'desc']));
+        addTransactions(orderBy(orders, ['date', 'orderNumber'], ['desc', 'desc']));
         setOpenSpinnerHistoryPurchase(false);
     };
 

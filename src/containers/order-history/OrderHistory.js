@@ -1,5 +1,5 @@
 import Accordion from '@material-ui/core/Accordion';
-import {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
 import moment from "moment";
 import {isEmpty, uniq, forEach, isNull} from 'lodash';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -16,6 +16,7 @@ import Tab from '@material-ui/core/Tab';
 
 import StoreIconMM from "../../assets/images/paperless_life_store.png";
 import OnlineIconMM from "../../assets/images/paperless_life_online.png";
+import {GlobalContext} from '../../context/GlobalState';
 
 const printDocumentNumbers = (documentNumber) => {
     if (isEmpty(documentNumber)) {
@@ -33,30 +34,34 @@ const printDocumentNumbers = (documentNumber) => {
     }
 }
 
-const OrderHistory = ({transactionsHistory, configData}) => {
+
+const OrderHistory = ({configData}) => {
     const [transactions, setTransactions] = useState([]);
+    const [allTransactions, setAllTransactions] = useState([]);
     const classes = OrderHistoryStyles();
     const [expanded, setExpanded] = useState(false);
     const [value, setValue] = useState(0);
+    const {transactionsHistory} = useContext(GlobalContext);
 
     useEffect(() => {
-        setTransactions(transactionsHistory);
+        setAllTransactions(Object.values(transactionsHistory));
+        setTransactions(Object.values(transactionsHistory));
     }, [transactionsHistory]);
 
     const filterOrderHistory = (event, newValue) => {
         setValue(newValue);
         setExpanded(false);
         if(newValue === 0) {
-            setTransactions(transactionsHistory);
+            setTransactions(Object.values(transactionsHistory));
         }
 
         if(newValue === 1) {
-            const storeTransactions = transactionsHistory.filter(transaction => transaction.type === 'store');
+            const storeTransactions = allTransactions.filter(transaction => transaction.type === 'store');
             setTransactions(storeTransactions);
         }
 
         if(newValue === 2) {
-            const onlineTransactions = transactionsHistory.filter(transaction => transaction.type === 'online');
+            const onlineTransactions = allTransactions.filter(transaction => transaction.type === 'online');
             setTransactions(onlineTransactions);
         }
 
