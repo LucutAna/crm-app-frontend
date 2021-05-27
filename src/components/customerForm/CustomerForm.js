@@ -6,24 +6,21 @@ import DateFnsUtils from '@date-io/date-fns';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
+import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import SearchIcon from '@material-ui/icons/Search';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import CustomerFormStyles from './CustomerFormStyles'
-import CustomerService from "../../shared/services/CustomerService";
-import {isEmpty, pickBy, find, pick, extend, get, cloneDeep, isNil, isUndefined} from 'lodash';
+import CustomerService from '../../shared/services/CustomerService';
+import {cloneDeep, extend, find, get, isEmpty, isNil, isUndefined, pick, pickBy} from 'lodash';
 import {useContext, useState} from 'react';
+import {useHistory} from 'react-router-dom';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import moment from 'moment';
-import {Redirect} from "react-router-dom";
 
 import {GlobalContext} from '../../context/GlobalState';
 import CustomersModal from '../modals/customersModal/customersModal';
@@ -120,6 +117,7 @@ const validateCustomerOnSearchByName = (customer) => {
 
 const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
     const classes = CustomerFormStyles();
+    const history = useHistory();
     const {addCustomer} = useContext(GlobalContext);
     const {customerData} = useContext(GlobalContext);
     const [customersDataResult, setCustomersDataResult] = useState([]);
@@ -128,7 +126,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const [openSpinner, setOpenSpinner] = useState(false);
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
-    const [redirectDashboard, setRedirectDashboard] = useState(null);
 
     let formFields = {
         firstName: isEmpty(customerData) ? '' : customerData.firstName,
@@ -175,12 +172,14 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                     }
                     ;
                     addCustomer({...customerSelected.data});
-                    //redirect to dasboard page
-                    setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
                     customerForm.resetForm(formFields);
                     //fil customer for with data from CCR
                     Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
                     setOpenSpinner(false);
+                    //redirect to dashboard page
+                    if ( !isNil(customerSelected.data.firstName) && customerSelected.status === 200 ) {
+                        history.push('/dashboard');
+                    }
                 } catch (error) {
                     console.log(error)
                 }
@@ -255,11 +254,14 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             const customerSelected = await CustomerService.selectCustomer(data);
             const customer = pickBy(customerSelected.data);
             addCustomer({...customerSelected.data});
-            //redirect to dasboard page
-            setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
             //fil customer for with data from CCR
             Object.keys(formFields).forEach(field => form.setFieldValue(field, customer[field], false));
             setOpenSpinner(false);
+            //redirect to dashboard page
+            if ( !isNil(customerSelected.data.firstName) && customerSelected.status === 200 ) {
+                history.push('/dashboard');
+            }
+
         } catch (error) {
             console.log(error);
             setOpenSpinner(false);
@@ -499,7 +501,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             <Backdrop className={classes.backdrop} open={openSpinner}>
                 <CircularProgress size='160px' color="primary" thickness={7}/>
             </Backdrop>
-            {redirectDashboard ? <Redirect to={{pathname: "/dashboard"}}/> : null}
         </>
     );
 };

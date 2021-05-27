@@ -1,11 +1,11 @@
-import {useState, useContext} from 'react';
-import {Redirect} from "react-router-dom";
+import {useContext, useState} from 'react';
+import {useHistory} from 'react-router-dom';
 
-import CustomerForm from "../../components/customerForm/CustomerForm";
-import SearchInput from "../../components/searchInput/SearchInput";
-import EnrollModal from "../../components/modals/enrollModal/EnrollModal";
-import CustomerService from "../../shared/services/CustomerService";
-import PrintModal from "../../components/modals/printModal/PrintModal";
+import CustomerForm from '../../components/customerForm/CustomerForm';
+import SearchInput from '../../components/searchInput/SearchInput';
+import EnrollModal from '../../components/modals/enrollModal/EnrollModal';
+import CustomerService from '../../shared/services/CustomerService';
+import PrintModal from '../../components/modals/printModal/PrintModal';
 import {GlobalContext} from '../../context/GlobalState';
 
 const Home = ({configData, onSetOpenSnackbar}) => {
@@ -13,9 +13,10 @@ const Home = ({configData, onSetOpenSnackbar}) => {
     const [customerRegistrationData, setCustomerRegistrationData] = useState('');
     const [openEnrollModal, setOpenEnrollModal] = useState(false);
     const [openPrintModal, setOpenPrintModal] = useState(false);
-    const [redirect, setRedirect] = useState(null);
-    const {deleteCustomerData} = useContext(GlobalContext);
     const [pdfUrl, setPdfUrl] = useState('');
+
+    const {deleteCustomerData} = useContext(GlobalContext);
+    const history = useHistory();
 
 
     const handleCiid = (searchCiid) => {
@@ -65,7 +66,9 @@ const Home = ({configData, onSetOpenSnackbar}) => {
         if (!!data && data === "SUBMIT") {
             try {
                 const customerCreated = await CustomerService.upsertCustomer(customerRegistrationData);
-                setRedirect(customerCreated.data.code === "SUCCESS");
+                if ( customerCreated.data.code === "SUCCESS" ) {
+                    history.push('/success', {customerRegistrationData})
+                }
                 deleteCustomerData();
             } catch (error) {
                 console.log(error);
@@ -77,7 +80,6 @@ const Home = ({configData, onSetOpenSnackbar}) => {
 
     return (
         <>
-            {redirect ? <Redirect to={{pathname: "/success", state: {customerRegistrationData}}}/> : null}
             <SearchInput onHandleCiid={handleCiid}
                          ciid={ciid}/>
             <CustomerForm configData={configData}
