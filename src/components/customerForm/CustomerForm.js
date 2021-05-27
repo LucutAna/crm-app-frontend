@@ -128,18 +128,18 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const [form, setForm] = useState({});
 
     let formFields = {
-        firstName: isEmpty(customerData) ? '' : customerData.firstName,
-        lastName: isEmpty(customerData) ? '' : customerData.lastName,
-        street1: isEmpty(customerData) ? '' : customerData.street1,
-        zipcode: isEmpty(customerData) ? '' : customerData.zipcode,
-        city: isEmpty(customerData) ? '' : customerData.city,
-        mobile: isEmpty(customerData) ? '' : customerData.mobile,
-        email: isEmpty(customerData) ? '' : customerData.email,
-        salutation: isEmpty(customerData) ? '' : customerData.salutation,
+        firstName: customerData.firstName || '',
+        lastName: customerData.lastName || '',
+        street1: customerData.street1 || '',
+        zipcode: customerData.zipcode || '',
+        city:  customerData.city || '',
+        mobile: customerData.mobile || '',
+        email: customerData.email || '',
+        salutation: customerData.salutation || '',
         country: isEmpty(customerData) ? Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '' : customerData.country,
-        birthDate: isEmpty(customerData) ? new Date() : customerData.birthDate,
-        partyUid: isEmpty(customerData) ? null : customerData.partyUid,
-        partyId: isEmpty(customerData) ? null: customerData.partyId,
+        birthDate: customerData.birthDate || new Date(),
+        partyUid: customerData.partyUid || null,
+        partyId: customerData.partyId || null,
         updateCustomerFlag: false
     };
 
@@ -273,7 +273,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     };
 
     const clearFormFields = (customerForm) => {
-        console.log(customerForm);
         deleteCustomerData();
         deleteTransactions();
         onClearSearchInput();
