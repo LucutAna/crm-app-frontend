@@ -20,6 +20,16 @@ const AppReducer = (state, action) => {
                 ...state,
                 transactionsHistory: {}
             }
+        case 'ADD_COUPONS':
+            return {
+                ...state,
+                coupons: {...action.payload, ...state.coupons}
+            }
+        case 'DELETE_COUPONS':
+            return {
+                ...state,
+                coupons: {}
+            }
         default:
             return state;
     }

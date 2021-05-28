@@ -39,6 +39,7 @@ const Dashboard = ({configData}) => {
     const classes = DashboardStyles();
     const {customerData} = useContext(GlobalContext);
     const {addTransactions} = useContext(GlobalContext);
+    const {addCoupons} = useContext(GlobalContext);
     const [customerInfo, setCustomerInfo] = useState('');
     const [salesOrderHistory, setSalesOrderHistory] = useState([]);
     const [customerCoupons, setCustomerCoupons] = useState([]);
@@ -200,6 +201,7 @@ const Dashboard = ({configData}) => {
             // });
             setCustomerCoupons(coupons.data);
             setOpenSpinnerCoupons(false);
+            addCoupons(coupons.data);
         } catch (error) {
             console.log(error);
             setOpenSpinnerCoupons(false);
