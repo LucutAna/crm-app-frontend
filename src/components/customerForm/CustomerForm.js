@@ -135,7 +135,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
         city:  customerData.city || '',
         mobile: customerData.mobile || '',
         email: customerData.email || '',
-        salutation: customerData.salutation || '',
+        salutation: customerData.salutation || 'Mrs.',
         country: isEmpty(customerData) ? Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '' : customerData.country,
         birthDate: customerData.birthDate || new Date(),
         partyUid: customerData.partyUid || null,
@@ -452,13 +452,13 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             error={customerForm.touched.country && Boolean(customerForm.errors.country)}
                                             helperText={customerForm.touched.country && customerForm.errors.country}
                                         >
-                                            <children/>
-                                            {Object.entries(configData).length !== 0 &&
-                                            configData.allowedCountries.map((option, index) => (
-                                                <MenuItem key={index} value={option}>
-                                                    {option}
-                                                </MenuItem>
-                                            ))
+                                            {Object.entries(configData).length !== 0 ?
+                                                configData.allowedCountries.map((option, index) => (
+                                                    <MenuItem key={index} value={option}>
+                                                        {option}
+                                                    </MenuItem>
+                                                )) :
+                                                <children/>
                                             }
                                         </TextField>
                                     </Grid>
