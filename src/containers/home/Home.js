@@ -38,6 +38,8 @@ const Home = ({configData, onSetOpenSnackbar}) => {
 
     const handleCloseEnrollModal = async (event, data, eKit, consentFlag) => {
         let url = '';
+        setOpenEnrollModal(false);
+
         if (!!data && data === "E-KIT_CARD") {
             setCustomerRegistrationData({...customerRegistrationData, cardCiid: eKit, customerConsentFlag: consentFlag})
             url = CustomerService.getRegistrationPdfUrlInternal(CustomerService.createCustomerPrintData(customerRegistrationData, configData, eKit, consentFlag));
@@ -59,7 +61,6 @@ const Home = ({configData, onSetOpenSnackbar}) => {
             setPdfUrl(url);
             setOpenPrintModal(true);
         }
-        setOpenEnrollModal(false);
     }
 
     const handleClosePrintModal = async (event, data) => {
@@ -67,6 +68,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
             try {
                 const customerCreated = await CustomerService.upsertCustomer(customerRegistrationData);
                 if ( customerCreated.data.code === "SUCCESS" ) {
+                    setOpenPrintModal(false);
                     history.push('/success', {customerRegistrationData})
                 }
                 deleteCustomerData();
