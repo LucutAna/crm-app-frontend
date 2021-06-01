@@ -80,7 +80,7 @@ function App() {
                                                           onSetOpenSnackbar={setOpenSnackbar}/>}/>
                             <Route path='/dashboard' component={() => <Dashboard configData={configData}/>}/>
                             <Route path='/order-history' component={() => <OrderHistory configData={configData}/>}/>
-                            <Route path='/coupons' component={() => <CouponsPage/>}/>
+                            <Route path='/coupons' component={() => <CouponsPage configData={configData}/>}/>
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                         </main>
                         <SnackbarComponent openSnackbar={openSnackbar}/>
