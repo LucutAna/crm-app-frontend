@@ -61,7 +61,7 @@ function App() {
     return (
         <ThemeProvider theme={ThemeCRMApp}>
             <GlobalProvider>
-                <Router>
+                <Router basename="/crm-app">
                     <div className={classes.root}>
                         <Header drawerWidth={drawerWidth}
                                 open={open}
