@@ -197,7 +197,7 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
 
             if (!isNil(customerForm.values.birthDate)) {
                 // Normalize date of birth for CCR and avoid hours set to 23 what causes after ISO conversion that the day is set to one day in the past caused by timezones.
-                customerForm.values.birthDate.setHours(12);
+                new Date(customerForm.values.birthDate).setHours(12);
                 cust.birthDate = (moment().format("YYYY/MM/DD") !== moment(customerForm.values.birthDate).format("YYYY/MM/DD")) ? moment(customerForm.values.birthDate).toISOString() : '';
             }
 

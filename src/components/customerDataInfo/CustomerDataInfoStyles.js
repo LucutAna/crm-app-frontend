@@ -18,6 +18,9 @@ const CustomerDataInfoStyles = makeStyles((theme) => ({
     },
     customerDetails: {
         fontWeight: 400
+    },
+    detailsGrid: {
+        wordBreak: 'break-word'
     }
 }));
 

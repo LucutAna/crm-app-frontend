@@ -22,7 +22,7 @@ const CustomerDataInfo = ({customer}) => {
                             <Grid item xs={12} sm={4}>
                                 {customerLable.map(lable => <h5 key={lable}>{lable}</h5>)}
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={12} sm={4} className={classes.detailsGrid}>
                                 <h5 className={classes.customerDetails}>{customer.ciid}</h5>
                                 <h5 className={classes.customerDetails}>{customer.preferredOutlet}</h5>
                                 <h5 className={classes.customerDetails}>{customer.consent}</h5>
