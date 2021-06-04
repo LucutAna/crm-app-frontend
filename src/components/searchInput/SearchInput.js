@@ -19,6 +19,7 @@ const SearchInput = ({onHandleCiid, ciid, onSelectCustomer, onEnter}) => {
                 }
                 InputProps={{
                     endAdornment: <InputAdornment position="end"
+                                                  className={classes.searchIcon}
                                                   onClick={onSelectCustomer}>
                                   <SearchIcon/>
                                   </InputAdornment>,

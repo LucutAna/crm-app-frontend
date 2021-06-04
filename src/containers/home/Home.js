@@ -89,6 +89,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
             <SearchInput onHandleCiid={handleCiid}
                          ciid={ciid}
                          onEnter={search}
+                         onSelectCustomer={search}
             />
             <CustomerForm configData={configData}
                           ciid={ciid}
@@ -99,10 +100,12 @@ const Home = ({configData, onSetOpenSnackbar}) => {
             />
             <EnrollModal openEnrollModal={openEnrollModal}
                          configData={configData}
-                         onHandleCloseEnrollModal={handleCloseEnrollModal}/>
+                         onHandleCloseEnrollModal={handleCloseEnrollModal}
+            />
             <PrintModal openPrintModal={openPrintModal}
                         onHandleClosePrintModal={handleClosePrintModal}
-                        pdfUrl={pdfUrl}/>
+                        pdfUrl={pdfUrl}
+            />
         </>
     )
 }

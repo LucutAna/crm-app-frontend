@@ -132,7 +132,6 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
     useImperativeHandle(ref, () => ({
 
         search() {
-            console.log(customerFormRef)
             searchCiid();
         }
 
