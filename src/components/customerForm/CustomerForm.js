@@ -16,7 +16,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import CustomerFormStyles from './CustomerFormStyles'
 import CustomerService from '../../shared/services/CustomerService';
 import {cloneDeep, extend, find, get, isEmpty, isNil, isUndefined, pick, pickBy} from 'lodash';
-import {useContext, useState} from 'react';
+import {forwardRef, useContext, useImperativeHandle, useRef, useState} from 'react';
 import {useHistory} from 'react-router-dom';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -115,7 +115,7 @@ const validateCustomerOnSearchByName = (customer) => {
     return hasStreet || hasStreetSeparated || hasEmail || hasMobile || hasDobZipCode || hasBirthDate;
 };
 
-const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
+const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar},ref) => {
     const classes = CustomerFormStyles();
     const history = useHistory();
     const {addCustomer} = useContext(GlobalContext);
@@ -126,6 +126,17 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const [openSpinner, setOpenSpinner] = useState(false);
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
+
+    const customerFormRef = useRef();
+
+    useImperativeHandle(ref, () => ({
+
+        search() {
+            console.log(customerFormRef)
+            searchCiid();
+        }
+
+    }));
 
     let formFields = {
         firstName: customerData.firstName || '',
@@ -143,55 +154,59 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
         updateCustomerFlag: false
     };
 
+    const searchCiid = async () => {
+        if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
+            //clear global objects
+            deleteCustomerData();
+            deleteTransactions();
+
+            try {
+                let data = {
+                    ciid,
+                    searchCiid: ciid,
+                    storeId: configData.storeNumber,
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                };
+                const customerSelected = await CustomerService.selectCustomer(data);
+                const customer = pickBy(customerSelected.data);
+                if (isUndefined(customer.firstName)) {
+                    let message = 'No customer data could be found with the entered search criteria';
+                    let open = true;
+                    let code = 'warning';
+                    setOpenSpinner(false);
+                    onSetOpenSnackbar({open, message, code});
+                    return
+                }
+                ;
+                addCustomer({...customerSelected.data});
+                customerFormRef.current.resetForm(formFields);
+                //fil customer for with data from CCR
+                Object.keys(formFields).forEach(field => customerFormRef.current.setFieldValue(field, customer[field], false));
+                setOpenSpinner(false);
+                //redirect to dashboard page
+                if (!isNil(customerSelected.data.firstName) && customerSelected.status === 200) {
+                    history.push('/dashboard');
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            let message = 'Please enter a valid customer card number';
+            let open = true;
+            let code = 'warning';
+            setOpenSpinner(false);
+            onSetOpenSnackbar({open, message, code});
+        }
+    }
+
     const search = async (customerForm) => {
         setOpenSpinner(true);
         setForm({...customerForm});
-        if (!!ciid) {
-            if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
-                //clear global objects
-                deleteCustomerData();
-                deleteTransactions();
-
-                try {
-                    let data = {
-                        ciid,
-                        searchCiid: ciid,
-                        storeId: configData.storeNumber,
-                        salesDivision: configData.salesDivision,
-                        subsidiary: configData.subsidiary
-                    };
-                    const customerSelected = await CustomerService.selectCustomer(data);
-                    const customer = pickBy(customerSelected.data);
-                    if (isUndefined(customer.firstName)) {
-                        let message = 'No customer data could be found with the entered search criteria';
-                        let open = true;
-                        let code = 'warning';
-                        setOpenSpinner(false);
-                        onSetOpenSnackbar({open, message, code});
-                        return
-                    }
-                    ;
-                    addCustomer({...customerSelected.data});
-                    customerForm.resetForm(formFields);
-                    //fil customer for with data from CCR
-                    Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
-                    setOpenSpinner(false);
-                    //redirect to dashboard page
-                    if ( !isNil(customerSelected.data.firstName) && customerSelected.status === 200 ) {
-                        history.push('/dashboard');
-                    }
-                } catch (error) {
-                    console.log(error)
-                }
-            } else {
-                let message = 'Please enter a valid customer card number';
-                let open = true;
-                let code = 'warning';
-                setOpenSpinner(false);
-                onSetOpenSnackbar({open, message, code});
-            }
+        if (ciid) {
+            await searchCiid()
         }
-        if (!ciid) {
+        else {
             let errCount = 0;
             let cust = cloneDeep(customerForm.values);
 
@@ -303,7 +318,11 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
 
     return (
         <>
-            <Formik initialValues={formFields} validationSchema={validationSchema} onSubmit={onSubmit}>
+            <Formik initialValues={formFields}
+                    validationSchema={validationSchema}
+                    onSubmit={onSubmit}
+                    innerRef={customerFormRef}
+            >
                 {customerForm => (
                     <Form>
                         <Grid container spacing={8}>
@@ -502,6 +521,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             </Backdrop>
         </>
     );
-};
+});
 
 export default CustomerForm;

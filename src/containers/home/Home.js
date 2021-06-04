@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import {useContext, useRef, useState} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import CustomerForm from '../../components/customerForm/CustomerForm';
@@ -17,6 +17,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
 
     const {deleteCustomerData} = useContext(GlobalContext);
     const history = useHistory();
+    const customerForm = useRef();
 
 
     const handleCiid = (searchCiid) => {
@@ -79,16 +80,23 @@ const Home = ({configData, onSetOpenSnackbar}) => {
         setOpenPrintModal(false);
     }
 
+    const search = () => {
+        customerForm.current.search()
+    }
 
     return (
         <>
             <SearchInput onHandleCiid={handleCiid}
-                         ciid={ciid}/>
+                         ciid={ciid}
+                         onEnter={search}
+            />
             <CustomerForm configData={configData}
                           ciid={ciid}
                           onClearSearchInput={clearSearchInput}
                           onNewRegistration={newRegistration}
-                          onSetOpenSnackbar={onSetOpenSnackbar}/>
+                          onSetOpenSnackbar={onSetOpenSnackbar}
+                          ref={customerForm}
+            />
             <EnrollModal openEnrollModal={openEnrollModal}
                          configData={configData}
                          onHandleCloseEnrollModal={handleCloseEnrollModal}/>
