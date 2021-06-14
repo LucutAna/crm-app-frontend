@@ -1,11 +1,11 @@
-import {useState, useContext} from 'react';
-import {Redirect} from "react-router-dom";
+import {useContext, useRef, useState} from 'react';
+import {useHistory} from 'react-router-dom';
 
-import CustomerForm from "../../components/customerForm/CustomerForm";
-import SearchInput from "../../components/searchInput/SearchInput";
-import EnrollModal from "../../components/modals/enrollModal/EnrollModal";
-import CustomerService from "../../shared/services/CustomerService";
-import PrintModal from "../../components/modals/printModal/PrintModal";
+import CustomerForm from '../../components/customerForm/CustomerForm';
+import SearchInput from '../../components/searchInput/SearchInput';
+import EnrollModal from '../../components/modals/enrollModal/EnrollModal';
+import CustomerService from '../../shared/services/CustomerService';
+import PrintModal from '../../components/modals/printModal/PrintModal';
 import {GlobalContext} from '../../context/GlobalState';
 
 const Home = ({configData, onSetOpenSnackbar}) => {
@@ -13,9 +13,11 @@ const Home = ({configData, onSetOpenSnackbar}) => {
     const [customerRegistrationData, setCustomerRegistrationData] = useState('');
     const [openEnrollModal, setOpenEnrollModal] = useState(false);
     const [openPrintModal, setOpenPrintModal] = useState(false);
-    const [redirect, setRedirect] = useState(null);
-    const {deleteCustomerData} = useContext(GlobalContext);
     const [pdfUrl, setPdfUrl] = useState('');
+
+    const {deleteCustomerData} = useContext(GlobalContext);
+    const history = useHistory();
+    const customerForm = useRef();
 
 
     const handleCiid = (searchCiid) => {
@@ -37,6 +39,8 @@ const Home = ({configData, onSetOpenSnackbar}) => {
 
     const handleCloseEnrollModal = async (event, data, eKit, consentFlag) => {
         let url = '';
+        setOpenEnrollModal(false);
+
         if (!!data && data === "E-KIT_CARD") {
             setCustomerRegistrationData({...customerRegistrationData, cardCiid: eKit, customerConsentFlag: consentFlag})
             url = CustomerService.getRegistrationPdfUrlInternal(CustomerService.createCustomerPrintData(customerRegistrationData, configData, eKit, consentFlag));
@@ -58,14 +62,16 @@ const Home = ({configData, onSetOpenSnackbar}) => {
             setPdfUrl(url);
             setOpenPrintModal(true);
         }
-        setOpenEnrollModal(false);
     }
 
     const handleClosePrintModal = async (event, data) => {
         if (!!data && data === "SUBMIT") {
             try {
                 const customerCreated = await CustomerService.upsertCustomer(customerRegistrationData);
-                setRedirect(customerCreated.data.code === "SUCCESS");
+                if ( customerCreated.data.code === "SUCCESS" ) {
+                    setOpenPrintModal(false);
+                    history.push('/success', {customerRegistrationData})
+                }
                 deleteCustomerData();
             } catch (error) {
                 console.log(error);
@@ -74,23 +80,32 @@ const Home = ({configData, onSetOpenSnackbar}) => {
         setOpenPrintModal(false);
     }
 
+    const search = () => {
+        customerForm.current.search()
+    }
 
     return (
         <>
-            {redirect ? <Redirect to={{pathname: "/success", state: {customerRegistrationData}}}/> : null}
             <SearchInput onHandleCiid={handleCiid}
-                         ciid={ciid}/>
+                         ciid={ciid}
+                         onEnter={search}
+                         onSelectCustomer={search}
+            />
             <CustomerForm configData={configData}
                           ciid={ciid}
                           onClearSearchInput={clearSearchInput}
                           onNewRegistration={newRegistration}
-                          onSetOpenSnackbar={onSetOpenSnackbar}/>
+                          onSetOpenSnackbar={onSetOpenSnackbar}
+                          ref={customerForm}
+            />
             <EnrollModal openEnrollModal={openEnrollModal}
                          configData={configData}
-                         onHandleCloseEnrollModal={handleCloseEnrollModal}/>
+                         onHandleCloseEnrollModal={handleCloseEnrollModal}
+            />
             <PrintModal openPrintModal={openPrintModal}
                         onHandleClosePrintModal={handleClosePrintModal}
-                        pdfUrl={pdfUrl}/>
+                        pdfUrl={pdfUrl}
+            />
         </>
     )
 }

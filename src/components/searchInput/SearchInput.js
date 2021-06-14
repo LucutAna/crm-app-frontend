@@ -4,7 +4,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import clsx from 'clsx';
 import SearchIcon from "@material-ui/icons/Search";
 
-const SearchInput = ({onHandleCiid, ciid, onSelectCustomer}) => {
+const SearchInput = ({onHandleCiid, ciid, onSelectCustomer, onEnter}) => {
     const classes = SearchInputStyles();
     return (
         <div className={classes.root}>
@@ -19,12 +19,19 @@ const SearchInput = ({onHandleCiid, ciid, onSelectCustomer}) => {
                 }
                 InputProps={{
                     endAdornment: <InputAdornment position="end"
+                                                  className={classes.searchIcon}
                                                   onClick={onSelectCustomer}>
                                   <SearchIcon/>
                                   </InputAdornment>,
                 }}
                 variant="outlined"
                 onChange={event => onHandleCiid(event.target.value)}
+                onKeyPress={(ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        onEnter();
+                    }
+                }}
             />
         </div>
     );

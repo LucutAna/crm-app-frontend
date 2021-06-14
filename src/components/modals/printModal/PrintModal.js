@@ -62,12 +62,12 @@ const PrintModal = ({openPrintModal, onHandleClosePrintModal, pdfUrl}) => {
                     </Typography>
                 </DialogContent>
                 <DialogActions className={classes.buttonWrapper}>
-                    <Button autoFocus variant="contained" onClick={(event) => {
+                    <Button variant="contained" onClick={(event) => {
                         onHandleClosePrintModal(event, "SUBMIT")
-                    }} color="primary">
+                    }} color="primary" autoFocus>
                         Yes, send data
                     </Button>
-                    <Button autoFocus variant="contained" onClick={onHandleClosePrintModal} color="primary">
+                    <Button variant="contained" onClick={onHandleClosePrintModal} color="primary">
                         Cancel
                     </Button>
                 </DialogActions>
