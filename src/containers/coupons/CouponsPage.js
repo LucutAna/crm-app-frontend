@@ -24,6 +24,7 @@ import {useContext, useEffect, useState} from "react";
 import {GlobalContext} from "../../context/GlobalState";
 
 import CouponsPageStyles from './CouponsPageStyles';
+import MemberService from "../../shared/services/MemberService";
 
 const CouponsPage = ({configData}) => {
     const StyledTableRow = withStyles((theme) => ({
@@ -45,7 +46,7 @@ const CouponsPage = ({configData}) => {
     }))(Tooltip);
 
     const classes = CouponsPageStyles();
-    const {coupons} = useContext(GlobalContext);
+    const {coupons, customerData, addCoupons, deleteCoupons } = useContext(GlobalContext);
     const [customerCoupons, setCustomerCoupons] = useState([]);
     const [rows, setRows] = useState([]);
     const [order, setOrder] = useState('asc');
@@ -203,8 +204,50 @@ const CouponsPage = ({configData}) => {
 
     const formatDate = date => isNull(date) ? '' : moment(date).format(configData.modules.DATE_FORMAT.toUpperCase());
 
-    const changeStatusCoupon = (coupon) => {
-        console.log(coupon);
+    const getCouponsCustomer = async (data) => {
+        try {
+            const coupons = await MemberService.getCoupons(data);
+            //TODO: check if the logic below is deprecated
+            // map(coupons.data, (coupon) => {
+            //     if (isNil(coupon.couponTypeName_de_DE))
+            //         coupon.typeName = coupon.couponTypeName;
+            //     else
+            //         coupon.typeName = coupon.couponTypeName_de_DE;
+            //     if (isNil(coupon.couponTypeDescription_de_DE))
+            //         coupon.typeDescription = coupon.couponTypeDescription;
+            //     else
+            //         coupon.typeDescription = coupon.couponTypeDescription_de_DE;
+            // });
+            setCustomerCoupons(coupons.data);
+            addCoupons(coupons.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const changeStatusCoupon = async (couponSelected) => {
+        const data = {
+            activationStatusCode: couponSelected.activationCode === 'I' ? 'A' : 'I',
+            couponCode: couponSelected.code,
+            partyUid: customerData.partyUid,
+            salesDivision: configData.salesDivision,
+            subsidiary: configData.subsidiary
+        }
+        try {
+            const activateDeactivate = await MemberService.activateDeactivateCoupons(data);
+            if (activateDeactivate.data.status === 'SUCCESS') {
+                deleteCoupons();
+                const couponsPayload = {
+                    partyUid: customerData.partyUid,
+                    locale: configData.locales[0],
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                };
+                getCouponsCustomer(couponsPayload);
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
 
@@ -265,21 +308,17 @@ const CouponsPage = ({configData}) => {
                                             <TableCell align="left">{row.value !== 0 ? row.value : ''}</TableCell>
                                             <TableCell align="left">{displayStatusCodeName(row.status)}</TableCell>
                                             <TableCell align="left">
-                                                {(row.status === 'I' && row.activationCode === 'I') ?
-                                                    <Button
-                                                        onClick={() => changeStatusCoupon(row)}
-                                                        variant="outlined"
-                                                        color="primary"
-                                                        fullWidth
-                                                        value={row}
-                                                        size="small">ACTIVATE</Button> : (row.status === 'I' && row.activationCode === 'A') ?
-                                                        <Button
-                                                            onClick={() => changeStatusCoupon(row)}
-                                                            variant="outlined"
-                                                            color="primary"
-                                                            fullWidth
-                                                            value={row}
-                                                            size="small">DEACTIVATE</Button> : ''}
+                                                <Button
+                                                    onClick={() => changeStatusCoupon(row)}
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    fullWidth
+                                                    value={row}
+                                                    size="small">
+                                                    {(row.status === 'I' && row.activationCode === 'I') ?
+                                                        'ACTIVATE' : (row.status === 'I' && row.activationCode === 'A') ?
+                                                            'DEACTIVATE' : ''}
+                                                </Button>
                                             </TableCell>
                                         </StyledTableRow>
                                     );

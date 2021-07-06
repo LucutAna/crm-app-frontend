@@ -6,7 +6,7 @@ import {
     isEmpty,
     flatten,
     concat,
-    each,
+    forEach,
     pullAt,
     values,
     filter,
@@ -37,9 +37,7 @@ const permissions = (customerPermision) => {
 
 const Dashboard = ({configData}) => {
     const classes = DashboardStyles();
-    const {customerData} = useContext(GlobalContext);
-    const {addTransactions} = useContext(GlobalContext);
-    const {addCoupons} = useContext(GlobalContext);
+    const {customerData, addTransactions, addCoupons, deleteCoupons} = useContext(GlobalContext);
     const [customerInfo, setCustomerInfo] = useState({});
     const [salesOrderHistory, setSalesOrderHistory] = useState([]);
     const [customerCoupons, setCustomerCoupons] = useState([]);
@@ -146,7 +144,7 @@ const Dashboard = ({configData}) => {
         }
 
         let filteredOrders = {};
-        each(allOrders, function (myOrder, i) {
+        forEach(allOrders, function (myOrder, i) {
             if (myOrder.type === 'online') {
                 if (!filteredOrders[myOrder.orderNumber]) {
                     filteredOrders[myOrder.orderNumber] = i;
@@ -157,9 +155,9 @@ const Dashboard = ({configData}) => {
                 filteredOrders[`${myOrder.orderNumber}_${myOrder.orderOutletId}_${myOrder.date.getTime()}`] = i;
             }
 
-            each(myOrder.orderDetails, function (details) {
+            forEach(myOrder.orderDetails, function (details) {
                 if (details.itemSet !== undefined) {
-                    each(details.itemSet, function (item) {
+                    forEach(details.itemSet, function (item) {
                         myOrder.orderDetails.push(item);
                     });
                     myOrder.orderDetails.splice(i, 1);
@@ -190,7 +188,7 @@ const Dashboard = ({configData}) => {
     const getCouponsCustomer = async (data) => {
         try {
             const coupons = await MemberService.getCoupons(data);
-            //TODO: check if the logic above is deprecated
+            //TODO: check if the logic below is deprecated
             // map(coupons.data, (coupon) => {
             //     if (isNil(coupon.couponTypeName_de_DE))
             //         coupon.typeName = coupon.couponTypeName;
@@ -221,6 +219,7 @@ const Dashboard = ({configData}) => {
         try {
             const activateDeactivate = await MemberService.activateDeactivateCoupons(data);
             if (activateDeactivate.data.status === 'SUCCESS') {
+                deleteCoupons();
                 const couponsPayload = {
                     partyUid: customerData.partyUid,
                     locale: configData.locales[0],
