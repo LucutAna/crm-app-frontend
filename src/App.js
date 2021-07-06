@@ -9,7 +9,7 @@ import ThemeCRMApp from './ThemeCRMApp';
 import Home from "./containers/home/Home";
 import Dashboard from "./containers/dashboard/Dashboard";
 import OrderHistory from "./containers/order-history/OrderHistory";
-import Coupons from "./containers/coupons/Coupons";
+import CouponsPage from "./containers/coupons/CouponsPage";
 import SuccessPage from "./containers/successPage/SuccessPage";
 import ConfigService from './shared/services/ConfigService'
 import {GlobalProvider} from './context/GlobalState';
@@ -80,7 +80,7 @@ function App() {
                                                           onSetOpenSnackbar={setOpenSnackbar}/>}/>
                             <Route path='/dashboard' component={() => <Dashboard configData={configData}/>}/>
                             <Route path='/order-history' component={() => <OrderHistory configData={configData}/>}/>
-                            <Route path='/coupons' component={Coupons}/>
+                            <Route path='/coupons' component={() => <CouponsPage configData={configData}/>}/>
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                         </main>
                         <SnackbarComponent openSnackbar={openSnackbar}/>
