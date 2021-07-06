@@ -16,6 +16,7 @@ const CouponsStyles = makeStyles((theme) => ({
     },
     couponsContainer: {
         paddingBottom: '4px',
+        height: theme.spacing(41)
     },
     cardImage: {
         height: '100px'
