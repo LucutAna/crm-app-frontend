@@ -40,72 +40,74 @@ const Dashboard = ({configData}) => {
     const {customerData} = useContext(GlobalContext);
     const {addTransactions} = useContext(GlobalContext);
     const {addCoupons} = useContext(GlobalContext);
-    const [customerInfo, setCustomerInfo] = useState('');
+    const [customerInfo, setCustomerInfo] = useState({});
     const [salesOrderHistory, setSalesOrderHistory] = useState([]);
     const [customerCoupons, setCustomerCoupons] = useState([]);
     const [openSpinnerHistoryPurchase, setOpenSpinnerHistoryPurchase] = useState(false);
     const [openSpinnerCoupons, setOpenSpinnerCoupons] = useState(false);
+
+    const getPreferredOutletName = async () => {
+        const preferredOutletName = await ConfigService.getStore(customerData.preferredOutlet);
+        const customer = {
+            ciid: customerData.cardCiid[0],
+            preferredOutlet: preferredOutletName.data.storeName,
+            consent: permissions(customerData.permissions),
+            activationDate: moment(customerData.clubDateOfEntry).format(configData.modules.DATE_FORMAT.toUpperCase()),
+            phoneNumber: customerData.mobile,
+            firstName: customerData.firstName,
+            lastName: customerData.lastName,
+            salutation: customerData.salutation
+        }
+        setCustomerInfo(customer)
+    }
+
+    const initializeTransactionsPanel = async () => {
+        setOpenSpinnerHistoryPurchase(true);
+        let partyUUID = customerData.partyUid;
+        let wcsUserId = customerData.wcsUserId || "";
+        let orderHistorySettings = configData.orderHistorySettings;
+        let getOrdersFromCar = true;
+        let getOrdersFromFom = false;
+        if (orderHistorySettings) {
+            getOrdersFromCar = orderHistorySettings.getOrdersFromCar;
+            getOrdersFromFom = orderHistorySettings.getOrdersFromFom;
+        }
+        let ciidPromises = [];
+
+        if (customerData.cardCiid) {
+            customerData.cardCiid.forEach(ciid => {
+                ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(ciid));
+                ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(ciid));
+            });
+        }
+
+        if (!isNil(customerData.ccrCiid)) {
+            ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(customerData.ccrCiid));
+            ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(customerData.ccrCiid));
+        }
+
+        const result = await Promise.all([
+            // firing all in store orders calls
+            Promise.all(ciidPromises),
+            // firing the online orders from car call if enabled
+            getOrdersFromCar ? SalesTransactions.getSalesOrderHistory(partyUUID) : [],
+            // firing the online orders from fom call if enabled
+            getOrdersFromFom ? SalesTransactions.getSalesOrderHistoryFom(configData, wcsUserId) : []
+        ])
+        showSalesOrderHistory(result);
+    };
 
     // initialize panels
     useEffect(() => {
         if (!isEmpty(customerData)) {
             //customer info
             try {
-                const getPreferredOutletName = async () => {
-                    const preferredOutletName = await ConfigService.getStore(customerData.preferredOutlet);
-                    const customer = {
-                        ciid: customerData.cardCiid[0],
-                        preferredOutlet: preferredOutletName.data.storeName,
-                        consent: permissions(customerData.permissions),
-                        activationDate: moment(customerData.clubDateOfEntry).format(configData.modules.DATE_FORMAT.toUpperCase()),
-                        phoneNumber: customerData.mobile,
-                        firstName: customerData.firstName,
-                        lastName: customerData.lastName,
-                        salutation: customerData.salutation
-                    }
-                    setCustomerInfo(customer)
-                }
                 getPreferredOutletName();
             } catch (error) {
                 console.log(error);
             }
 
             //order history
-            const initializeTransactionsPanel = async () => {
-                setOpenSpinnerHistoryPurchase(true);
-                let partyUUID = customerData.partyUid;
-                let wcsUserId = customerData.wcsUserId || "";
-                let orderHistorySettings = configData.orderHistorySettings;
-                let getOrdersFromCar = true;
-                let getOrdersFromFom = false;
-                if (orderHistorySettings) {
-                    getOrdersFromCar = orderHistorySettings.getOrdersFromCar;
-                    getOrdersFromFom = orderHistorySettings.getOrdersFromFom;
-                }
-                let ciidPromises = [];
-
-                if (customerData.cardCiid) {
-                    customerData.cardCiid.forEach(ciid => {
-                        ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(ciid));
-                        ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(ciid));
-                    });
-                }
-
-                if (!isNil(customerData.ccrCiid)) {
-                    ciidPromises.push(SalesTransactions.getSalesOrderHistoryAtStore(customerData.ccrCiid));
-                    ciidPromises.push(SalesTransactions.getSalesOrderHistoryOnlineByCiid(customerData.ccrCiid));
-                }
-
-                const result = await Promise.all([
-                    // firing all in store orders calls
-                    Promise.all(ciidPromises),
-                    // firing the online orders from car call if enabled
-                    getOrdersFromCar ? SalesTransactions.getSalesOrderHistory(partyUUID) : [],
-                    // firing the online orders from fom call if enabled
-                    getOrdersFromFom ? SalesTransactions.getSalesOrderHistoryFom(configData, wcsUserId) : []
-                ])
-                showSalesOrderHistory(result);
-            };
             initializeTransactionsPanel();
 
             // cupons

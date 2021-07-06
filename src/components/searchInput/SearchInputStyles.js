@@ -5,9 +5,13 @@ const SearchInputStyles = makeStyles((theme) => ({
         display: 'flex',
         paddingBottom: 50
     },
+    searchIcon: {
+        cursor: 'pointer',
+        padding: '0.5em'
+    },
     textField: {
         width: '65%'
-    },
+    }
 }));
 
 export default SearchInputStyles;

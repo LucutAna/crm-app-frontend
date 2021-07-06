@@ -6,24 +6,21 @@ import DateFnsUtils from '@date-io/date-fns';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
+import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import SearchIcon from '@material-ui/icons/Search';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import CustomerFormStyles from './CustomerFormStyles'
-import CustomerService from "../../shared/services/CustomerService";
-import {isEmpty, pickBy, find, pick, extend, get, cloneDeep, isNil, isUndefined} from 'lodash';
-import {useContext, useState} from 'react';
+import CustomerService from '../../shared/services/CustomerService';
+import {cloneDeep, extend, find, get, isEmpty, isNil, isUndefined, pick, pickBy} from 'lodash';
+import {forwardRef, useContext, useImperativeHandle, useRef, useState} from 'react';
+import {useHistory} from 'react-router-dom';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import moment from 'moment';
-import {Redirect} from "react-router-dom";
 
 import {GlobalContext} from '../../context/GlobalState';
 import CustomersModal from '../modals/customersModal/customersModal';
@@ -118,8 +115,9 @@ const validateCustomerOnSearchByName = (customer) => {
     return hasStreet || hasStreetSeparated || hasEmail || hasMobile || hasDobZipCode || hasBirthDate;
 };
 
-const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}) => {
+const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar},ref) => {
     const classes = CustomerFormStyles();
+    const history = useHistory();
     const {addCustomer} = useContext(GlobalContext);
     const {customerData} = useContext(GlobalContext);
     const [customersDataResult, setCustomersDataResult] = useState([]);
@@ -128,77 +126,92 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     const [openSpinner, setOpenSpinner] = useState(false);
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
-    const [redirectDashboard, setRedirectDashboard] = useState(null);
+
+    const customerFormRef = useRef();
+
+    useImperativeHandle(ref, () => ({
+
+        search() {
+            searchCiid();
+        }
+
+    }));
 
     let formFields = {
-        firstName: isEmpty(customerData) ? '' : customerData.firstName,
-        lastName: isEmpty(customerData) ? '' : customerData.lastName,
-        street1: isEmpty(customerData) ? '' : customerData.street1,
-        zipcode: isEmpty(customerData) ? '' : customerData.zipcode,
-        city: isEmpty(customerData) ? '' : customerData.city,
-        mobile: isEmpty(customerData) ? '' : customerData.mobile,
-        email: isEmpty(customerData) ? '' : customerData.email,
-        salutation: isEmpty(customerData) ? '' : customerData.salutation,
+        firstName: customerData.firstName || '',
+        lastName: customerData.lastName || '',
+        street1: customerData.street1 || '',
+        zipcode: customerData.zipcode || '',
+        city:  customerData.city || '',
+        mobile: customerData.mobile || '',
+        email: customerData.email || '',
+        salutation: customerData.salutation || 'Mrs.',
         country: isEmpty(customerData) ? Object.entries(configData).length !== 0 ? configData.locales[0].split('_')[1] : '' : customerData.country,
-        birthDate: isEmpty(customerData) ? new Date() : customerData.birthDate,
-        partyUid: isEmpty(customerData) ? null : customerData.partyUid,
-        partyId: isEmpty(customerData) ? null: customerData.partyId,
+        birthDate: customerData.birthDate || new Date(),
+        partyUid: customerData.partyUid || null,
+        partyId: customerData.partyId || null,
         updateCustomerFlag: false
     };
+
+    const searchCiid = async () => {
+        if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
+            //clear global objects
+            deleteCustomerData();
+            deleteTransactions();
+
+            try {
+                let data = {
+                    ciid,
+                    searchCiid: ciid,
+                    storeId: configData.storeNumber,
+                    salesDivision: configData.salesDivision,
+                    subsidiary: configData.subsidiary
+                };
+                const customerSelected = await CustomerService.selectCustomer(data);
+                const customer = pickBy(customerSelected.data);
+                if (isUndefined(customer.firstName)) {
+                    let message = 'No customer data could be found with the entered search criteria';
+                    let open = true;
+                    let code = 'warning';
+                    setOpenSpinner(false);
+                    onSetOpenSnackbar({open, message, code});
+                    return
+                }
+                ;
+                addCustomer({...customerSelected.data});
+                customerFormRef.current.resetForm(formFields);
+                //fil customer for with data from CCR
+                Object.keys(formFields).forEach(field => customerFormRef.current.setFieldValue(field, customer[field], false));
+                setOpenSpinner(false);
+                //redirect to dashboard page
+                if (!isNil(customerSelected.data.firstName) && customerSelected.status === 200) {
+                    history.push('/dashboard');
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            let message = 'Please enter a valid customer card number';
+            let open = true;
+            let code = 'warning';
+            setOpenSpinner(false);
+            onSetOpenSnackbar({open, message, code});
+        }
+    }
 
     const search = async (customerForm) => {
         setOpenSpinner(true);
         setForm({...customerForm});
-        if (!!ciid) {
-            if (CustomerService.isClubCardNumberFormatValid(ciid, configData.salesDivision, configData.subsidiary)) {
-                //clear global objects
-                deleteCustomerData();
-                deleteTransactions();
-
-                try {
-                    let data = {
-                        ciid,
-                        searchCiid: ciid,
-                        storeId: configData.storeNumber,
-                        salesDivision: configData.salesDivision,
-                        subsidiary: configData.subsidiary
-                    };
-                    const customerSelected = await CustomerService.selectCustomer(data);
-                    const customer = pickBy(customerSelected.data);
-                    if (isUndefined(customer.firstName)) {
-                        let message = 'No customer data could be found with the entered search criteria';
-                        let open = true;
-                        let code = 'warning';
-                        setOpenSpinner(false);
-                        onSetOpenSnackbar({open, message, code});
-                        return
-                    }
-                    ;
-                    addCustomer({...customerSelected.data});
-                    //redirect to dasboard page
-                    setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
-                    customerForm.resetForm(formFields);
-                    //fil customer for with data from CCR
-                    Object.keys(formFields).forEach(field => customerForm.setFieldValue(field, customer[field], false));
-                    setOpenSpinner(false);
-                } catch (error) {
-                    console.log(error)
-                }
-            } else {
-                let message = 'Please enter a valid customer card number';
-                let open = true;
-                let code = 'warning';
-                setOpenSpinner(false);
-                onSetOpenSnackbar({open, message, code});
-            }
+        if (ciid) {
+            await searchCiid()
         }
-        if (!ciid) {
+        else {
             let errCount = 0;
             let cust = cloneDeep(customerForm.values);
 
             if (!isNil(customerForm.values.birthDate)) {
                 // Normalize date of birth for CCR and avoid hours set to 23 what causes after ISO conversion that the day is set to one day in the past caused by timezones.
-                customerForm.values.birthDate.setHours(12);
+                new Date(customerForm.values.birthDate).setHours(12);
                 cust.birthDate = (moment().format("YYYY/MM/DD") !== moment(customerForm.values.birthDate).format("YYYY/MM/DD")) ? moment(customerForm.values.birthDate).toISOString() : '';
             }
 
@@ -255,11 +268,14 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             const customerSelected = await CustomerService.selectCustomer(data);
             const customer = pickBy(customerSelected.data);
             addCustomer({...customerSelected.data});
-            //redirect to dasboard page
-            setRedirectDashboard(!isNil(customerSelected.data.firstName) && customerSelected.status === 200)
             //fil customer for with data from CCR
             Object.keys(formFields).forEach(field => form.setFieldValue(field, customer[field], false));
             setOpenSpinner(false);
+            //redirect to dashboard page
+            if ( !isNil(customerSelected.data.firstName) && customerSelected.status === 200 ) {
+                history.push('/dashboard');
+            }
+
         } catch (error) {
             console.log(error);
             setOpenSpinner(false);
@@ -271,7 +287,6 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
     };
 
     const clearFormFields = (customerForm) => {
-        console.log(customerForm);
         deleteCustomerData();
         deleteTransactions();
         onClearSearchInput();
@@ -302,7 +317,11 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
 
     return (
         <>
-            <Formik initialValues={formFields} validationSchema={validationSchema} onSubmit={onSubmit}>
+            <Formik initialValues={formFields}
+                    validationSchema={validationSchema}
+                    onSubmit={onSubmit}
+                    innerRef={customerFormRef}
+            >
                 {customerForm => (
                     <Form>
                         <Grid container spacing={8}>
@@ -451,13 +470,13 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
                                             error={customerForm.touched.country && Boolean(customerForm.errors.country)}
                                             helperText={customerForm.touched.country && customerForm.errors.country}
                                         >
-                                            <children/>
-                                            {Object.entries(configData).length !== 0 &&
-                                            configData.allowedCountries.map((option, index) => (
-                                                <MenuItem key={index} value={option}>
-                                                    {option}
-                                                </MenuItem>
-                                            ))
+                                            {Object.entries(configData).length !== 0 ?
+                                                configData.allowedCountries.map((option, index) => (
+                                                    <MenuItem key={index} value={option}>
+                                                        {option}
+                                                    </MenuItem>
+                                                )) :
+                                                <children/>
                                             }
                                         </TextField>
                                     </Grid>
@@ -499,9 +518,8 @@ const CustomerForm = ({ciid, configData, onNewRegistration, onClearSearchInput, 
             <Backdrop className={classes.backdrop} open={openSpinner}>
                 <CircularProgress size='160px' color="primary" thickness={7}/>
             </Backdrop>
-            {redirectDashboard ? <Redirect to={{pathname: "/dashboard"}}/> : null}
         </>
     );
-};
+});
 
 export default CustomerForm;
