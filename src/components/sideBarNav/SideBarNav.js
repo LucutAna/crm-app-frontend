@@ -45,7 +45,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                 <MenuItem>
                     <NavLink className={classes.listItemIcon} to='/crm'>
                         <ListItemIcon>
-                            <HomeIcon fontSize="small"/>
+                            <HomeIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit">Home</Typography>
                     </NavLink>
@@ -53,7 +53,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                 <MenuItem>
                     <NavLink className={classes.listItemIcon} to='/dashboard'>
                         <ListItemIcon>
-                            <DashboardIcon fontSize="small"/>
+                            <DashboardIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit">Dashboard</Typography>
                     </NavLink>
@@ -61,7 +61,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                 <MenuItem>
                     <NavLink className={classes.listItemIcon} to='/order-history'>
                         <ListItemIcon>
-                            <ReceiptIcon fontSize="small"/>
+                            <ReceiptIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit">Order History</Typography>
                     </NavLink>
@@ -69,7 +69,7 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                 <MenuItem>
                     <NavLink className={classes.listItemIcon} to='/coupons'>
                         <ListItemIcon>
-                            <CreditCardIcon fontSize="small"/>
+                            <CreditCardIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit">Coupons</Typography>
                     </NavLink>

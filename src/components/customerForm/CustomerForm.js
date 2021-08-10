@@ -115,14 +115,16 @@ const validateCustomerOnSearchByName = (customer) => {
     return hasStreet || hasStreetSeparated || hasEmail || hasMobile || hasDobZipCode || hasBirthDate;
 };
 
-const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar},ref) => {
+const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSearchInput, onSetOpenSnackbar}, ref) => {
     const classes = CustomerFormStyles();
     const history = useHistory();
-    const {addCustomer} = useContext(GlobalContext);
-    const {customerData} = useContext(GlobalContext);
+    const {
+        addCustomer,
+        customerData,
+        deleteCustomerData,
+        deleteTransactions
+    } = useContext(GlobalContext);
     const [customersDataResult, setCustomersDataResult] = useState([]);
-    const {deleteCustomerData} = useContext(GlobalContext);
-    const {deleteTransactions} = useContext(GlobalContext);
     const [openSpinner, setOpenSpinner] = useState(false);
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
@@ -142,7 +144,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
         lastName: customerData.lastName || '',
         street1: customerData.street1 || '',
         zipcode: customerData.zipcode || '',
-        city:  customerData.city || '',
+        city: customerData.city || '',
         mobile: customerData.mobile || '',
         email: customerData.email || '',
         salutation: customerData.salutation || 'Mrs.',
@@ -204,8 +206,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
         setForm({...customerForm});
         if (ciid) {
             await searchCiid()
-        }
-        else {
+        } else {
             let errCount = 0;
             let cust = cloneDeep(customerForm.values);
 
@@ -214,7 +215,6 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                 new Date(customerForm.values.birthDate).setHours(12);
                 cust.birthDate = (moment().format("YYYY/MM/DD") !== moment(customerForm.values.birthDate).format("YYYY/MM/DD")) ? moment(customerForm.values.birthDate).toISOString() : '';
             }
-
             if (!validateCustomerOnSearchByName(cust)) {
                 setOpenSpinner(false);
                 let message = 'When searching, please enter at least the first and last name of the customer and at least one additional piece of information (email address, street and house number, date of birth and zip code, mobile number';
@@ -242,7 +242,8 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                     let open = true;
                     let code = 'info';
                     onSetOpenSnackbar({open, message, code});
-                };
+                }
+                ;
                 setCustomersDataResult(customerResult.data);
                 setOpenSpinner(false);
                 setOpenCustomersModal(true);
@@ -272,7 +273,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
             Object.keys(formFields).forEach(field => form.setFieldValue(field, customer[field], false));
             setOpenSpinner(false);
             //redirect to dashboard page
-            if ( !isNil(customerSelected.data.firstName) && customerSelected.status === 200 ) {
+            if (!isNil(customerSelected.data.firstName) && customerSelected.status === 200) {
                 history.push('/dashboard');
             }
 
@@ -399,7 +400,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                     <Grid item xs={12} sm={6}>
                                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                             <KeyboardDatePicker
-                                                className={classes.birthDate}
+                                                className={`${classes.birthDate} ${classes.inputText}`}
                                                 margin="normal"
                                                 id="date-picker-dialog"
                                                 label="Birthday*"

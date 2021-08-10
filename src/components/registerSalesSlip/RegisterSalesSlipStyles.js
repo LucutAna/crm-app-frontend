@@ -10,20 +10,14 @@ const RegisterSalesSlipStyles = makeStyles((theme) => ({
         marginBottom: '5px'
     },
     paperContent: {
-        maxHeight: '80%',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        height: theme.spacing(41)
+        height: theme.spacing(60)
     },
-    cardImage: {
-        height: '100px'
+    salesSlipImage: {
+        height: '300px',
+        paddingTop:'7%'
     },
-    wrapperCouponInfo: {
-        display: 'flex',
-        flexDirection: 'column'
-    },
-    couponInfo: {
-        margin: 0
+    gridContent: {
+        textAlign: 'center'
     }
 }));
 

@@ -1,10 +1,14 @@
 import axiosInstance from '../../axiosInstance';
 
-const getStore = (outletId) => {
+const getStore = outletId => {
     return axiosInstance.get(`/crm-util/stores/${outletId}/`);
 };
 
-const getConfigData =  ({salesDivision, subsidiary}) => {
+const getStoreBySapId = sapOutletId => {
+    return axiosInstance.get(`crm-util/outlet?sapCode=${sapOutletId.toUpperCase()}/`)
+}
+
+const getConfigData = ({salesDivision, subsidiary}) => {
     return axiosInstance.get(`/crm-util/configurations/`, {
         headers: {
             salesDivision,
@@ -15,6 +19,7 @@ const getConfigData =  ({salesDivision, subsidiary}) => {
 
 const ConfigService = {
     getStore,
+    getStoreBySapId,
     getConfigData
 };
 

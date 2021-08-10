@@ -2,10 +2,10 @@ import {makeStyles} from '@material-ui/core/styles';
 
 const CustomerFormStyles = makeStyles((theme) => ({
     country: {
-        marginTop: theme.spacing(2),
         marginRight: theme.spacing(2)
     },
     birthDate: {
+        marginTop: 0,
         width: '100%'
     },
     selectEmpty: {
@@ -18,7 +18,11 @@ const CustomerFormStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(2),
     },
     inputText: {
-        marginTop: theme.spacing(2)
+        '& div.MuiInputBase-root': {
+            '&:not(.Mui-error)': {
+                marginBottom: '23px'
+            },
+        }
     },
     paper: {
         display: 'flex',
