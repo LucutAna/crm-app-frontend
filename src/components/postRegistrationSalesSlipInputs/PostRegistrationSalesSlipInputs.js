@@ -115,21 +115,6 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                 />
                                 <TextField
                                     size="small"
-                                    className={`${classes.inputText} ${classes.sapOutletId}`}
-                                    fullWidth
-                                    id="sapOutletId"
-                                    name="sapOutletId"
-                                    label="Market number*"
-                                    placeholder="1 character and 3 digits"
-                                    variant="outlined"
-                                    value={salesSlipForm.values.sapOutletId}
-                                    onChange={salesSlipForm.handleChange}
-                                    onBlur={salesSlipForm.handleBlur}
-                                    error={salesSlipForm.touched.sapOutletId && Boolean(salesSlipForm.errors.sapOutletId)}
-                                    helperText={salesSlipForm.touched.sapOutletId && salesSlipForm.errors.sapOutletId}
-                                />
-                                <TextField
-                                    size="small"
                                     className={`${classes.inputText} ${classes.cashRegisterNo}`}
                                     fullWidth
                                     id="cashRegisterNo"
@@ -142,23 +127,6 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                     onBlur={salesSlipForm.handleBlur}
                                     error={salesSlipForm.touched.cashRegisterNo && Boolean(salesSlipForm.errors.cashRegisterNo)}
                                     helperText={salesSlipForm.touched.cashRegisterNo && salesSlipForm.errors.cashRegisterNo}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    size="small"
-                                    className={`${classes.inputText} ${classes.cashierNo}`}
-                                    fullWidth
-                                    id="cashierNo"
-                                    name="cashierNo"
-                                    label="Cashier*"
-                                    placeholder="1-6 digits"
-                                    variant="outlined"
-                                    value={salesSlipForm.values.cashierNo}
-                                    onChange={salesSlipForm.handleChange}
-                                    onBlur={salesSlipForm.handleBlur}
-                                    error={salesSlipForm.touched.cashierNo && Boolean(salesSlipForm.errors.cashierNo)}
-                                    helperText={salesSlipForm.touched.cashierNo && salesSlipForm.errors.cashierNo}
                                 />
                                 <TextField
                                     size="small"
@@ -174,6 +142,40 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                     onBlur={salesSlipForm.handleBlur}
                                     error={salesSlipForm.touched.slipDate && Boolean(salesSlipForm.errors.slipDate)}
                                     helperText={salesSlipForm.touched.slipDate && salesSlipForm.errors.slipDate}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    size="small"
+                                    className={`${classes.inputText} ${classes.sapOutletId}`}
+                                    fullWidth
+                                    id="sapOutletId"
+                                    name="sapOutletId"
+                                    label="Market number*"
+                                    placeholder="1 character and 3 digits"
+                                    variant="outlined"
+                                    value={salesSlipForm.values.sapOutletId}
+                                    onChange={salesSlipForm.handleChange}
+                                    onBlur={salesSlipForm.handleBlur}
+                                    error={salesSlipForm.touched.sapOutletId && Boolean(salesSlipForm.errors.sapOutletId)}
+                                    helperText={salesSlipForm.touched.sapOutletId && salesSlipForm.errors.sapOutletId}
+
+                                />
+                                <TextField
+
+                                    size="small"
+                                    className={`${classes.inputText} ${classes.cashierNo}`}
+                                    fullWidth
+                                    id="cashierNo"
+                                    name="cashierNo"
+                                    label="Cashier*"
+                                    placeholder="1-6 digits"
+                                    variant="outlined"
+                                    value={salesSlipForm.values.cashierNo}
+                                    onChange={salesSlipForm.handleChange}
+                                    onBlur={salesSlipForm.handleBlur}
+                                    error={salesSlipForm.touched.cashierNo && Boolean(salesSlipForm.errors.cashierNo)}
+                                    helperText={salesSlipForm.touched.cashierNo && salesSlipForm.errors.cashierNo}
                                 />
                                 <TextField
                                     size="small"

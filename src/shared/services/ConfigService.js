@@ -5,7 +5,7 @@ const getStore = outletId => {
 };
 
 const getStoreBySapId = sapOutletId => {
-    return axiosInstance.get(`crm-util/outlet?sapCode=${sapOutletId.toUpperCase()}/`)
+    return axiosInstance.get(`crm-util/outlet?sapCode=${sapOutletId.toUpperCase()}`)
 }
 
 const getConfigData = ({salesDivision, subsidiary}) => {
