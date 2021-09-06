@@ -87,6 +87,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
     };
     const onSubmit = async (values, actions) => {
         const store = await ConfigService.getStoreBySapId(values.sapOutletId)
+        const update = await ConfigService.updateSalesSlip(values)
         console.log(store);
     }
 
