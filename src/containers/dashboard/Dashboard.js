@@ -15,7 +15,7 @@ import {
     chain,
     toInteger
 } from 'lodash';
-
+import Grid from '@material-ui/core/Grid';
 
 import DashboardStyles from './DashboardStyles';
 import {GlobalContext} from '../../context/GlobalState';
@@ -24,7 +24,9 @@ import MemberService from '../../shared/services/MemberService';
 import SalesTransactions from '../../shared/services/SalesTransactions';
 import CustomerDataInfo from '../../components/customerDataInfo/CustomerDataInfo';
 import HistoryPurchases from '../../components/historyPurchases/HistoryPurchases';
-import Coupons from '../../components/Coupons/Coupons';
+import Coupons from '../../components/coupons/Coupons';
+import RegisterSalesSlip from '../../components/registerSalesSlip/RegisterSalesSlip';
+import ReplacementCard from '../../components/replacementCard/ReplacementCard';
 
 
 const permissions = (customerPermision) => {
@@ -237,11 +239,25 @@ const Dashboard = ({configData}) => {
         <div className={classes.root}>
             {!isEmpty(customerData) ?
                 <>
-                    <CustomerDataInfo customer={customerInfo}/>
-                    <HistoryPurchases salesOrderHistory={salesOrderHistory} configData={configData}
-                                      openSpinnerHistoryPurchase={openSpinnerHistoryPurchase}/>
-                    <Coupons coupons={customerCoupons} onChangeStatusCoupon={changeStatusCoupon}
-                             openSpinnerCoupons={openSpinnerCoupons}/>
+                    <Grid container spacing={4}>
+                        <Grid item xs={12} sm={6}>
+                            <CustomerDataInfo customer={customerInfo}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <HistoryPurchases salesOrderHistory={salesOrderHistory} configData={configData}
+                                              openSpinnerHistoryPurchase={openSpinnerHistoryPurchase}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Coupons coupons={customerCoupons} onChangeStatusCoupon={changeStatusCoupon}
+                                     openSpinnerCoupons={openSpinnerCoupons}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <ReplacementCard/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <RegisterSalesSlip configData={configData}/>
+                        </Grid>
+                    </Grid>
                 </> : null}
         </div>
     )

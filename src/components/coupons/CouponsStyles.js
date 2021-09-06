@@ -12,10 +12,11 @@ const CouponsStyles = makeStyles((theme) => ({
     paperContent: {
         maxHeight: '80%',
         overflowX: 'hidden',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        height: theme.spacing(41)
     },
     couponsContainer: {
-        paddingBottom: '4px',
+        paddingBottom: '4px'
     },
     cardImage: {
         height: '100px'

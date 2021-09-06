@@ -13,7 +13,7 @@ const CustomerDataInfo = ({customer}) => {
         <Paper elevation={3}>
             <h4 className={classes.paperHeader}>Customer - Club data</h4>
             {!isEmpty(customer) ?
-                <span>
+                <div className={classes.container}>
                         <h2 className={classes.customerName}>{`${customer.salutation} ${customer.lastName} ${customer.firstName}`}</h2>
                         <Grid container spacing={1}>
                             <Grid item xs={12} sm={4}>
@@ -30,7 +30,7 @@ const CustomerDataInfo = ({customer}) => {
                                 <h5 className={classes.customerDetails}>{customer.phoneNumber}</h5>
                             </Grid>
                         </Grid> 
-                    </span> : <Spinner openSpinner={true}/>
+                    </div> : <Spinner openSpinner={true}/>
             }
         </Paper>
     )

@@ -8,6 +8,9 @@ const CustomerDataInfoStyles = makeStyles((theme) => ({
         color: '#fff',
         fontWeight: 400
     },
+    container: {
+        height: theme.spacing(41)
+    },
     customerName: {
         paddingLeft: '15px'
     },
