@@ -1,7 +1,7 @@
 import axiosInstance from '../../axiosInstance';
 
 const getStore = outletId => {
-    return axiosInstance.get(`/crm-util/stores/${outletId}/`);
+    return axiosInstance.get(`/crm-util/stores/433/`);
 };
 
 const getStoreBySapId = sapOutletId => {
@@ -17,10 +17,15 @@ const getConfigData = ({salesDivision, subsidiary}) => {
     });
 }
 
+const updateSalesSlip = (data) => {
+   return axiosInstance.post(`/crm-sales/updateSalesSlip/`, data)
+}
+
 const ConfigService = {
     getStore,
     getStoreBySapId,
-    getConfigData
+    getConfigData,
+    updateSalesSlip
 };
 
 export default ConfigService;
