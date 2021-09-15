@@ -17,44 +17,39 @@ const ReplacementCard = (props) => {
     const {customerData, addTransactions, addCoupons, deleteCoupons, ...rest} = useContext(GlobalContext);
     const [replacementCard, setReplacementCard] = useState('');
     const [existingCards, setExistingCards] = useState([]);
-    const [customer, setCustomer] = useState( []);
 
     useEffect(() => {
-       getAllCards();
+        getAllCards();
     },[]);
 
     const getActivationDate = (card) =>{
-        if(customer && customer.customerCards){
-        const cardFound = customer.customerCards.find(item => item.ciid === card.ciid)
-        return cardFound && moment(cardFound.activationDate).format("DD-MM-yyyy");
+        if(customerData && customerData.customerCards){
+            const cardFound = customerData.customerCards.find(item => item.ciid === card.ciid)
+            return cardFound && moment(cardFound.activationDate).format("DD-MM-yyyy");
         }
     }
 
     const classes = ReplacementCardStyles();
 
-   const replacementCardHandler=(event) => {
+    const replacementCardHandler=(event) => {
         setReplacementCard(event.target.value)
     }
     const addReplacementCard =() => {
-       const {salesDivision, subsidiary} = props;
-     const dataToBeSaved = {
-         ...customer,
-         ciid:replacementCard,
-         salesDivision,
-         subsidiary
-     }
+        const {salesDivision, subsidiary} = props;
+        const dataToBeSaved = {
+            ...customerData,
+            ciid:replacementCard,
+            salesDivision,
+            subsidiary
+        }
         CustomerService.validateCardNumber(dataToBeSaved)
-            .then(() => {
-                const data= CustomerService.createCustomerUpsertData(customer, props.configData)
+            .then(async (async) => {
+                const data = CustomerService.createCustomerUpsertData(customerData, props.configData)
                 data.cardCiid = dataToBeSaved.ciid;
-                CustomerService.upsertCustomer(data)
-                    .then((result) => {
-                   console.log(result);
-                   getAllCards();
-                    })
+                await CustomerService.upsertCustomer(data)
+                getAllCards();
             })
     }
-
     const getAllCards = () => {
         const {salesDivision, subsidiary, partyUid,activationDate} = props;
         const data = {
@@ -65,22 +60,16 @@ const ReplacementCard = (props) => {
         }
         MemberService.getHousehold(data)
             .then( (result) => {
-                console.log('result',result)
                 setExistingCards(result.data[0].householdCards)
             })
-        CustomerService.selectCustomer(data)
-            .then((result) =>{
-                console.log("result 2",result)
-                setCustomer(result.data);
-            })
+
     }
-   const checkCardType = (card) => {
-      const activationDate =  getActivationDate(card);
-      console.log(activationDate)
-       if (card.cardTypeCode === 'P' && moment(activationDate).isAfter(moment("2020-11-02T03:08:00"))){
-           return 'SYSTEM'
-       }
-       return 'P'
+    const checkCardType = (card) => {
+        const activationDate =  getActivationDate(card);
+        if (card.cardTypeCode === 'P' && moment(activationDate).isAfter(moment("2020-11-02T03:08:00"))){
+            return 'SYSTEM'
+        }
+        return 'P'
     }
     const checkStatusCode = (card) => {
         if (card.statusCode === 'I') {
@@ -88,8 +77,6 @@ const ReplacementCard = (props) => {
         }
         return 'Inactive'
     }
-    console.log('cards', existingCards);
-
     return (
         <Paper elevation={3}>
             <h3 className={classes.paperHeader}>Replacement card</h3>
@@ -100,20 +87,20 @@ const ReplacementCard = (props) => {
                             size="small"
                             type="number"
                             variant="outlined"
-                           className={classes.inputText}
-                        value={replacementCard}
-                        onChange={replacementCardHandler}/>
+                            className={classes.inputText}
+                            value={replacementCard}
+                            onChange={replacementCardHandler}/>
                     </div>
                     <Button className={classes.addReplacementCardButton}
                             size="large"
                             variant="contained"
                             color="primary"
-                        onClick={addReplacementCard}
-                            >Add replacement card</Button>
+                            onClick={addReplacementCard}
+                    >Add replacement card</Button>
                     <Grid container
-                        spacing={1}
-                        justify="center"
-                        alignItems="center">
+                          spacing={1}
+                          justify="center"
+                          alignItems="center">
                         <Grid item xs={12} sm={2}>
                         </Grid>
                         <Grid className={classes.wrapperCouponInfo} item xs={12} sm={6}>
@@ -132,14 +119,14 @@ const ReplacementCard = (props) => {
                         </Paper>
                     </Grid>
                     <List component="nav">
-                        {existingCards.map((card) =>(
-                                <ListItem>
-                                    <ListItemText  primary= {card.ciid} />
-                                    <ListItemText align="left" primary= {checkCardType(card)} />
-                                    <ListItemText align="right" primary= {getActivationDate(card)}/>
-                                    <ListItemText  align="right" primary= {checkStatusCode(card)} />
-                                </ListItem>
-                                ))}
+                        {existingCards.map((card) => (
+                            <ListItem>
+                                <ListItemText primary={card.ciid}/>
+                                <ListItemText align="left" primary={checkCardType(card)}/>
+                                <ListItemText align="right" primary={getActivationDate(card)}/>
+                                <ListItemText align="right" primary={checkStatusCode(card)}/>
+                            </ListItem>
+                        ))}
                     </List>
                     <Divider />
                 </div>

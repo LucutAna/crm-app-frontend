@@ -39,11 +39,9 @@ const ReplacementCardStyles = makeStyles((theme) => ({
     },
     addReplacementCardButton: {
         marginTop: theme.spacing(-1),
-        //marginTop: "auto"
     },
     paper: {
         padding: theme.spacing(1),
-       // textAlign: 'center',
         fontWeight: "bold",
         color: theme.palette.text.primary,
         display: "flex",
