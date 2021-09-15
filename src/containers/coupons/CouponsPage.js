@@ -38,10 +38,8 @@ const CouponsPage = (props) => {
             salesDivision: configData.salesDivision,
             subsidiary: configData.subsidiary
         }
-        console.log("customerData", customerData)
         MemberService.getCoupons(data)
             .then((result) => {
-                console.log('result', result)
                 setCoupons(result.data);
                 setFilteredCoupons(result.data);
 
@@ -53,7 +51,6 @@ const CouponsPage = (props) => {
                     }
                 })
                 setCouponNameFilterOptions(nameOptions);
-                console.log(nameOptions)
 
                 const statusOptions = [];
                 result.data.forEach(coupon => {
@@ -85,13 +82,11 @@ const CouponsPage = (props) => {
                     }
                 })
                 setStatusFilterOptions(statusOptions);
-                console.log(statusOptions)
             })
     }, [customerData])
 
     const couponsRefreshButton = () => {
         setFilteredCoupons(coupons);
-        console.log("button pressed")
     }
 
     const getCouponStatus = (coupon) =>{
@@ -115,18 +110,15 @@ const CouponsPage = (props) => {
         }
     }
     const couponStatus = (coupon) =>{
-        console.log('active status')
-       if(coupon.couponActivationCode === "I"){
-           return 'Active'
-       }
-       else if(coupon.couponActivationCode === "A"){
-           return 'Inactive'
-       }
+        if(coupon.couponActivationCode === "I"){
+            return 'Active'
+        }
+        else if(coupon.couponActivationCode === "A"){
+            return 'Inactive'
+        }
     }
     const filterByName= (param) =>{
-       console.log("filter 1", param.target.value);
-
-       let allCoupons = [...coupons];
+        let allCoupons = [...coupons];
 
         if (!firstFilterWasApplied) {
             setFirstFilterWasApplied(true);
@@ -139,7 +131,6 @@ const CouponsPage = (props) => {
         }
         if(param.target.value === 10){
             setFilteredCoupons(allCoupons)
-            console.log("all coupons", allCoupons)
         }
         else
         {
@@ -149,8 +140,6 @@ const CouponsPage = (props) => {
     }
 
     const filterByCouponStatus = (param) =>{
-       console.log("filter number 2", param.target.value)
-
         let allCoupons = [...coupons];
 
         if (!secondFilterWasApplied) {
@@ -165,20 +154,16 @@ const CouponsPage = (props) => {
         if(param.target.value === 10)
         {
             setFilteredCoupons(allCoupons);
-            console.log(allCoupons)
         }
-       else
+        else
         {
             const filteredCouponsByStatus = allCoupons.filter(coupon => coupon.statusCode === param.target.value)
             setFilteredCoupons(filteredCouponsByStatus);
-            console.log("filtered coupons", filteredCouponsByStatus)
         }
     }
 
     const filterByExpirationDate = (param) => {
-    console.log("filter number 3", param.target.value);
-
-    let allCoupons = [...coupons];
+        let allCoupons = [...coupons];
         if (!thirdFilterWasApplied) {
             setFirstFilterWasApplied(true);
         }
@@ -192,110 +177,106 @@ const CouponsPage = (props) => {
             setFilteredCoupons(allCoupons);
         }
         if(param.target.value === 20){
-            console.log(allCoupons)
-            //var currentDate = moment(Date.now()).startOf('day').format('YYYY-MM-DD');
-            var expirationDate = moment().endOf('day').add(60, "days");
+            const expirationDate = moment().endOf('day').add(60, "days");
             const expirationDateSixtyDays = allCoupons.filter(currMonth => moment(currMonth.endDate).isBefore(expirationDate) && moment(currMonth.endDate).isAfter(moment()));
-           // console.log("expiration date",expirationDate)
             setFilteredCoupons(expirationDateSixtyDays);
-            console.log("filter by expiration date in the next 60 days",expirationDateSixtyDays);
         }
     }
 
-return(
-    <div>
-        <h3>Coupons</h3>
-        <Grid container style={{textAlign:"end"}}>
-            <Grid container>
-                <Grid sm={2}>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Filter</InputLabel>
-                            <Select    labelId="demo-simple-select-label"
-                                       id="demo-simple-select"
-                                       onChange={filterByName}
-                            >
-                                <MenuItem value={10}>Filter by coupon name</MenuItem>
-                                {couponNameFilter.map((name) => (
-                                    <MenuItem value={name}>{name}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </Grid>
-                <Grid sm={2}>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Filter</InputLabel>
-                            <Select    labelId="demo-simple-select-label"
-                                       id="demo-simple-select"
-                                 onChange={filterByCouponStatus}
-                            >
-                                <MenuItem value={10}>Filter by coupon status</MenuItem>
-                                {statusFilter.map((status) =>(
-                                    <MenuItem value={status.value}>{status.name} </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </Grid>
-                <Grid sm={2}>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Filter</InputLabel>
-                            <Select    labelId="demo-simple-select-label"
-                                       id="demo-simple-select"
-                                       onChange={filterByExpirationDate}
-                            >
-                                <MenuItem value={10}>Filter by expiration period</MenuItem>
-                                <MenuItem value={20}>Expiration date in the next 60 days</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </Grid>
+    return(
+        <div>
+            <h3>Coupons</h3>
+            <Grid container style={{textAlign:"end"}}>
+                <Grid container>
+                    <Grid sm={2}>
+                        <Box sx={{ minWidth: 120 }}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+                                <Select    labelId="demo-simple-select-label"
+                                           id="demo-simple-select"
+                                           onChange={filterByName}
+                                >
+                                    <MenuItem value={10}>Filter by coupon name</MenuItem>
+                                    {couponNameFilter.map((name) => (
+                                        <MenuItem value={name}>{name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Grid>
+                    <Grid sm={2}>
+                        <Box sx={{ minWidth: 120 }}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+                                <Select    labelId="demo-simple-select-label"
+                                           id="demo-simple-select"
+                                           onChange={filterByCouponStatus}
+                                >
+                                    <MenuItem value={10}>Filter by coupon status</MenuItem>
+                                    {statusFilter.map((status) =>(
+                                        <MenuItem value={status.value}>{status.name} </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Grid>
+                    <Grid sm={2}>
+                        <Box sx={{ minWidth: 120 }}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+                                <Select    labelId="demo-simple-select-label"
+                                           id="demo-simple-select"
+                                           onChange={filterByExpirationDate}
+                                >
+                                    <MenuItem value={10}>Filter by expiration period</MenuItem>
+                                    <MenuItem value={20}>Expiration date in the next 60 days</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Grid>
 
-            <Grid sm={6}>
-                <Button variant="contained" style={{ marginLeft:"auto"}} endIcon={<RefreshIcon/>} onClick={couponsRefreshButton}  >Coupons refresh</Button>
+                    <Grid sm={6}>
+                        <Button variant="contained" style={{ marginLeft:"auto"}} endIcon={<RefreshIcon/>} onClick={couponsRefreshButton}  >Coupons refresh</Button>
+                    </Grid>
+                </Grid>
             </Grid>
-        </Grid>
-        </Grid>
-        <TableContainer component={Paper}>
-            <Table sx={{minWidth: 700}} aria-label="customized-table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell style={{fontWeight:"bold"}}>Date</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Code</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Name</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Description</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Date</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Expiration Date</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Redeem Date</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Value</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Status</TableCell>
-                        <TableCell align="right" style={{fontWeight:"bold"}}>Action</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {filteredCoupons.map((card) => (
+            <TableContainer component={Paper}>
+                <Table sx={{minWidth: 700}} aria-label="customized-table">
+                    <TableHead>
                         <TableRow>
-                            <TableCell >{moment(card.startDate).format("DD-MM-yyyy")}</TableCell>
-                            <TableCell align="right" >{card.couponCode}</TableCell>
-                            <TableCell align="right">{card.couponTypeName}</TableCell>
-                            <Tooltip title={card.couponTypeDescription} >
-                                <TableCell align="right">Coupon Description</TableCell>
-                            </Tooltip>
-                            <TableCell align="right">{}</TableCell>
-                            <TableCell align="right">{moment(card.endDate).format("DD-MM-yyyy")}</TableCell>
-                            <TableCell align="right">{card.redemptionDate}</TableCell>
-                            <TableCell align="right">{card.value}</TableCell>
-                            <TableCell align="right">{getCouponStatus(card)}</TableCell>
-                            <TableCell align="right">{couponStatus(card)}</TableCell>
+                            <TableCell style={{fontWeight:"bold"}}>Date</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Code</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Name</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Description</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Date</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Expiration Date</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Redeem Date</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Value</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Status</TableCell>
+                            <TableCell align="right" style={{fontWeight:"bold"}}>Action</TableCell>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-    </div>
-)
+                    </TableHead>
+                    <TableBody>
+                        {filteredCoupons.map((card) => (
+                            <TableRow>
+                                <TableCell >{moment(card.startDate).format("DD-MM-yyyy")}</TableCell>
+                                <TableCell align="right" >{card.couponCode}</TableCell>
+                                <TableCell align="right">{card.couponTypeName}</TableCell>
+                                <Tooltip title={card.couponTypeDescription} >
+                                    <TableCell align="right">Coupon Description</TableCell>
+                                </Tooltip>
+                                <TableCell align="right">{}</TableCell>
+                                <TableCell align="right">{moment(card.endDate).format("DD-MM-yyyy")}</TableCell>
+                                <TableCell align="right">{card.redemptionDate}</TableCell>
+                                <TableCell align="right">{card.value}</TableCell>
+                                <TableCell align="right">{getCouponStatus(card)}</TableCell>
+                                <TableCell align="right">{couponStatus(card)}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </div>
+    )
 }
 export default CouponsPage;
