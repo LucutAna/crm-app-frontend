@@ -86,7 +86,6 @@ const createCustomerUpsertData = (form, configData) => {
         generateExternalKey: true,
         legalAgreementVersion: "1.2",
         systemName: "KONYWWS",
-      //  updateCustomerFlag: form.updateCustomerFlag,
         partyId: !!form.partyId ? form.partyId : null,
         partyUid: !!form.partyUid ? form.partyUid : null,
         loyaltyActiveFlag: true,

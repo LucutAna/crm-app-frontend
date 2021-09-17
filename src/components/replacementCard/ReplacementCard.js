@@ -50,7 +50,7 @@ const ReplacementCard = (props) => {
                 getAllCards();
             })
     }
-    const getAllCards = () => {
+    const getAllCards = async () => {
         const {salesDivision, subsidiary, partyUid,activationDate} = props;
         const data = {
             salesDivision,
@@ -58,11 +58,8 @@ const ReplacementCard = (props) => {
             partyUid,
             activationDate
         }
-        MemberService.getHousehold(data)
-            .then( (result) => {
-                setExistingCards(result.data[0].householdCards)
-            })
-
+        const result = await MemberService.getHousehold(data)
+        setExistingCards(result.data[0].householdCards)
     }
     const checkCardType = (card) => {
         const activationDate =  getActivationDate(card);

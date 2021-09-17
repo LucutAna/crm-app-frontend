@@ -234,8 +234,6 @@ const Dashboard = ({configData}) => {
             console.log(error);
         }
     };
-console.log(configData)
-    console.log('partyuid', customerData.partyUid)
     return (
         <div className={classes.root}>
             {!isEmpty(customerData) ?

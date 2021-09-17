@@ -1,7 +1,7 @@
 import axiosInstance from '../../axiosInstance';
 
 const getStore = outletId => {
-    return axiosInstance.get(`/crm-util/stores/433/`);
+    return axiosInstance.get(`/crm-util/stores/${outletId}/`);
 };
 
 const getStoreBySapId = sapOutletId => {
