@@ -21,8 +21,7 @@ import RefreshIcon from "@material-ui/icons/Refresh";
 import Tooltip from '@material-ui/core/Tooltip';
 
 const CouponsPage = (props) => {
-    const {customerData, addTransactions, addCoupons, deleteCoupons, ...rest} = useContext(GlobalContext);
-    const [coupons, setCoupons] = useState([]);
+    const {customerData, addTransactions, addCoupons, deleteCoupons, coupons, ...rest} = useContext(GlobalContext);
     const [filteredCoupons, setFilteredCoupons] = useState([]);
     const [firstFilterWasApplied, setFirstFilterWasApplied] = useState(false);
     const [secondFilterWasApplied, setSecondFilterWasApplied] = useState(false);
@@ -31,94 +30,128 @@ const CouponsPage = (props) => {
     const [couponNameFilter, setCouponNameFilterOptions] = useState([]);
 
     useEffect(() => {
-        const {configData} = props;
-        const data = {
-            locale: customerData.locale,
+        const couponsPayload = {
             partyUid: customerData.partyUid,
-            salesDivision: configData.salesDivision,
-            subsidiary: configData.subsidiary
-        }
-        MemberService.getCoupons(data)
-            .then((result) => {
-                setCoupons(result.data);
-                setFilteredCoupons(result.data);
+            locale: props.configData.locales[0],
+            salesDivision: props.configData.salesDivision,
+            subsidiary: props.configData.subsidiary
+        };
+        getCouponsCustomer(couponsPayload);
+    }, [customerData]);
 
-                const nameOptions = [];
-                result.data.forEach(coupon => {
-                    if(!nameOptions.find(item => item === coupon.couponTypeName))
-                    {
-                        nameOptions.push(coupon.couponTypeName);
-                    }
-                })
-                setCouponNameFilterOptions(nameOptions);
+    const setInitialData = (coupons) => {
+        setFilteredCoupons(coupons);
+        const nameOptions = [];
+        coupons.forEach(coupon => {
+            if (!nameOptions.find(item => item === coupon.couponTypeName)) {
+                nameOptions.push(coupon.couponTypeName);
+            }
+        })
+        setCouponNameFilterOptions(nameOptions);
 
-                const statusOptions = [];
-                result.data.forEach(coupon => {
-                    if(!statusOptions.find(item => item.value === coupon.statusCode)){
-                        if(coupon.statusCode === "E")
-                        {
-                            statusOptions.push({value: coupon.statusCode, name:"Expired"})
-                        }
-                        if(coupon.statusCode === "G")
-                        {
-                            statusOptions.push({value: coupon.statusCode, name:"Created"})
-                        }
-                        if(coupon.statusCode === "I")
-                        {
-                            statusOptions.push({value: coupon.statusCode, name:"Issued"})
-                        }
-                        if(coupon.statusCode === "P")
-                        {
-                            statusOptions.push({value: coupon.statusCode, name:"Issue pending"})
-                        }
-                        if(coupon.statusCode === "U")
-                        {
-                            statusOptions.push({value: coupon.statusCode, name:"Redeemed"})
-                        }
-                        if(coupon.statusCode === "X")
-                        {
-                            statusOptions.push({value: coupon.statusCode, name:"Annulled"})
-                        }
+        const statusOptions = [];
+        coupons.forEach(coupon => {
+            if (!statusOptions.find(item => item.value === coupon.statusCode)) {
+                switch (coupon.statusCode) {
+                    case "E": {
+                        statusOptions.push({value: coupon.statusCode, name: "Expired"})
+                        break;
                     }
-                })
-                setStatusFilterOptions(statusOptions);
-            })
-    }, [customerData])
+                    case "G": {
+                        statusOptions.push({value: coupon.statusCode, name: "Created"})
+                        break;
+                    }
+                    case "I": {
+                        statusOptions.push({value: coupon.statusCode, name: "Issued"})
+                        break;
+                    }
+                    case "P": {
+                        statusOptions.push({value: coupon.statusCode, name: "Issue pending"})
+                        break;
+                    }
+                    case "U": {
+                        statusOptions.push({value: coupon.statusCode, name: "Redeemed"})
+                        break;
+                    }
+                    case "X": {
+                        statusOptions.push({value: coupon.statusCode, name: "Annulled"})
+                    }
+                }
+            }
+        })
+        setStatusFilterOptions(statusOptions);
+    }
 
     const couponsRefreshButton = () => {
-        setFilteredCoupons(coupons);
+        let allCoupons = [...Object.keys(coupons).map(item => coupons[item])];
+        setFilteredCoupons(allCoupons);
     }
 
-    const getCouponStatus = (coupon) =>{
-        if(coupon.statusCode === "E"){
-            return "Expired"
-        }
-        if(coupon.statusCode === "G"){
-            return "Created"
-        }
-        if(coupon.statusCode === "I"){
-            return "Issued"
-        }
-        if(coupon.statusCode === "P"){
-            return "Issue pending"
-        }
-        if(coupon.statusCode === "U"){
-            return "Redeemed"
-        }
-        if(coupon.statusCode === "X"){
-            return "Annuleled"
-        }
-    }
-    const couponStatus = (coupon) =>{
-        if(coupon.couponActivationCode === "I"){
-            return 'Active'
-        }
-        else if(coupon.couponActivationCode === "A"){
-            return 'Inactive'
+    const getCouponStatus = (coupon) => {
+        switch (coupon.statusCode) {
+            case "E": {
+                return "Expired"
+            }
+            case "G": {
+                return "Created"
+            }
+            case "I": {
+                return "Issued"
+            }
+            case "P": {
+                return "Issue pending"
+            }
+            case "U": {
+                return "Redeemed"
+            }
+            case "X": {
+                return "Annuleled"
+            }
         }
     }
-    const filterByName= (param) =>{
-        let allCoupons = [...coupons];
+    const couponStatus = (coupon) => {
+        if (coupon.couponActivationCode === "I") {
+            return 'Deactivate'
+        } else if (coupon.couponActivationCode === "A") {
+            return 'Activate'
+        }
+    }
+
+    const getCouponsCustomer = async (data) => {
+        try {
+            const coupons = await MemberService.getCoupons(data);
+            addCoupons(coupons.data);
+            setInitialData(coupons.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const changeStatusCoupon = async (couponSelected) => {
+        const data = {
+            activationStatusCode: couponSelected.couponActivationCode === 'I' ? 'A' : 'I',
+            couponCode: couponSelected.couponCode,
+            partyUid: customerData.partyUid,
+            salesDivision: props.configData.salesDivision,
+            subsidiary: props.configData.subsidiary
+        }
+        try {
+            const activateDeactivate = await MemberService.activateDeactivateCoupons(data);
+            if (activateDeactivate.data.status === 'SUCCESS') {
+                deleteCoupons();
+                const couponsPayload = {
+                    partyUid: customerData.partyUid,
+                    locale: props.configData.locales[0],
+                    salesDivision: props.configData.salesDivision,
+                    subsidiary: props.configData.subsidiary
+                };
+                await getCouponsCustomer(couponsPayload);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const filterByName = (param) => {
+        let allCoupons = [...Object.keys(coupons).map(item => coupons[item])];
 
         if (!firstFilterWasApplied) {
             setFirstFilterWasApplied(true);
@@ -129,18 +162,16 @@ const CouponsPage = (props) => {
         if (secondFilterWasApplied) {
             allCoupons = [...filteredCoupons];
         }
-        if(param.target.value === 10){
+        if (param.target.value === 10) {
             setFilteredCoupons(allCoupons)
-        }
-        else
-        {
+        } else {
             const nameFilter = allCoupons.filter(name => name.couponTypeName === param.target.value)
             setFilteredCoupons(nameFilter);
         }
     }
 
-    const filterByCouponStatus = (param) =>{
-        let allCoupons = [...coupons];
+    const filterByCouponStatus = (param) => {
+        let allCoupons = [...Object.keys(coupons).map(item => coupons[item])];
 
         if (!secondFilterWasApplied) {
             setSecondFilterWasApplied(true);
@@ -151,19 +182,17 @@ const CouponsPage = (props) => {
         if (firstFilterWasApplied) {
             allCoupons = [...filteredCoupons];
         }
-        if(param.target.value === 10)
-        {
+        if (param.target.value === 10) {
             setFilteredCoupons(allCoupons);
-        }
-        else
-        {
+        } else {
             const filteredCouponsByStatus = allCoupons.filter(coupon => coupon.statusCode === param.target.value)
             setFilteredCoupons(filteredCouponsByStatus);
         }
     }
 
     const filterByExpirationDate = (param) => {
-        let allCoupons = [...coupons];
+        let allCoupons = [...Object.keys(coupons).map(item => coupons[item])];
+
         if (!thirdFilterWasApplied) {
             setFirstFilterWasApplied(true);
         }
@@ -173,28 +202,27 @@ const CouponsPage = (props) => {
         if (firstFilterWasApplied) {
             allCoupons = [...filteredCoupons];
         }
-        if(param.target.value === 10){
+        if (param.target.value === 10) {
             setFilteredCoupons(allCoupons);
         }
-        if(param.target.value === 20){
+        if (param.target.value === 20) {
             const expirationDate = moment().endOf('day').add(60, "days");
             const expirationDateSixtyDays = allCoupons.filter(currMonth => moment(currMonth.endDate).isBefore(expirationDate) && moment(currMonth.endDate).isAfter(moment()));
             setFilteredCoupons(expirationDateSixtyDays);
         }
     }
-
-    return(
+    return (
         <div>
             <h3>Coupons</h3>
-            <Grid container style={{textAlign:"end"}}>
+            <Grid container style={{textAlign: "end"}}>
                 <Grid container>
                     <Grid sm={2}>
-                        <Box sx={{ minWidth: 120 }}>
+                        <Box sx={{minWidth: 120}}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Filter</InputLabel>
-                                <Select    labelId="demo-simple-select-label"
-                                           id="demo-simple-select"
-                                           onChange={filterByName}
+                                <Select labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        onChange={filterByName}
                                 >
                                     <MenuItem value={10}>Filter by coupon name</MenuItem>
                                     {couponNameFilter.map((name) => (
@@ -205,15 +233,15 @@ const CouponsPage = (props) => {
                         </Box>
                     </Grid>
                     <Grid sm={2}>
-                        <Box sx={{ minWidth: 120 }}>
+                        <Box sx={{minWidth: 120}}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Filter</InputLabel>
-                                <Select    labelId="demo-simple-select-label"
-                                           id="demo-simple-select"
-                                           onChange={filterByCouponStatus}
+                                <Select labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        onChange={filterByCouponStatus}
                                 >
                                     <MenuItem value={10}>Filter by coupon status</MenuItem>
-                                    {statusFilter.map((status) =>(
+                                    {statusFilter.map((status) => (
                                         <MenuItem value={status.value}>{status.name} </MenuItem>
                                     ))}
                                 </Select>
@@ -221,12 +249,12 @@ const CouponsPage = (props) => {
                         </Box>
                     </Grid>
                     <Grid sm={2}>
-                        <Box sx={{ minWidth: 120 }}>
+                        <Box sx={{minWidth: 120}}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Filter</InputLabel>
-                                <Select    labelId="demo-simple-select-label"
-                                           id="demo-simple-select"
-                                           onChange={filterByExpirationDate}
+                                <Select labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        onChange={filterByExpirationDate}
                                 >
                                     <MenuItem value={10}>Filter by expiration period</MenuItem>
                                     <MenuItem value={20}>Expiration date in the next 60 days</MenuItem>
@@ -236,7 +264,8 @@ const CouponsPage = (props) => {
                     </Grid>
 
                     <Grid sm={6}>
-                        <Button variant="contained" style={{ marginLeft:"auto"}} endIcon={<RefreshIcon/>} onClick={couponsRefreshButton}  >Coupons refresh</Button>
+                        <Button variant="contained" style={{marginLeft: "auto"}} endIcon={<RefreshIcon/>}
+                                onClick={couponsRefreshButton}>Coupons refresh</Button>
                     </Grid>
                 </Grid>
             </Grid>
@@ -244,25 +273,25 @@ const CouponsPage = (props) => {
                 <Table sx={{minWidth: 700}} aria-label="customized-table">
                     <TableHead>
                         <TableRow>
-                            <TableCell style={{fontWeight:"bold"}}>Date</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Code</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Name</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Description</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Date</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Expiration Date</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Redeem Date</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Value</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Coupon Status</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Action</TableCell>
+                            <TableCell style={{fontWeight: "bold"}}>Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Code</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Name</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Description</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Expiration Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Redeem Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Value</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Status</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {filteredCoupons.map((card) => (
                             <TableRow>
-                                <TableCell >{moment(card.startDate).format("DD-MM-yyyy")}</TableCell>
-                                <TableCell align="right" >{card.couponCode}</TableCell>
+                                <TableCell>{moment(card.startDate).format("DD-MM-yyyy")}</TableCell>
+                                <TableCell align="right">{card.couponCode}</TableCell>
                                 <TableCell align="right">{card.couponTypeName}</TableCell>
-                                <Tooltip title={card.couponTypeDescription} >
+                                <Tooltip title={card.couponTypeDescription}>
                                     <TableCell align="right">Coupon Description</TableCell>
                                 </Tooltip>
                                 <TableCell align="right">{}</TableCell>
@@ -270,7 +299,18 @@ const CouponsPage = (props) => {
                                 <TableCell align="right">{card.redemptionDate}</TableCell>
                                 <TableCell align="right">{card.value}</TableCell>
                                 <TableCell align="right">{getCouponStatus(card)}</TableCell>
-                                <TableCell align="right">{couponStatus(card)}</TableCell>
+                                <TableCell align="right">
+                                    {card.statusCode !== "E" && !card.redemptionDate ?
+                                        <Button
+                                            onClick={() => changeStatusCoupon(card)}
+                                            variant="outlined"
+                                            color="primary"
+                                            fullWidth
+                                            size="small">
+                                            {couponStatus(card)}
+                                        </Button> : false
+                                    }
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
