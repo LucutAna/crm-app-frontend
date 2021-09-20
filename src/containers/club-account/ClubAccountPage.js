@@ -26,117 +26,141 @@ const ClubAccountPage = (props) => {
     const [secondFilterWasApplied, setSecondFilterWasApplied] = useState(false);
     const [transactionsFilterOptions, setTransactionsFilterOptions] = useState([]);
 
-    useEffect( () => {
+    useEffect(async () => {
         const {configData} = props;
         const data = {
             partyUid: customerData.partyUid,
             salesDivision: configData.salesDivision,
             subsidiary: configData.subsidiary
         }
-        MemberService.getTransactions(data)
-            .then( (result) =>{
-                setTransactions(result.data);
-                setFilteredTransactions(result.data);
+        const result = await MemberService.getTransactions(data)
+        setTransactions(result.data);
+        setFilteredTransactions(result.data);
 
-                const transactionsOptions =[];
-                result.data.forEach(transaction =>{
-                    if(!transactionsOptions.find(item => item.value  === transaction.transactionType)){
-                        if(transaction.transactionType === "PT"){
-                            transactionsOptions.push({value:transaction.transactionType, name:"Kontozusammenführung"})
-                        }
-                        if(transaction.transactionType === "EN") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Anmeldung"})
-                        }
-                        if(transaction.transactionType === "EV") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Externes Event"})
-                        }
-                        if(transaction.transactionType === "EX") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Punkteverfall"})
-                        }
-                        if(transaction.transactionType === "GW") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Manuelle Buchung"})
-                        }
-                        if(transaction.transactionType === "IR") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Verlängerte Umtauschzeit bei Online-Retouren"})
-                        }
-                        if(transaction.transactionType === "LO") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Kulanzlose"})
-                        }
-                        if(transaction.transactionType === "MM") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Kunden werben Kunden"})
-                        }
-                        if(transaction.transactionType === "MT") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Kündigung der Mitgliedschaft"})
-                        }
-                        if(transaction.transactionType === "PC") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Punktekorrektur"})
-                        }
-                        if(transaction.transactionType === "RL") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Level-Aufstieg"})
-                        }
-                        if(transaction.transactionType === "RT") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Retoure"})
-                        }
-                        if(transaction.transactionType === "SA") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Einkauf"})
-                        }
-                        if(transaction.transactionType === "ST") {
-                            transactionsOptions.push({value: transaction.transactionType, name: "Gewinnstufe „Treue belohnen“ erreicht"})
-                        }
+        const transactionsOptions = [];
+        result.data.forEach(transaction => {
+            if(!transactionsOptions.find(item => item.value === transaction.transactionType)) {
+                switch(transaction.transactionType){
+                    case "PT": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Kontozusammenführung"})
+                        break;
                     }
-                })
-                setTransactionsFilterOptions(transactionsOptions);
-            })
-    },[customerData])
+                    case "EN": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Anmeldung"})
+                        break;
+                    }
+                    case "EV": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Externes Event"})
+                        break;
+                    }
+                    case "EX": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Punkteverfall"})
+                        break;
+                    }
+                    case  "GW": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Manuelle Buchung"})
+                        break;
+                    }
+                    case "IR": {
+                        transactionsOptions.push({
+                            value: transaction.transactionType,
+                            name: "Verlängerte Umtauschzeit bei Online-Retouren"
+                        })
+                        break;
+                    }
+                    case "LO": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Kulanzlose"})
+                        break;
+                    }
+                    case "MM": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Kunden werben Kunden"})
+                        break;
+                    }
+                    case "MT": {
+                        transactionsOptions.push({
+                            value: transaction.transactionType,
+                            name: "Kündigung der Mitgliedschaft"
+                        })
+                        break;
+                    }
+                    case "PC": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Punktekorrektur"})
+                        break;
+                    }
+                    case "RL": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Level-Aufstieg"})
+                        break;
+                    }
+                    case "RT": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Retoure"})
+                        break;
+                    }
+                    case "SA": {
+                        transactionsOptions.push({value: transaction.transactionType, name: "Einkauf"})
+                        break;
+                    }
+                    case "ST": {
+                        transactionsOptions.push({
+                            value: transaction.transactionType,
+                            name: "Gewinnstufe „Treue belohnen“ erreicht"
+                        })
+                    }
+                }
+            }
+        })
+        setTransactionsFilterOptions(transactionsOptions);
+    }, [customerData])
 
     const refreshPage = () => {
         setFilteredTransactions(transactions);
     }
-    const getTransactionType = (transactions) =>{
-        if(transactions.transactionType === "PT"){
-            return "Kontozusammenführung"
-        }
-        if(transactions.transactionType === "EN"){
-            return "Anmeldung"
-        }
-        if(transactions.transactionType === "EV"){
-            return "Externes Event"
-        }
-        if(transactions.transactionType === "EX"){
-            return "Punkteverfall"
-        }
-        if(transactions.transactionType === "GW"){
-            return "Manuelle Buchung"
-        }
-        if(transactions.transactionType === "IR"){
-            return "Verlängerte Umtauschzeit bei Online-Retouren"
-        }
-        if(transactions.transactionType === "LO"){
-            return "Kulanzlose"
-        }
-        if(transactions.transactionType === "MM"){
-            return "Kunden werben Kunden"
-        }
-        if(transactions.transactionType === "MT"){
-            return "Kündigung der Mitgliedschaft"
-        }
-        if(transactions.transactionType === "PC"){
-            return "Punktekorrektur"
-        }
-        if(transactions.transactionType === "RL"){
-            return "Level-Aufstieg"
-        }
-        if(transactions.transactionType === "RT"){
-            return "Retoure"
-        }
-        if(transactions.transactionType === "SA"){
-            return "Einkauf"
-        }
-        if(transactions.transactionType === "ST"){
-            return "Gewinnstufe „Treue belohnen“ erreicht"
+    const getTransactionType = (transactions) => {
+        switch (transactions.transactionType) {
+            case "PT": {
+                return "Kontozusammenführung"
+            }
+            case "EN": {
+                return "Anmeldung"
+            }
+            case "EV": {
+                return "Externes Event"
+            }
+            case "EX": {
+                return "Punkteverfall"
+            }
+            case "GW": {
+                return "Manuelle Buchung"
+            }
+            case "IR": {
+                return "Verlängerte Umtauschzeit bei Online-Retouren"
+            }
+            case "LO": {
+                return "Kulanzlose"
+            }
+            case "MM": {
+                return "Kunden werben Kunden"
+            }
+            case "MT": {
+                return "Kündigung der Mitgliedschaft"
+            }
+            case "PC": {
+                return "Punktekorrektur"
+            }
+            case "RL": {
+                return "Level-Aufstieg"
+            }
+            case "RT": {
+                return "Retoure"
+            }
+            case "SA": {
+                return "Einkauf"
+            }
+            case "ST": {
+                return "Gewinnstufe „Treue belohnen“ erreicht"
+            }
         }
     }
-    const transactionsFilter= (param) =>{
+    const transactionsFilter = (param) => {
         let allTransactions = [...transactions];
 
         if (!firstFilterWasApplied) {
@@ -145,17 +169,14 @@ const ClubAccountPage = (props) => {
         if (secondFilterWasApplied) {
             allTransactions = [...filteredTransactions];
         }
-        if(param.target.value === 10)
-        {
+        if (param.target.value === 10) {
             setFilteredTransactions(allTransactions);
-        }
-        else
-        {
-            const transactionsTypeFilter= allTransactions.filter(trans => trans.transactionType === param.target.value)
+        } else {
+            const transactionsTypeFilter = allTransactions.filter(trans => trans.transactionType === param.target.value)
             setFilteredTransactions(transactionsTypeFilter);
         }
     }
-    const transactionsMonthFilter= (param) =>{
+    const transactionsMonthFilter = (param) => {
 
         let allTransactions = [...transactions];
 
@@ -165,45 +186,38 @@ const ClubAccountPage = (props) => {
         if (firstFilterWasApplied) {
             allTransactions = [...filteredTransactions];
         }
-        if(param.target.value === 10)
-        {
+        if (param.target.value === 10) {
             const dateEndOf = moment(Date.now()).endOf('month').format('YYYY-MM-DD');
             const dateStartOf = moment(Date.now()).startOf('month').format('YYYY-MM-DD');
 
             const currentMonthTransactions = allTransactions.filter(currMonth => moment(currMonth.processingDate).isBetween(dateStartOf, dateEndOf))
             setFilteredTransactions(currentMonthTransactions);
             console.log("filter current month")
-        }
-        else if(param.target.value === 20)
-        {
-            const dateEndOf = moment(Date.now()).subtract(1,'months').endOf('month').format('YYYY-MM-DD');
-            const dateStartOf = moment(Date.now()).subtract(1,'months').startOf('month').format('YYYY-MM-DD');
+        } else if (param.target.value === 20) {
+            const dateEndOf = moment(Date.now()).subtract(1, 'months').endOf('month').format('YYYY-MM-DD');
+            const dateStartOf = moment(Date.now()).subtract(1, 'months').startOf('month').format('YYYY-MM-DD');
             const lastMonthTransactions = allTransactions.filter(currMonth => moment(currMonth.processingDate).isBetween(dateStartOf, dateEndOf))
             setFilteredTransactions(lastMonthTransactions);
-        }
-        else if(param.target.value === 30)
-        {
-            const dateStartOf = moment(Date.now()).subtract(6,'months').startOf('month').format('YYYY-MM-DD');
+        } else if (param.target.value === 30) {
+            const dateStartOf = moment(Date.now()).subtract(6, 'months').startOf('month').format('YYYY-MM-DD');
             const lastMonthTransactions = allTransactions.filter(currMonth => moment(currMonth.processingDate).isSameOrAfter(dateStartOf))
             setFilteredTransactions(lastMonthTransactions);
-        }
-        else if(param.target.value === 40)
-        {
+        } else if (param.target.value === 40) {
             setFilteredTransactions(allTransactions);
         }
     }
-    return(
+    return (
         <div>
-            <Grid container style={{textAlign:"end"}}>
-                <Grid sm={2} >
-                    <Box sx={{ minWidth: 120 }}>
+            <Grid container style={{textAlign: "end"}}>
+                <Grid sm={2}>
+                    <Box sx={{minWidth: 120}}>
                         <FormControl fullWidth>
                             <InputLabel id="select-label">All transactions</InputLabel>
-                            <Select    labelId="select-label"
-                                       id="simple-select"
-                                       onChange={transactionsFilter}>
+                            <Select labelId="select-label"
+                                    id="simple-select"
+                                    onChange={transactionsFilter}>
                                 <MenuItem value={10}>All Transactions</MenuItem>
-                                {transactionsFilterOptions.map((transaction) =>(
+                                {transactionsFilterOptions.map((transaction) => (
                                     <MenuItem value={transaction.value}>{transaction.name}</MenuItem>
                                 ))}
                             </Select>
@@ -211,12 +225,12 @@ const ClubAccountPage = (props) => {
                     </Box>
                 </Grid>
                 <Grid sm={2}>
-                    <Box sx={{ minWidth: 120 }}>
+                    <Box sx={{minWidth: 120}}>
                         <FormControl fullWidth>
                             <InputLabel id="select-label">Everyone</InputLabel>
-                            <Select    labelId="select-label"
-                                       id="simple-select"
-                                       onChange={transactionsMonthFilter}>
+                            <Select labelId="select-label"
+                                    id="simple-select"
+                                    onChange={transactionsMonthFilter}>
                                 <MenuItem value={10}>Current month</MenuItem>
                                 <MenuItem value={20}>Last month</MenuItem>
                                 <MenuItem value={30}>Last 6 months</MenuItem>
@@ -226,26 +240,27 @@ const ClubAccountPage = (props) => {
                     </Box>
                 </Grid>
                 <Grid sm={8}>
-                    <Button variant="contained" style={{ marginLeft:"auto"}} endIcon={<RefreshIcon/>} onClick={refreshPage} >Page refresh</Button>
+                    <Button variant="contained" style={{marginLeft: "auto"}} endIcon={<RefreshIcon/>}
+                            onClick={refreshPage}>Page refresh</Button>
                 </Grid>
             </Grid>
             <TableContainer component={Paper}>
                 <Table sx={{minWidth: 700}} aria-label="customized-table">
                     <TableHead>
                         <TableRow>
-                            <TableCell style={{fontWeight:"bold"}}>Date</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Action</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Document</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Re-registered</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Euro</TableCell>
-                            <TableCell align="right" style={{fontWeight:"bold"}}>Transaction ID</TableCell>
+                            <TableCell style={{fontWeight: "bold"}}>Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Action</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Document</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Re-registered</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Euro</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Transaction ID</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {filteredTransactions.map((card) => (
                             <TableRow>
-                                <TableCell >{moment(card.processingDate).format("DD-MM-yyyy")}</TableCell>
-                                <TableCell align="right" >{getTransactionType(card)}</TableCell>
+                                <TableCell>{moment(card.processingDate).format("DD-MM-yyyy")}</TableCell>
+                                <TableCell align="right">{getTransactionType(card)}</TableCell>
                                 <TableCell align="right">{card.documentTypeCode}</TableCell>
                                 <TableCell align="right">
                                     {card.belated !== null && <input type="checkbox"
