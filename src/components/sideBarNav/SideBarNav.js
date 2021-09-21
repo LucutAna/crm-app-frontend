@@ -74,6 +74,14 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                         <Typography variant="inherit">Coupons</Typography>
                     </NavLink>
                 </MenuItem>
+                <MenuItem>
+                    <NavLink className={classes.listItemIcon} to='/club-account'>
+                        <ListItemIcon>
+                            <CreditCardIcon/>
+                        </ListItemIcon>
+                        <Typography variant="inherit">Club Account</Typography>
+                    </NavLink>
+                </MenuItem>
             </MenuList>
         </Drawer>
     )
