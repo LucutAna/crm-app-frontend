@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -7,231 +6,133 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import {withStyles} from '@material-ui/core/styles';
 import moment from 'moment';
-import {isNull} from 'lodash';
-import Zoom from '@material-ui/core/Zoom';
-
-
 import {useContext, useEffect, useState} from "react";
 import {GlobalContext} from "../../context/GlobalState";
-
-import CouponsPageStyles from './CouponsPageStyles';
 import MemberService from "../../shared/services/MemberService";
+import {Select} from "@material-ui/core";
+import MenuItem from "@material-ui/core/MenuItem";
+import Box from "@material-ui/core/Box";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Grid from "@material-ui/core/Grid";
+import RefreshIcon from "@material-ui/icons/Refresh";
+import Tooltip from '@material-ui/core/Tooltip';
 
-const CouponsPage = ({configData}) => {
-    const StyledTableRow = withStyles((theme) => ({
-        root: {
-            '&:nth-of-type(odd)': {
-                backgroundColor: theme.palette.action.hover,
-            },
-        },
-    }))(TableRow);
-
-    const HtmlTooltip = withStyles((theme) => ({
-        tooltip: {
-            backgroundColor: ' #d5d5d5',
-            color: 'rgba(0, 0, 0, 0.87)',
-            maxWidth: 750,
-            fontSize: theme.typography.pxToRem(6),
-            border: '1px solid #dadde9',
-        },
-    }))(Tooltip);
-
-    const classes = CouponsPageStyles();
-    const {coupons, customerData, addCoupons, deleteCoupons } = useContext(GlobalContext);
-    const [customerCoupons, setCustomerCoupons] = useState([]);
-    const [rows, setRows] = useState([]);
-    const [order, setOrder] = useState('asc');
-    const [orderBy, setOrderBy] = useState('calories');
-    const [selected, setSelected] = useState([]);
-
-    //ToDo change logic when we will add translation
-    const statusName = [
-        {
-            statusCode: 'C',
-            statusCodeName: 'Canceled'
-        },
-        {
-            statusCode: 'E',
-            statusCodeName: 'Expired'
-        },
-        {
-            statusCode: 'G',
-            statusCodeName: 'Created'
-        },
-        {
-            statusCode: 'I',
-            statusCodeName: 'Issued'
-        },
-        {
-            statusCode: 'P',
-            statusCodeName: 'Issue pending'
-        },
-        {
-            statusCode: 'U',
-            statusCodeName: 'Redeemed'
-        },
-        {
-            statusCode: 'X',
-            statusCodeName: 'Annulled'
-        }
-    ];
-    const displayStatusCodeName = code => statusName.map(status => status.statusCode === code ? status.statusCodeName : '');
-
-
-    const headCells = [
-        {id: 'code', label: 'Coupon Code'},
-        {id: 'name', label: 'Coupon name'},
-        {id: 'description', label: 'Coupon description'},
-        {id: 'date', label: 'Coupon Date'},
-        {id: 'valid', label: 'Expiration Date'},
-        {id: 'redeem', label: 'Redeem Date'},
-        {id: 'value', label: 'Coupon Value'},
-        {id: 'status', label: 'Coupon Status'},
-        {id: 'activationCode', label: 'Action'},
-    ];
-
-    const createData = (code, name, description, date, valid, redeem, value, status, activationCode) => {
-        return {code, name, description, date, valid, redeem, value, status, activationCode};
-    }
+const CouponsPage = (props) => {
+    const {customerData, addTransactions, addCoupons, deleteCoupons, coupons, ...rest} = useContext(GlobalContext);
+    const [filteredCoupons, setFilteredCoupons] = useState([]);
+    const [firstFilterWasApplied, setFirstFilterWasApplied] = useState(false);
+    const [secondFilterWasApplied, setSecondFilterWasApplied] = useState(false);
+    const [thirdFilterWasApplied, setThirdFilterWasApplied] = useState(false);
+    const [statusFilter, setStatusFilterOptions] = useState([]);
+    const [couponNameFilter, setCouponNameFilterOptions] = useState([]);
 
     useEffect(() => {
-        setCustomerCoupons(Object.values(coupons).filter(item => item.endDate > moment().format('YYYY-MM-DDThh:mm:ss')))
-    }, [coupons])
-
-
-    useEffect(() => {
-        if (customerCoupons.length > 0) {
-            const rowData = [];
-            customerCoupons.forEach(coupon => rowData.push(createData(coupon.couponCode, coupon.couponTypeName, coupon.couponTypeDescription, coupon.startDate, coupon.endDate, coupon.redemptionDate, coupon.value, coupon.statusCode, coupon.couponActivationCode)))
-            setRows(rowData);
-        }
-    }, [customerCoupons])
-
-    const descendingComparator = (a, b, orderBy) => {
-        if (b[orderBy] < a[orderBy]) {
-            return -1;
-        }
-        if (b[orderBy] > a[orderBy]) {
-            return 1;
-        }
-        return 0;
-    }
-
-    const getComparator = (order, orderBy) => {
-        return order === 'desc'
-            ? (a, b) => descendingComparator(a, b, orderBy)
-            : (a, b) => -descendingComparator(a, b, orderBy);
-    }
-
-    const stableSort = (array, comparator) => {
-        const stabilizedThis = array.map((el, index) => [el, index]);
-        stabilizedThis.sort((a, b) => {
-            const order = comparator(a[0], b[0]);
-            if (order !== 0) return order;
-            return a[1] - b[1];
-        });
-        return stabilizedThis.map((el) => el[0]);
-    }
-
-    const EnhancedTableHead = (props) => {
-        const {classes, order, orderBy, onRequestSort} = props;
-        const createSortHandler = property => (event) => {
-            onRequestSort(event, property);
+        const couponsPayload = {
+            partyUid: customerData.partyUid,
+            locale: props.configData.locales[0],
+            salesDivision: props.configData.salesDivision,
+            subsidiary: props.configData.subsidiary
         };
+        getCouponsCustomer(couponsPayload);
+    }, [customerData]);
 
-        return (
-            <TableHead>
-                <TableRow>
-                    {headCells.map((headCell) => (
-                        <TableCell
-                            className={classes.headersTable}
-                            key={headCell.id}
-                            align="left"
-                            sortDirection={orderBy === headCell.id ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === headCell.id}
-                                direction={orderBy === headCell.id ? order : 'asc'}
-                                onClick={createSortHandler(headCell.id)}
-                            >
-                                {headCell.label}
-                                {orderBy === headCell.id ? (
-                                    <span className={classes.visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </span>
-                                ) : null}
-                            </TableSortLabel>
-                        </TableCell>
-                    ))}
-                </TableRow>
-            </TableHead>
-        );
+    const setInitialData = (coupons) => {
+        setFilteredCoupons(coupons);
+        const nameOptions = [];
+        coupons.forEach(coupon => {
+            if (!nameOptions.find(item => item === coupon.couponTypeName)) {
+                nameOptions.push(coupon.couponTypeName);
+            }
+        })
+        setCouponNameFilterOptions(nameOptions);
+
+        const statusOptions = [];
+        coupons.forEach(coupon => {
+            if (!statusOptions.find(item => item.value === coupon.statusCode)) {
+                switch (coupon.statusCode) {
+                    case "E": {
+                        statusOptions.push({value: coupon.statusCode, name: "Expired"})
+                        break;
+                    }
+                    case "G": {
+                        statusOptions.push({value: coupon.statusCode, name: "Created"})
+                        break;
+                    }
+                    case "I": {
+                        statusOptions.push({value: coupon.statusCode, name: "Issued"})
+                        break;
+                    }
+                    case "P": {
+                        statusOptions.push({value: coupon.statusCode, name: "Issue pending"})
+                        break;
+                    }
+                    case "U": {
+                        statusOptions.push({value: coupon.statusCode, name: "Redeemed"})
+                        break;
+                    }
+                    case "X": {
+                        statusOptions.push({value: coupon.statusCode, name: "Annulled"})
+                    }
+                }
+            }
+        })
+        setStatusFilterOptions(statusOptions);
     }
 
-    EnhancedTableHead.propTypes = {
-        classes: PropTypes.object.isRequired,
-        numSelected: PropTypes.number.isRequired,
-        onRequestSort: PropTypes.func.isRequired,
-        onSelectAllClick: PropTypes.func.isRequired,
-        order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-        orderBy: PropTypes.string.isRequired,
-        rowCount: PropTypes.number.isRequired,
-    };
+    const couponsRefreshButton = () => {
+        let allCoupons = [...Object.keys(coupons).map(item => coupons[item])];
+        setFilteredCoupons(allCoupons);
+    }
 
-    const handleRequestSort = (event, property) => {
-        const isAsc = orderBy === property && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(property);
-    };
-
-    const handleSelectAllClick = (event) => {
-        if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.name);
-            setSelected(newSelecteds);
-            return;
+    const getCouponStatus = (coupon) => {
+        switch (coupon.statusCode) {
+            case "E": {
+                return "Expired"
+            }
+            case "G": {
+                return "Created"
+            }
+            case "I": {
+                return "Issued"
+            }
+            case "P": {
+                return "Issue pending"
+            }
+            case "U": {
+                return "Redeemed"
+            }
+            case "X": {
+                return "Annuleled"
+            }
         }
-        setSelected([]);
-    };
-
-    const formatDate = date => isNull(date) ? '' : moment(date).format(configData.modules.DATE_FORMAT.toUpperCase());
+    }
+    const couponStatus = (coupon) => {
+        if (coupon.couponActivationCode === "I") {
+            return 'Deactivate'
+        } else if (coupon.couponActivationCode === "A") {
+            return 'Activate'
+        }
+    }
 
     const getCouponsCustomer = async (data) => {
         try {
             const coupons = await MemberService.getCoupons(data);
-            //TODO: check if the logic below is deprecated
-            // map(coupons.data, (coupon) => {
-            //     if (isNil(coupon.couponTypeName_de_DE))
-            //         coupon.typeName = coupon.couponTypeName;
-            //     else
-            //         coupon.typeName = coupon.couponTypeName_de_DE;
-            //     if (isNil(coupon.couponTypeDescription_de_DE))
-            //         coupon.typeDescription = coupon.couponTypeDescription;
-            //     else
-            //         coupon.typeDescription = coupon.couponTypeDescription_de_DE;
-            // });
-            setCustomerCoupons(coupons.data);
             addCoupons(coupons.data);
+            setInitialData(coupons.data);
         } catch (error) {
             console.log(error);
         }
-    };
-
+    }
     const changeStatusCoupon = async (couponSelected) => {
         const data = {
-            activationStatusCode: couponSelected.activationCode === 'I' ? 'A' : 'I',
-            couponCode: couponSelected.code,
+            activationStatusCode: couponSelected.couponActivationCode === 'I' ? 'A' : 'I',
+            couponCode: couponSelected.couponCode,
             partyUid: customerData.partyUid,
-            salesDivision: configData.salesDivision,
-            subsidiary: configData.subsidiary
+            salesDivision: props.configData.salesDivision,
+            subsidiary: props.configData.subsidiary
         }
         try {
             const activateDeactivate = await MemberService.activateDeactivateCoupons(data);
@@ -239,95 +140,183 @@ const CouponsPage = ({configData}) => {
                 deleteCoupons();
                 const couponsPayload = {
                     partyUid: customerData.partyUid,
-                    locale: configData.locales[0],
-                    salesDivision: configData.salesDivision,
-                    subsidiary: configData.subsidiary
+                    locale: props.configData.locales[0],
+                    salesDivision: props.configData.salesDivision,
+                    subsidiary: props.configData.subsidiary
                 };
-                getCouponsCustomer(couponsPayload);
+                await getCouponsCustomer(couponsPayload);
             }
         } catch (error) {
             console.log(error);
         }
     }
+    const filterByName = (param) => {
+        let allCoupons = [...Object.keys(coupons).map(item => coupons[item])];
 
+        if (!firstFilterWasApplied) {
+            setFirstFilterWasApplied(true);
+        }
+        if (!thirdFilterWasApplied) {
+            setFirstFilterWasApplied(true);
+        }
+        if (secondFilterWasApplied) {
+            allCoupons = [...filteredCoupons];
+        }
+        if (param.target.value === 10) {
+            setFilteredCoupons(allCoupons)
+        } else {
+            const nameFilter = allCoupons.filter(name => name.couponTypeName === param.target.value)
+            setFilteredCoupons(nameFilter);
+        }
+    }
 
+    const filterByCouponStatus = (param) => {
+        let allCoupons = [...Object.keys(coupons).map(item => coupons[item])];
+
+        if (!secondFilterWasApplied) {
+            setSecondFilterWasApplied(true);
+        }
+        if (!thirdFilterWasApplied) {
+            setFirstFilterWasApplied(true);
+        }
+        if (firstFilterWasApplied) {
+            allCoupons = [...filteredCoupons];
+        }
+        if (param.target.value === 10) {
+            setFilteredCoupons(allCoupons);
+        } else {
+            const filteredCouponsByStatus = allCoupons.filter(coupon => coupon.statusCode === param.target.value)
+            setFilteredCoupons(filteredCouponsByStatus);
+        }
+    }
+
+    const filterByExpirationDate = (param) => {
+        let allCoupons = [...Object.keys(coupons).map(item => coupons[item])];
+
+        if (!thirdFilterWasApplied) {
+            setFirstFilterWasApplied(true);
+        }
+        if (!secondFilterWasApplied) {
+            setFirstFilterWasApplied(true);
+        }
+        if (firstFilterWasApplied) {
+            allCoupons = [...filteredCoupons];
+        }
+        if (param.target.value === 10) {
+            setFilteredCoupons(allCoupons);
+        }
+        if (param.target.value === 20) {
+            const expirationDate = moment().endOf('day').add(60, "days");
+            const expirationDateSixtyDays = allCoupons.filter(currMonth => moment(currMonth.endDate).isBefore(expirationDate) && moment(currMonth.endDate).isAfter(moment()));
+            setFilteredCoupons(expirationDateSixtyDays);
+        }
+    }
     return (
-        <div className={classes.root}>
-            <Paper className={classes.paper}>
-                <Toolbar className={classes.highlight}>
-                    <Typography className={classes.title} variant="h5" id="tableTitle" component="div">
-                        Coupons
-                    </Typography>
-                    <Tooltip title="Filter list">
-                        <IconButton fontSize="large" aria-label="filter list">
-                            <FilterListIcon/>
-                        </IconButton>
-                    </Tooltip>
-                </Toolbar>
-                <TableContainer>
-                    <Table
-                        className={classes.table}
-                        aria-labelledby="tableTitle"
-                        aria-label="enhanced table"
-                    >
-                        <EnhancedTableHead
-                            classes={classes}
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
-                        />
-                        <TableBody>
-                            {stableSort(rows, getComparator(order, orderBy))
-                                .map((row, index) => {
-                                    const labelId = `enhanced-table-checkbox-${index}`;
+        <div>
+            <h3>Coupons</h3>
+            <Grid container style={{textAlign: "end"}}>
+                <Grid container>
+                    <Grid sm={2}>
+                        <Box sx={{minWidth: 120}}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+                                <Select labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        onChange={filterByName}
+                                >
+                                    <MenuItem value={10}>Filter by coupon name</MenuItem>
+                                    {couponNameFilter.map((name) => (
+                                        <MenuItem value={name}>{name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Grid>
+                    <Grid sm={2}>
+                        <Box sx={{minWidth: 120}}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+                                <Select labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        onChange={filterByCouponStatus}
+                                >
+                                    <MenuItem value={10}>Filter by coupon status</MenuItem>
+                                    {statusFilter.map((status) => (
+                                        <MenuItem value={status.value}>{status.name} </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Grid>
+                    <Grid sm={2}>
+                        <Box sx={{minWidth: 120}}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+                                <Select labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        onChange={filterByExpirationDate}
+                                >
+                                    <MenuItem value={10}>Filter by expiration period</MenuItem>
+                                    <MenuItem value={20}>Expiration date in the next 60 days</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Grid>
 
-                                    return (
-                                        <StyledTableRow key={row.code}>
-                                            <TableCell component="th" id={labelId} scope="row">
-                                                {row.code}
-                                            </TableCell>
-                                            <TableCell align="left">{row.name}</TableCell>
-                                            <HtmlTooltip arrow TransitionComponent={Zoom}
-                                                         TransitionProps={{timeout: 500}}
-                                                         title={
-                                                             <React.Fragment>
-                                                                 <Typography
-                                                                     color="inherit">{row.description}</Typography>
-                                                             </React.Fragment>
-                                                         }
-                                            >
-                                                <TableCell className={classes.descriptionContainer}
-                                                           align="left">{row.description}</TableCell>
-                                            </HtmlTooltip>
-                                            <TableCell align="left">{formatDate(row.date)}</TableCell>
-                                            <TableCell align="left">{formatDate(row.valid)}</TableCell>
-                                            <TableCell align="left">{formatDate(row.redeem)}</TableCell>
-                                            <TableCell align="left">{row.value !== 0 ? row.value : ''}</TableCell>
-                                            <TableCell align="left">{displayStatusCodeName(row.status)}</TableCell>
-                                            <TableCell align="left">
-                                                <Button
-                                                    onClick={() => changeStatusCoupon(row)}
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    fullWidth
-                                                    value={row}
-                                                    size="small">
-                                                    {(row.status === 'I' && row.activationCode === 'I') ?
-                                                        'ACTIVATE' : (row.status === 'I' && row.activationCode === 'A') ?
-                                                            'DEACTIVATE' : ''}
-                                                </Button>
-                                            </TableCell>
-                                        </StyledTableRow>
-                                    );
-                                })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
+                    <Grid sm={6}>
+                        <Button variant="contained" style={{marginLeft: "auto"}} endIcon={<RefreshIcon/>}
+                                onClick={couponsRefreshButton}>Coupons refresh</Button>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <TableContainer component={Paper}>
+                <Table sx={{minWidth: 700}} aria-label="customized-table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell style={{fontWeight: "bold"}}>Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Code</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Name</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Description</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Expiration Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Redeem Date</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Value</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Status</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Action</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredCoupons.map((card) => (
+                            <TableRow>
+                                <TableCell>{moment(card.startDate).format("DD-MM-yyyy")}</TableCell>
+                                <TableCell align="right">{card.couponCode}</TableCell>
+                                <TableCell align="right">{card.couponTypeName}</TableCell>
+                                <Tooltip title={card.couponTypeDescription}>
+                                    <TableCell align="right">Coupon Description</TableCell>
+                                </Tooltip>
+                                <TableCell align="right">{}</TableCell>
+                                <TableCell align="right">{moment(card.endDate).format("DD-MM-yyyy")}</TableCell>
+                                <TableCell align="right">{card.redemptionDate}</TableCell>
+                                <TableCell align="right">{card.value}</TableCell>
+                                <TableCell align="right">{getCouponStatus(card)}</TableCell>
+                                <TableCell align="right">
+                                    {card.statusCode !== "E" && !card.redemptionDate ?
+                                        <Button
+                                            onClick={() => changeStatusCoupon(card)}
+                                            variant="outlined"
+                                            color="primary"
+                                            fullWidth
+                                            size="small">
+                                            {couponStatus(card)}
+                                        </Button> : false
+                                    }
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
-    );
+    )
 }
 export default CouponsPage;
