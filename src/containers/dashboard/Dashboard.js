@@ -234,7 +234,6 @@ const Dashboard = ({configData}) => {
             console.log(error);
         }
     };
-
     return (
         <div className={classes.root}>
             {!isEmpty(customerData) ?
@@ -252,7 +251,7 @@ const Dashboard = ({configData}) => {
                                      openSpinnerCoupons={openSpinnerCoupons}/>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <ReplacementCard/>
+                            <ReplacementCard configData={configData} salesDivision = {configData.salesDivision} subsidiary ={configData.subsidiary} partyUid={customerData.partyUid}/>
                         </Grid>
                         <Grid item xs={12}>
                             <RegisterSalesSlip configData={configData}/>

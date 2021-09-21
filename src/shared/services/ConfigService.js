@@ -17,10 +17,15 @@ const getConfigData = ({salesDivision, subsidiary}) => {
     });
 }
 
+const updateSalesSlip = (data) => {
+   return axiosInstance.post(`/crm-sales/updateSalesSlip/`, data)
+}
+
 const ConfigService = {
     getStore,
     getStoreBySapId,
-    getConfigData
+    getConfigData,
+    updateSalesSlip
 };
 
 export default ConfigService;
