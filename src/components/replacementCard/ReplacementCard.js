@@ -34,7 +34,7 @@ const ReplacementCard = (props) => {
     const replacementCardHandler=(event) => {
         setReplacementCard(event.target.value)
     }
-    const addReplacementCard =() => {
+    const addReplacementCard = async() => {
         const {salesDivision, subsidiary} = props;
         const dataToBeSaved = {
             ...customerData,
@@ -42,13 +42,14 @@ const ReplacementCard = (props) => {
             salesDivision,
             subsidiary
         }
-        CustomerService.validateCardNumber(dataToBeSaved)
-            .then(async (async) => {
-                const data = CustomerService.createCustomerUpsertData(customerData, props.configData)
-                data.cardCiid = dataToBeSaved.ciid;
-                await CustomerService.upsertCustomer(data)
-                getAllCards();
-            })
+        const result = await CustomerService.validateCardNumber(dataToBeSaved)
+        if(result.data.code === "SUCCESS") {
+            const data = CustomerService.createCustomerUpsertData(customerData, props.configData)
+            data.cardCiid = dataToBeSaved.ciid;
+            await CustomerService.upsertCustomer(data)
+            getAllCards();
+        }
+
     }
     const getAllCards = async () => {
         const {salesDivision, subsidiary, partyUid,activationDate} = props;
