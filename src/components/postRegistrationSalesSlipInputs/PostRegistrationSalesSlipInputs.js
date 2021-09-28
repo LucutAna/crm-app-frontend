@@ -85,10 +85,19 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
         slipDate: '',
         slipTime: ''
     };
+
     const onSubmit = async (values, actions) => {
-        const store = await ConfigService.getStoreBySapId(values.sapOutletId)
-        const update = await ConfigService.updateSalesSlip(values)
-        console.log(store);
+        const {slipDate, slipTime, ...rest} = values;
+        const salesSlipDate=moment(slipDate  + slipTime, dateFormat +'HH:mm')
+        const storeInfo = await ConfigService.getStoreBySapId(values.sapOutletId);
+        
+        const dataToBeSaved = {
+            ...rest,
+            ciid: customerData.cardCiid[0],
+            createDateTime:salesSlipDate.format(),
+            outletId:storeInfo.data.outletPK.id
+        }
+        await ConfigService.updateSalesSlip(dataToBeSaved)
     }
 
     return (
