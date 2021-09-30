@@ -12,6 +12,8 @@ import Typography from "@material-ui/core/Typography";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import ReceiptIcon from "@material-ui/icons/Receipt";
 import CreditCardIcon from "@material-ui/icons/CreditCard";
+import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
+import EmailIcon from '@material-ui/icons/Email';
 import React from "react";
 import clsx from 'clsx';
 import {useTheme} from "@material-ui/core/styles";
@@ -77,9 +79,17 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                 <MenuItem>
                     <NavLink className={classes.listItemIcon} to='/club-account'>
                         <ListItemIcon>
-                            <CreditCardIcon/>
+                            <AccountBalanceWalletIcon/>
                         </ListItemIcon>
                         <Typography variant="inherit">Club Account</Typography>
+                    </NavLink>
+                </MenuItem>
+                <MenuItem>
+                    <NavLink className={classes.listItemIcon} to='/channel-permissions'>
+                        <ListItemIcon>
+                            <EmailIcon/>
+                        </ListItemIcon>
+                        <Typography variant="inherit">Channel Permissions</Typography>
                     </NavLink>
                 </MenuItem>
             </MenuList>

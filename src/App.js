@@ -17,6 +17,7 @@ import {GlobalProvider} from './context/GlobalState';
 import Header from "./components/header/Header";
 import SideBarNav from "./components/sideBarNav/SideBarNav";
 import SnackbarComponent from "./components/snackbar/SnackbarComponent";
+import ChannelPermissionsPage from "./containers/channel-permissions/ChannelPermissionsPage";
 
 function App() {
     const drawerWidth = 240;
@@ -25,7 +26,7 @@ function App() {
     const [configData, setConfigData] = useState([]);
     const [outletID, setOutletID] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState({open: false, message: '', code: ''});
-    
+
 
     useEffect(() => {
         try {
@@ -83,6 +84,7 @@ function App() {
                             <Route path='/order-history' component={() => <OrderHistory configData={configData}/>}/>
                             <Route path='/coupons' component={() => <CouponsPage configData={configData}/>}/>
                             <Route path='/club-account' component={() => <ClubAccountPage configData={configData}/>}/>
+                            <Route path='/channel-permissions' component={() => <ChannelPermissionsPage configData={configData}/>}/>
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                         </main>
                         <SnackbarComponent openSnackbar={openSnackbar}/>

@@ -287,7 +287,7 @@ const CouponsPage = (props) => {
                     </TableHead>
                     <TableBody>
                         {filteredCoupons.map((card) => (
-                            <TableRow>
+                            <TableRow key={card.id}>
                                 <TableCell>{moment(card.startDate).format("DD-MM-yyyy")}</TableCell>
                                 <TableCell align="right">{card.couponCode}</TableCell>
                                 <TableCell align="right">{card.couponTypeName}</TableCell>
