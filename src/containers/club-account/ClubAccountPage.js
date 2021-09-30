@@ -258,7 +258,7 @@ const ClubAccountPage = (props) => {
                     </TableHead>
                     <TableBody>
                         {filteredTransactions.map((card) => (
-                            <TableRow>
+                            <TableRow key={card.id}>
                                 <TableCell>{moment(card.processingDate).format("DD-MM-yyyy")}</TableCell>
                                 <TableCell align="right">{getTransactionType(card)}</TableCell>
                                 <TableCell align="right">{card.documentTypeCode}</TableCell>

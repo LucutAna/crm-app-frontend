@@ -118,7 +118,7 @@ const ReplacementCard = (props) => {
                     </Grid>
                     <List component="nav">
                         {existingCards.map((card) => (
-                            <ListItem>
+                            <ListItem key={card.id}>
                                 <ListItemText primary={card.ciid}/>
                                 <ListItemText align="left" primary={checkCardType(card)}/>
                                 <ListItemText align="right" primary={getActivationDate(card)}/>
