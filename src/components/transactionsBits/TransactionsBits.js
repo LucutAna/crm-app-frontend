@@ -1,26 +1,27 @@
-import * as React from 'react';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import {Select, TableCell} from '@material-ui/core';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Box from '@material-ui/core/Box';
-import {useContext, useEffect, useState} from "react";
-import MemberService from "../../shared/services/MemberService";
-import {GlobalContext} from "../../context/GlobalState";
+import React, {useContext, useEffect, useState} from 'react';
+import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
+import FormControl from "@material-ui/core/FormControl";
+import Paper from "@material-ui/core/Paper";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import {Select, TableCell} from "@material-ui/core";
+import TableContainer from "@material-ui/core/TableContainer";
+import Table from "@material-ui/core/Table";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import {GlobalContext} from "../../context/GlobalState";
+import MemberService from "../../shared/services/MemberService";
 import Button from "@material-ui/core/Button";
-import RefreshIcon from '@material-ui/icons/Refresh';
+import RefreshIcon from "@material-ui/icons/Refresh";
 import moment from "moment";
+import TableBody from "@material-ui/core/TableBody";
 
-const ClubAccountPage = (props) => {
-    const {customerData, addTransactions, addCoupons, deleteCoupons, ...rest} = useContext(GlobalContext);
+const TransactionsBits = (props) => {
+    const {customerData, addTransactions, ...rest} = useContext(GlobalContext);
     const [transactions, setTransactions] = useState([]);
+    const [bitss, setBits] = useState([]);
+    const [bitsType, setBitsType] = useState('');
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [firstFilterWasApplied, setFilterWasApplied] = useState(false);
     const [secondFilterWasApplied, setSecondFilterWasApplied] = useState(false);
@@ -33,12 +34,17 @@ const ClubAccountPage = (props) => {
             salesDivision: configData.salesDivision,
             subsidiary: configData.subsidiary
         }
-        const result = await MemberService.getTransactions(data)
-        setTransactions(result.data);
-        setFilteredTransactions(result.data);
+        const result = await MemberService.getHousehold(data)
+        setBits(result.data[0].bitsBalances);
+        const bitsTypeFound = result.data[0].bitsBalances.find(item => item.bitsType === 'PT');
+        setBitsType(bitsTypeFound);
+
+        const resultTransactions = await MemberService.getTransactions(data)
+        setTransactions(resultTransactions.data);
+        setFilteredTransactions(resultTransactions.data);
 
         const transactionsOptions = [];
-        result.data.forEach(transaction => {
+        resultTransactions.data.forEach(transaction => {
             if(!transactionsOptions.find(item => item.value === transaction.transactionType)) {
                 switch(transaction.transactionType){
                     case "PT": {
@@ -109,11 +115,8 @@ const ClubAccountPage = (props) => {
             }
         })
         setTransactionsFilterOptions(transactionsOptions);
-    }, [customerData])
+    },[customerData]);
 
-    const refreshPage = () => {
-        setFilteredTransactions(transactions);
-    }
     const getTransactionType = (transactions) => {
         switch (transactions.transactionType) {
             case "PT": {
@@ -192,7 +195,6 @@ const ClubAccountPage = (props) => {
 
             const currentMonthTransactions = allTransactions.filter(currMonth => moment(currMonth.processingDate).isBetween(dateStartOf, dateEndOf))
             setFilteredTransactions(currentMonthTransactions);
-            console.log("filter current month")
         } else if (param.target.value === 20) {
             const dateEndOf = moment(Date.now()).subtract(1, 'months').endOf('month').format('YYYY-MM-DD');
             const dateStartOf = moment(Date.now()).subtract(1, 'months').startOf('month').format('YYYY-MM-DD');
@@ -206,8 +208,26 @@ const ClubAccountPage = (props) => {
             setFilteredTransactions(allTransactions);
         }
     }
-    return (
+    const refreshTransactions = () => {
+        setBits(bitss);
+        setFilteredTransactions(transactions);
+    }
+
+    return(
         <div>
+            <Grid container style={{textAlign: "end"}}>
+                <Grid sm={2}>
+                    <label>Total bits </label>
+                    <div>{bitsType.bookedBits}</div>
+                </Grid>
+                <Grid sm={2}>
+                    <label>Pending bits</label>
+                    <div>{bitsType.pendingBits}</div>
+                </Grid>
+                <Grid sm={4}>
+                    <Button variant="contained" endIcon={<RefreshIcon/>} onClick={refreshTransactions}>Refresh transactions</Button>
+                </Grid>
+            </Grid>
             <Grid container style={{textAlign: "end"}}>
                 <Grid sm={2}>
                     <Box sx={{minWidth: 120}}>
@@ -215,7 +235,8 @@ const ClubAccountPage = (props) => {
                             <InputLabel id="select-label">All transactions</InputLabel>
                             <Select labelId="select-label"
                                     id="simple-select"
-                                    onChange={transactionsFilter}>
+                                    onChange={transactionsFilter}
+                            >
                                 <MenuItem value={10}>All Transactions</MenuItem>
                                 {transactionsFilterOptions.map((transaction) => (
                                     <MenuItem key={transaction.id} value={transaction.value}>{transaction.name}</MenuItem>
@@ -230,7 +251,8 @@ const ClubAccountPage = (props) => {
                             <InputLabel id="select-label">Everyone</InputLabel>
                             <Select labelId="select-label"
                                     id="simple-select"
-                                    onChange={transactionsMonthFilter}>
+                                    onChange={transactionsMonthFilter}
+                            >
                                 <MenuItem value={10}>Current month</MenuItem>
                                 <MenuItem value={20}>Last month</MenuItem>
                                 <MenuItem value={30}>Last 6 months</MenuItem>
@@ -239,20 +261,17 @@ const ClubAccountPage = (props) => {
                         </FormControl>
                     </Box>
                 </Grid>
-                <Grid sm={8}>
-                    <Button variant="contained" style={{marginLeft: "auto"}} endIcon={<RefreshIcon/>}
-                            onClick={refreshPage}>Page refresh</Button>
-                </Grid>
             </Grid>
             <TableContainer component={Paper}>
                 <Table sx={{minWidth: 700}} aria-label="customized-table">
                     <TableHead>
                         <TableRow>
                             <TableCell style={{fontWeight: "bold"}}>Date</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Action</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Document</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Re-registered</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Euro</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Transaction</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Document Type</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Registered</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Value</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>Bits</TableCell>
                             <TableCell align="right" style={{fontWeight: "bold"}}>Transaction ID</TableCell>
                         </TableRow>
                     </TableHead>
@@ -267,9 +286,9 @@ const ClubAccountPage = (props) => {
                                                                      disabled={true}
                                                                      checked={card.belated === true}
                                     >
-                                    </input>}
-                                </TableCell>
+                                    </input>}</TableCell>
                                 <TableCell align="right">{card.retailPrice}</TableCell>
+                                <TableCell align="right">{card.bitsBalances && card.bitsBalances[0] && card.bitsBalances[0].bits}</TableCell>
                                 <TableCell align="right">{card.loyaltyTransactionId}</TableCell>
                             </TableRow>
                         ))}
@@ -277,6 +296,7 @@ const ClubAccountPage = (props) => {
                 </Table>
             </TableContainer>
         </div>
-    );
+    )
 }
-export default ClubAccountPage;
+
+export default TransactionsBits;

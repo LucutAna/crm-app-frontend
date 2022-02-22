@@ -92,6 +92,22 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                         <Typography variant="inherit">Channel Permissions</Typography>
                     </NavLink>
                 </MenuItem>
+                <MenuItem>
+                    <NavLink className={classes.listItemIcon} to='/transactions-bits'>
+                        <ListItemIcon>
+                            <EmailIcon/>
+                        </ListItemIcon>
+                        <Typography variant="inherit">Transactions & Points</Typography>
+                    </NavLink>
+                </MenuItem>
+                <MenuItem>
+                    <NavLink className={classes.listItemIcon} to='/shopping-card'>
+                        <ListItemIcon>
+                            <EmailIcon/>
+                        </ListItemIcon>
+                        <Typography variant="inherit">Shopping Card</Typography>
+                    </NavLink>
+                </MenuItem>
             </MenuList>
         </Drawer>
     )

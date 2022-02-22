@@ -18,6 +18,7 @@ import Header from "./components/header/Header";
 import SideBarNav from "./components/sideBarNav/SideBarNav";
 import SnackbarComponent from "./components/snackbar/SnackbarComponent";
 import ChannelPermissionsPage from "./containers/channel-permissions/ChannelPermissionsPage";
+import TransactionsBits from "./components/transactionsBits/TransactionsBits";
 
 function App() {
     const drawerWidth = 240;
@@ -86,6 +87,7 @@ function App() {
                             <Route path='/club-account' component={() => <ClubAccountPage configData={configData}/>}/>
                             <Route path='/channel-permissions' component={() => <ChannelPermissionsPage configData={configData}/>}/>
                             <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
+                            <Route path='/transactions-bits' component={ () => <TransactionsBits configData={configData}/>}/>
                         </main>
                         <SnackbarComponent openSnackbar={openSnackbar}/>
                     </div>
