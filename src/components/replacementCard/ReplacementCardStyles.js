@@ -14,6 +14,8 @@ const ReplacementCardStyles = makeStyles((theme) => ({
         overflowX: 'hidden',
         overflowY: 'auto',
         height: theme.spacing(41),
+        marginLeft:10,
+        marginRight:10,
 
     },
     couponsContainer: {
