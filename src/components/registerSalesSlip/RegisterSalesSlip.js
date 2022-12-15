@@ -4,12 +4,13 @@ import Grid from '@material-ui/core/Grid';
 import RegisterSalesSlipStyles from './RegisterSalesSlipStyles';
 import PostRegistrationSalesSlipInputs from '../postRegistrationSalesSlipInputs/PostRegistrationSalesSlipInputs'
 import ImageRegistrationSalesSlip from '../../assets/images/registration_saleslip.png';
+import i18next from "i18next";
 
 const RegisterSalesSlip = ({configData}) => {
     const classes = RegisterSalesSlipStyles();
     return (
         <Paper elevation={3}>
-            <h3 className={classes.paperHeader}>Register sales slip</h3>
+            <h3 className={classes.paperHeader}>{i18next.t('TAB_REGISTER_SALES_SLIP')}</h3>
             <div className={classes.paperContent}>
                     <Grid container
                         spacing={2}

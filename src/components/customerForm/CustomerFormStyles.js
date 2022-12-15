@@ -1,4 +1,5 @@
 import {makeStyles} from '@material-ui/core/styles';
+import {useAutocomplete} from "@material-ui/lab";
 
 const CustomerFormStyles = makeStyles((theme) => ({
     country: {
@@ -33,6 +34,14 @@ const CustomerFormStyles = makeStyles((theme) => ({
         textAlign: 'center',
         color: theme.palette.text.secondary,
     },
+    paperText: {
+         paddingTop: theme.spacing(4),
+         paddingBottom: theme.spacing(4),
+        textAlign: 'center',
+        width:'100%',
+        height: '100%'
+
+    },
     wrapperButtons: {
         paddingTop: '60px !important'
     },
@@ -42,6 +51,12 @@ const CustomerFormStyles = makeStyles((theme) => ({
     backdrop: {
         zIndex: theme.zIndex.drawer + 1,
     },
+    btnGenerateCIID: {
+        bottom:"20px",
+        left:"40px",
+        paddingLeft:"15px",
+        paddingRight:"15px"
+    }
 }));
 
 export default CustomerFormStyles; 

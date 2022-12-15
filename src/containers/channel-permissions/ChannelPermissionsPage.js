@@ -5,6 +5,7 @@ import CustomerService from "../../shared/services/CustomerService";
 import ChannelPermissionsPageStyle from "./ChannelPermissionsPageStyle";
 import {ListItem, ListItemText} from "@material-ui/core";
 import {Alert} from "@material-ui/lab";
+import i18next from "i18next";
 
 const ChannelPermissionsPage = (props) =>{
     const classes = ChannelPermissionsPageStyle();
@@ -51,10 +52,10 @@ const ChannelPermissionsPage = (props) =>{
 
     return(
         <>
-            <div className={classes.firstText}>Nachfolgend können Sie festlegen, über welchen Informationskanal der Kunde über Neuigkeiten und Angebote sowie wertvolle Programmvorteile des Clubs informiert werden soll:</div>
-            <div className={classes.secondText}>Bitte bestätigen Sie die Änderung mit „Änderungen speichern“ und legen Sie dem Kunden den Ausdruck zur Unterschrift vor. Das unterschriebene Dokument ist an SPS zu senden.</div>
+            <div className={classes.firstText}>{i18next.t('TXT_PERMISSION_CHANNELS_INFO')}</div>
+            <div className={classes.secondText}>{i18next.t('TXT_PERMISSION_CHANNELS_CHANGES')}</div>
             <div>
-                <label className={classes.emailText}>Email:</label>
+                <label className={classes.emailText}>{i18next.t('LBL_EMAIL')}</label>
                 <input type="text"
                        value={email}
                        onChange={(e) => setEmail(e.target.value)}
@@ -66,12 +67,12 @@ const ChannelPermissionsPage = (props) =>{
                 />
             </div>
             <div>
-                <Button className={classes.saveButton} variant="contained" color="primary" disabled={!checkboxSelected} onClick={saveHandler}>save Changes</Button>
+                <Button className={classes.saveButton} variant="contained" color="primary" disabled={!checkboxSelected} onClick={saveHandler}>{i18next.t('BTN_SAVE_CHANGES')}</Button>
             </div>
-            <div className={classes.saveMessages}>{succesMessage}</div>
-            <div className={classes.saveMessages}>{errorInvalidEmail}</div>
+            <div className={classes.saveMessages}>{i18next.t('LBL_YES')}</div>
+            <div className={classes.saveMessages}>{i18next.t('ERR_INVALID_EMAIL')}</div>
             <div className={classes.thirdText}>
-                <ListItem> Abmeldemöglichkeit für den Kunden: </ListItem>
+                <ListItem> {i18next.t('TEXT_PERMISSIONS_CHANNELS_DEREGISTER')} </ListItem>
                 <ListItem>• Abmeldung im Newsletter über den Button "Newsletter abmelden"</ListItem>
                 <ListItem>• E-Mail an: kontakt@mediamarkt.club</ListItem>
                 <ListItem>• Hotline: 0800 / 72 430 40</ListItem>

@@ -112,7 +112,7 @@ const getSalesOrderHistoryFom = async ({configData, wcsUserId}) => {
 };
 
 const updateSalesSlip = data => {
-    return axiosInstance.post(`crm-sales/updateSalesSlip/`, data);
+    return axiosInstance.post(`/crm-members/updateSalesSlip/`, data);
 }
 const SalesTransactions = {
     getSalesOrderHistoryAtStore,

@@ -17,6 +17,7 @@ import Tab from '@material-ui/core/Tab';
 import StoreIconMM from "../../assets/images/paperless_life_store.png";
 import OnlineIconMM from "../../assets/images/paperless_life_online.png";
 import {GlobalContext} from '../../context/GlobalState';
+import i18next from "i18next";
 
 const printDocumentNumbers = (documentNumber) => {
     if (isEmpty(documentNumber)) {
@@ -107,9 +108,9 @@ const OrderHistory = ({configData}) => {
                     onChange={filterOrderHistory}
                     aria-label="disabled tabs example"
                 >
-                    <Tab label="All" />
-                    <Tab label="Store" />
-                    <Tab label="Online" />
+                    <Tab label={i18next.t('LBL_ORDERS_ALL')}/>
+                    <Tab label={i18next.t('LBL_ORDERS_IN_STORE')}/>
+                    <Tab label={i18next.t('LBL_ORDERS_ONLINE')}/>
                 </Tabs>
             </Paper>
             {

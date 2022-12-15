@@ -14,10 +14,15 @@
     "axios": "^0.21.1",
     "date-fns": "^2.18.0",
     "formik": "^2.2.6",
+    "i18next": "^21.9.1",
+    "i18next-http-backend": "^2.0.2",
     "moment": "^2.29.1",
     "react": "^17.0.1",
     "react-datepicker": "^4.6.0",
     "react-dom": "^17.0.1",
+    "react-dots-loader": "^1.1.4",
+    "react-i18next": "^11.18.5",
+    "react-native-animated-ellipsis": "^2.0.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
@@ -53,6 +58,7 @@
     "@material-ui/data-grid": "^4.0.0-alpha.37",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/styles": "^4.11.3",
-    "@mui/icons-material": "^5.0.1"
+    "@mui/icons-material": "^5.0.1",
+    "react-i18n": "^1.0.1"
   }
 }

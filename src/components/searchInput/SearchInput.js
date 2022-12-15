@@ -3,15 +3,15 @@ import SearchInputStyles from './SearchInputStyles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import clsx from 'clsx';
 import SearchIcon from "@material-ui/icons/Search";
+import i18next from "i18next";
 
 const SearchInput = ({onHandleCiid, ciid, onSelectCustomer, onEnter}) => {
     const classes = SearchInputStyles();
     return (
         <div className={classes.root}>
             <TextField
-                label="Search by Club Card Number"
+                label={i18next.t('LBL_LOYALTY_CARD_NUMBER_FULL_MM')}
                 id="outlined-start-adornment"
-                placeholder="Card Number"
                 value={ciid}
                 className={clsx(classes.margin, classes.textField)}
                 inputProps={

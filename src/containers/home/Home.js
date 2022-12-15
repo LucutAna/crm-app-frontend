@@ -7,6 +7,8 @@ import EnrollModal from '../../components/modals/enrollModal/EnrollModal';
 import CustomerService from '../../shared/services/CustomerService';
 import PrintModal from '../../components/modals/printModal/PrintModal';
 import {GlobalContext} from '../../context/GlobalState';
+import {useTranslation} from "react-i18next";
+import i18next from "i18next";
 
 const Home = ({configData, onSetOpenSnackbar}) => {
     const [ciid, setCiid] = useState('');
@@ -17,6 +19,7 @@ const Home = ({configData, onSetOpenSnackbar}) => {
 
     const {deleteCustomerData} = useContext(GlobalContext);
     const history = useHistory();
+    const { t } = useTranslation();
     const customerForm = useRef();
 
 

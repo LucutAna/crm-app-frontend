@@ -16,16 +16,20 @@ const getConfigData = ({salesDivision, subsidiary}) => {
         }
     });
 }
+const getLanguage = locale => {
+    return axiosInstance.get(`/crm-util/${locale}/translations/`);
+};
 
 const updateSalesSlip = (data) => {
-   return axiosInstance.post(`/crm-sales/updateSalesSlip/`, data)
+   return axiosInstance.post(`/crm-members/updateSalesSlip/`, data)
 }
 
 const ConfigService = {
     getStore,
     getStoreBySapId,
     getConfigData,
-    updateSalesSlip
+    updateSalesSlip,
+    getLanguage
 };
 
 export default ConfigService;

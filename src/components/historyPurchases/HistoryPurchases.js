@@ -12,6 +12,7 @@ import HistoryPurchasesStyles from './HistoryPurchasesStayles';
 import StoreIconMM from '../../assets/images/paperless_life_store.png';
 import OnlineIconMM from '../../assets/images/paperless_life_online.png';
 import Spinner from '../../components/spinners/customSpinner/CustomSpinner';
+import i18next from "i18next";
 
 const HistoryPurchases = ({salesOrderHistory, configData, openSpinnerHistoryPurchase}) => {
     const classes = HistoryPurchasesStyles();
@@ -32,7 +33,7 @@ const HistoryPurchases = ({salesOrderHistory, configData, openSpinnerHistoryPurc
 
     return (
         <Paper elevation={3}>
-            <h3 className={classes.paperHeader}>Purchases history</h3>
+            <h3 className={classes.paperHeader}>{i18next.t('TAB_ORDER_HISTORY')}</h3>
             {!isEmpty(salesOrderHistory) && !isEmpty(configData) && !isEmpty(rows) ?
                 <TableContainer className={classes.container}>
                     <Table stickyHeader aria-label="sticky table">

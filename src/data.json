@@ -1,0 +1,58 @@
+{
+  "DE": {
+    "subsidiaryCode": "DE",
+    "subsidiaryName": "Deutschland",
+    "salesDivisions": [
+      {
+        "salesDivison": "MM",
+        "salesDivisionName": "Media Markt"
+      },
+      {
+        "salesDivison": "SAT",
+        "salesDivisionName": "Saturn"
+      }
+    ],
+    "subsidiaryLocales": [
+      {
+        "subsidiaryLocale": "de_DE",
+        "subsidiaryLocaleLanguage": "Deutsch"
+      }
+    ]
+  },
+  "SE": {
+    "subsidiaryCode": "SE",
+    "subsidiaryName": "Sverige",
+    "salesDivisions": [
+      {
+        "salesDivison": "MM",
+        "salesDivisionName": "Media Markt"
+      }
+    ],
+    "subsidiaryLocales": [
+      {
+        "subsidiaryLocale": "sv_SV",
+        "subsidiaryLocaleLanguage": "Swedish"
+      }
+    ]
+  },
+  "BE": {
+    "subsidiaryCode": "BE",
+    "subsidiaryName": "Belgique",
+    "salesDivisions": [
+      {
+        "salesDivison": "MM",
+        "salesDivisionName": "Media Markt"
+      }
+    ],
+    "subsidiaryLocales": [
+      {
+        "subsidiaryLocale": "fr_BE",
+        "subsidiaryLocaleLanguage": "French"
+      },
+      {
+        "subsidiaryLocale": "nl_BE",
+        "subsidiaryLocaleLanguage": "Dutch"
+      }
+    ]
+  }
+}

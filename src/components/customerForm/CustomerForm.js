@@ -24,6 +24,8 @@ import moment from 'moment';
 
 import {GlobalContext} from '../../context/GlobalState';
 import CustomersModal from '../modals/customersModal/customersModal';
+import {Checkbox} from "@material-ui/core";
+import i18next from "i18next";
 
 const validationSchema = yup.object({
     firstName: yup
@@ -69,7 +71,10 @@ const validationSchema = yup.object({
                 const minAge = 18;
                 return age >= minAge
             })
-        .required('Birth Date is required')
+        .required('Birth Date is required'),
+    generatedCard: yup
+        .number('Club Card Number must be 16 digits')
+        .required('Club Card Number is requred')
 });
 
 
@@ -128,6 +133,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
     const [openSpinner, setOpenSpinner] = useState(false);
     const [openCustomersModal, setOpenCustomersModal] = useState(false);
     const [form, setForm] = useState({});
+    const [generatedCard, setGeneratedCard] = useState('');
 
     const customerFormRef = useRef();
 
@@ -152,7 +158,8 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
         birthDate: customerData.birthDate || new Date(),
         partyUid: customerData.partyUid || null,
         partyId: customerData.partyId || null,
-        updateCustomerFlag: false
+        updateCustomerFlag: false,
+        generatedCard: generatedCard
     };
 
     const searchCiid = async () => {
@@ -193,7 +200,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                 console.log(error)
             }
         } else {
-            let message = 'Please enter a valid customer card number';
+            let message = i18next.t('ERR_CIID_INVALID_MM');
             let open = true;
             let code = 'warning';
             setOpenSpinner(false);
@@ -217,7 +224,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
             }
             if (!validateCustomerOnSearchByName(cust)) {
                 setOpenSpinner(false);
-                let message = 'When searching, please enter at least the first and last name of the customer and at least one additional piece of information (email address, street and house number, date of birth and zip code, mobile number';
+                let message = i18next.t('ERR_CUST_SEARCH_REQ_FIELDS');
                 let open = true;
                 let code = 'warning';
                 onSetOpenSnackbar({open, message, code});
@@ -238,7 +245,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                 const customerResult = await CustomerService.searchCustomer(data);
                 if (isEmpty(customerResult.data)) {
                     setOpenSpinner(false);
-                    let message = 'No customer data could be found with the entered search criteria';
+                    let message = i18next.t('ERR_CUST_SEARCH_CIID_NO_RESULT_MM');
                     let open = true;
                     let code = 'info';
                     onSetOpenSnackbar({open, message, code});
@@ -294,6 +301,21 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
         customerForm.resetForm(formFields);
     }
 
+    const generateCardNumber = async () =>{
+        try {
+            let data = {
+                cardTypeCode: 'P',
+                salesDivision: configData.salesDivision,
+                subsidiary: configData.subsidiary
+            }
+            const card = await CustomerService.generateCiid(data);
+            setGeneratedCard(card.data.ciid);
+        }
+        catch (error) {
+                console.log(error);
+            }
+    }
+
     const onSubmit = (values, actions) => {
         //use consent flag from selectCustomer response
         let consentFlag = false;
@@ -311,8 +333,10 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
             mobile: values.mobile,
             country: values.country,
             updateCustomerFlag: values.updateCustomerFlag,
-            customerConsentFlag: consentFlag
+            customerConsentFlag: consentFlag,
+            generatedCard: values.generatedCard
         }, configData);
+        console.log("enrollCustomer", enrollCustomer)
         onNewRegistration({...enrollCustomer})
     };
 
@@ -333,10 +357,12 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             value={customerForm.values.salutation}
                                             onChange={customerForm.handleChange}
                                 >
-                                    <FormControlLabel value="Mrs." disabled={disableUserInput(customerForm.values)}
-                                                      control={<Radio/>} label="Mrs."/>
                                     <FormControlLabel value="Mr." disabled={disableUserInput(customerForm.values)}
-                                                      control={<Radio/>} label="Mr."/>
+                                                      control={<Radio/>} label={i18next.t('CMB_SIR')}/>
+                                    <FormControlLabel value="Mrs." disabled={disableUserInput(customerForm.values)}
+                                                      control={<Radio/>} label={i18next.t('CMB_MADAM')}/>
+                                    <FormControlLabel value="Unknown" disabled={disableUserInput(customerForm.values)}
+                                                      control={<Radio/>} label={i18next.t('LBL_UNKNOWN')}/>
                                 </RadioGroup>
                                 <Grid container spacing={4}>
                                     <Grid item xs={12} sm={6}>
@@ -345,7 +371,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             fullWidth
                                             id="firstName"
                                             name="firstName"
-                                            label="First name*"
+                                            label={i18next.t('LBL_FIRST_NAME')}
                                             disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.firstName}
                                             onChange={customerForm.handleChange}
@@ -359,7 +385,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             fullWidth
                                             id="street1"
                                             name="street1"
-                                            label="Street*"
+                                            label={i18next.t('LBL_STREET')}
                                             value={customerForm.values.street1}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
@@ -374,7 +400,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             fullWidth
                                             id="lastName"
                                             name="lastName"
-                                            label="Last name*"
+                                            label={i18next.t('LBL_LAST_NAME')}
                                             disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.lastName}
                                             onChange={customerForm.handleChange}
@@ -388,7 +414,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             fullWidth
                                             id="zipcode"
                                             name="zipcode"
-                                            label="Zip Code*"
+                                            label={i18next.t('LBL_ZIPCODE')}
                                             value={customerForm.values.zipcode}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.zipcode && Boolean(customerForm.errors.zipcode)}
@@ -403,7 +429,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                                 className={`${classes.birthDate} ${classes.inputText}`}
                                                 margin="normal"
                                                 id="date-picker-dialog"
-                                                label="Birthday*"
+                                                label={i18next.t('LBL_DOB')}
                                                 format="dd/MM/yyyy"
                                                 disabled={disableUserInput(customerForm.values)}
                                                 value={customerForm.values.birthDate}
@@ -422,7 +448,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             fullWidth
                                             id="city"
                                             name="city"
-                                            label="City*"
+                                            label={i18next.t('LBL_CITY')}
                                             value={customerForm.values.city}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.city && Boolean(customerForm.errors.city)}
@@ -431,13 +457,13 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                     </Grid>
                                 </Grid>
                                 <Grid container spacing={4}>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid item xs={12} sm={6}>
                                         <TextField
                                             className={classes.inputText}
                                             fullWidth
                                             id="email"
                                             name="email"
-                                            label="Email*"
+                                            label={i18next.t('LBL_EMAIL')}
                                             disabled={disableUserInput(customerForm.values)}
                                             value={customerForm.values.email}
                                             onChange={customerForm.handleChange}
@@ -445,13 +471,25 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             helperText={customerForm.touched.email && customerForm.errors.email}
                                         />
                                     </Grid>
+                                        {configData.subsidiary === 'CH' &&
+                                        <Grid item xs={12} sm={4}>
+                                        < Checkbox
+                                            id="consentFlag"
+                                            name="emailConsentCheckbox"
+                                            value={customerForm.values.emailConsentFlag}
+                                            onChange={customerForm.handleChange}
+                                            error={customerForm.touched.email && Boolean(customerForm.errors.email)}
+                                            />
+                                            <span>CONTACT_ALLOWED</span>
+                                        </Grid>
+                                        }
                                     <Grid item xs={12} sm={4}>
                                         <TextField
                                             className={classes.inputText}
                                             fullWidth
                                             id="mobile"
                                             name="mobile"
-                                            label="Phone number"
+                                            label={i18next.t('LBL_TEL_MOBILE')}
                                             value={customerForm.values.mobile}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.mobile && Boolean(customerForm.errors.mobile)}
@@ -465,7 +503,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             id="standard-select-currency"
                                             name="country"
                                             select
-                                            label="Country*"
+                                            label={i18next.t('LBL_COUNTRY')}
                                             value={customerForm.values.country}
                                             onChange={customerForm.handleChange}
                                             error={customerForm.touched.country && Boolean(customerForm.errors.country)}
@@ -482,6 +520,31 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                         </TextField>
                                     </Grid>
                                 </Grid>
+                                <Grid container spacing={4}>
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField className={classes.inputText}
+                                                   fullWidth
+                                                   id="cardnumber"
+                                                   name="cardnumber"
+                                                   value={generatedCard}
+                                                   label={i18next.t('LBL_LOYALTY_CARD_NUMBER_FULL_MM')}
+                                                   error={customerForm.touched.generatedCard && Boolean(customerForm.errors.generatedCard)}
+                                                   helperText={customerForm.touched.generatedCard && customerForm.errors.generatedCard}
+                                                   />
+                                    </Grid>
+                                    <Grid container spacing={4}>
+                                    <Grid item xs={12} sm={6}>
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            color="primary"
+                                            className={classes.btnGenerateCIID}
+                                            onClick={() => {generateCardNumber()}}>
+                                            {i18next.t('BTN_GENERATE_CARD')}
+                                        </Button>
+                                    </Grid>
+                                    </Grid>
+                                </Grid>
                             </Grid>
                             <Grid item xs={12} sm={4} className={classes.wrapperButtons}>
                                 <Paper className={classes.paper}>
@@ -490,7 +553,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             color="primary"
                                             type="submit">
                                         <CreditCardIcon fontSize="small"/>
-                                        New Club Registration
+                                        {i18next.t('BTN_PRINT')} & {i18next.t('BTN_SEND')}
                                     </Button>
                                     <Button size="large"
                                             className={classes.buttons}
@@ -498,15 +561,24 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                                             color="secondary"
                                             onClick={() => search(customerForm)}>
                                         <SearchIcon fontSize="small"/>
-                                        Search
+                                        {i18next.t('BTN_SEARCH')}
                                     </Button>
                                     <Button variant="contained" size="large"
                                             className={classes.buttons}
                                             onClick={() => clearFormFields(customerForm)}>
                                         <DeleteForeverIcon fontSize="small"/>
-                                        Clear
+                                        {i18next.t('BTN_EMPTY')}
                                     </Button>
                                 </Paper>
+                                {configData.subsidiary === 'CH' &&
+                                <Grid item xs={12} sm={8} className={classes.wrapperButtons}>
+                                    <Paper className={classes.paperText}>
+                                        <div>
+                                            {i18next.t('LBL_PERMISSION_INFO')}
+                                        </div>
+                                    </Paper>
+                                </Grid>
+                                }
                             </Grid>
                         </Grid>
                     </Form>
