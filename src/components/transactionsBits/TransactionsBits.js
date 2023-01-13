@@ -16,6 +16,7 @@ import Button from "@material-ui/core/Button";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import moment from "moment";
 import TableBody from "@material-ui/core/TableBody";
+import i18next from "i18next";
 
 const TransactionsBits = (props) => {
     const {customerData, addTransactions, ...rest} = useContext(GlobalContext);
@@ -36,7 +37,7 @@ const TransactionsBits = (props) => {
         }
         const result = await MemberService.getHousehold(data)
         setBits(result.data[0].bitsBalances);
-        const bitsTypeFound = result.data[0].bitsBalances.find(item => item.bitsType === 'PT');
+        const bitsTypeFound = result.data[0].bitsBalances.find(item => item.bitsType === 'PT' || item.bitsType === 'MM_PL_PT' || item.bitsType === 'BT');
         setBitsType(bitsTypeFound);
 
         const resultTransactions = await MemberService.getTransactions(data)
@@ -48,67 +49,67 @@ const TransactionsBits = (props) => {
             if(!transactionsOptions.find(item => item.value === transaction.transactionType)) {
                 switch(transaction.transactionType){
                     case "PT": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Kontozusammenführung"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_PT')})
                         break;
                     }
                     case "EN": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Anmeldung"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_EN')})
                         break;
                     }
                     case "EV": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Externes Event"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_EV')})
                         break;
                     }
                     case "EX": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Punkteverfall"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_EX')})
                         break;
                     }
                     case  "GW": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Manuelle Buchung"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_GW')})
                         break;
                     }
                     case "IR": {
                         transactionsOptions.push({
                             value: transaction.transactionType,
-                            name: "Verlängerte Umtauschzeit bei Online-Retouren"
+                            name: i18next.t('TRANSACTION_TYPE_IR')
                         })
                         break;
                     }
                     case "LO": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Kulanzlose"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_LO')})
                         break;
                     }
                     case "MM": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Kunden werben Kunden"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_MM')})
                         break;
                     }
                     case "MT": {
                         transactionsOptions.push({
                             value: transaction.transactionType,
-                            name: "Kündigung der Mitgliedschaft"
+                            name: i18next.t('TRANSACTION_TYPE_NT')
                         })
                         break;
                     }
                     case "PC": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Punktekorrektur"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_PC')})
                         break;
                     }
                     case "RL": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Level-Aufstieg"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_RL')})
                         break;
                     }
                     case "RT": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Retoure"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_RT')})
                         break;
                     }
                     case "SA": {
-                        transactionsOptions.push({value: transaction.transactionType, name: "Einkauf"})
+                        transactionsOptions.push({value: transaction.transactionType, name: i18next.t('TRANSACTION_TYPE_SA')})
                         break;
                     }
                     case "ST": {
                         transactionsOptions.push({
                             value: transaction.transactionType,
-                            name: "Gewinnstufe „Treue belohnen“ erreicht"
+                            name: i18next.t('TRANSACTION_TYPE_ST')
                         })
                     }
                 }
@@ -120,46 +121,46 @@ const TransactionsBits = (props) => {
     const getTransactionType = (transactions) => {
         switch (transactions.transactionType) {
             case "PT": {
-                return "Kontozusammenführung"
+                return i18next.t('TRANSACTION_TYPE_PT')
             }
             case "EN": {
-                return "Anmeldung"
+                return i18next.t('TRANSACTION_TYPE_EN')
             }
             case "EV": {
-                return "Externes Event"
+                return i18next.t('TRANSACTION_TYPE_EV')
             }
             case "EX": {
-                return "Punkteverfall"
+                return i18next.t('TRANSACTION_TYPE_EX')
             }
             case "GW": {
-                return "Manuelle Buchung"
+                return i18next.t('TRANSACTION_TYPE_GW')
             }
             case "IR": {
-                return "Verlängerte Umtauschzeit bei Online-Retouren"
+                return i18next.t('TRANSACTION_TYPE_IR')
             }
             case "LO": {
-                return "Kulanzlose"
+                return i18next.t('TRANSACTION_TYPE_LO')
             }
             case "MM": {
-                return "Kunden werben Kunden"
+                return i18next.t('TRANSACTION_TYPE_MM')
             }
             case "MT": {
-                return "Kündigung der Mitgliedschaft"
+                return i18next.t('TRANSACTION_TYPE_MT')
             }
             case "PC": {
-                return "Punktekorrektur"
+                return i18next.t('TRANSACTION_TYPE_PC')
             }
             case "RL": {
-                return "Level-Aufstieg"
+                return i18next.t('TRANSACTION_TYPE_RL')
             }
             case "RT": {
-                return "Retoure"
+                return i18next.t('TRANSACTION_TYPE_RT')
             }
             case "SA": {
-                return "Einkauf"
+                return i18next.t('TRANSACTION_TYPE_SA')
             }
             case "ST": {
-                return "Gewinnstufe „Treue belohnen“ erreicht"
+                return i18next.t('TRANSACTION_TYPE_ST')
             }
         }
     }
@@ -213,31 +214,49 @@ const TransactionsBits = (props) => {
         setFilteredTransactions(transactions);
     }
 
+    // const displayTransactionsAfterGoLiveDate = (transactions) => {
+    //     if(subsidiary === 'DE' && salesDivision === '1'){
+    //         const compareDate = moment('2021-10-01');
+    //         let transactionDate = new Date(transactions);
+    //         return transactionDate.getTime() >= compareDate;
+    //     }
+    //     else if(subsidiary === 'CH' && salesDivision === '1'){
+    //         const compareDate = moment('2022-06-07');
+    //         let transactionDate = new Date(transactions);
+    //         return transactionDate.getTime() >= compareDate;
+    //     }
+    //     else if(subsidiary === 'PL' && salesDivision === '1'){
+    //         const compareDate = moment('2022-06-08');
+    //         let transactionDate = new Date(transactions);
+    //         return transactionDate.getTime() >= compareDate;
+    //     }
+    // }
+
     return(
         <div>
             <Grid container style={{textAlign: "end"}}>
                 <Grid sm={2}>
-                    <label>Total bits </label>
+                    <label>{i18next.t('LBL_MM_TOTAL_BITS')} </label>
                     <div>{bitsType.bookedBits}</div>
                 </Grid>
                 <Grid sm={2}>
-                    <label>Pending bits</label>
+                    <label>{i18next.t('LBL_MM_PENDING_BITS')}</label>
                     <div>{bitsType.pendingBits}</div>
                 </Grid>
                 <Grid sm={4}>
-                    <Button variant="contained" endIcon={<RefreshIcon/>} onClick={refreshTransactions}>Refresh transactions</Button>
+                    <Button variant="contained" endIcon={<RefreshIcon/>} onClick={refreshTransactions}>{i18next.t('BTN_REFRESH')}</Button>
                 </Grid>
             </Grid>
             <Grid container style={{textAlign: "end"}}>
                 <Grid sm={2}>
                     <Box sx={{minWidth: 120}}>
                         <FormControl fullWidth>
-                            <InputLabel id="select-label">All transactions</InputLabel>
+                            <InputLabel id="select-label">{i18next.t('TRANSACTION_TYPE_ALL')}</InputLabel>
                             <Select labelId="select-label"
                                     id="simple-select"
                                     onChange={transactionsFilter}
                             >
-                                <MenuItem value={10}>All Transactions</MenuItem>
+                                <MenuItem value={10}>{i18next.t('TRANSACTION_TYPE_ALL')}</MenuItem>
                                 {transactionsFilterOptions.map((transaction) => (
                                     <MenuItem key={transaction.id} value={transaction.value}>{transaction.name}</MenuItem>
                                 ))}
@@ -248,15 +267,15 @@ const TransactionsBits = (props) => {
                 <Grid sm={2}>
                     <Box sx={{minWidth: 120}}>
                         <FormControl fullWidth>
-                            <InputLabel id="select-label">Everyone</InputLabel>
+                            <InputLabel id="select-label">{i18next.t('TRANSACTION_TIME_ALL_TIME')}</InputLabel>
                             <Select labelId="select-label"
                                     id="simple-select"
                                     onChange={transactionsMonthFilter}
                             >
-                                <MenuItem value={10}>Current month</MenuItem>
-                                <MenuItem value={20}>Last month</MenuItem>
-                                <MenuItem value={30}>Last 6 months</MenuItem>
-                                <MenuItem value={40}>Everyone</MenuItem>
+                                <MenuItem value={10}>{i18next.t('TRANSACTION_TIME_THIS_MONTH')}</MenuItem>
+                                <MenuItem value={20}>{i18next.t('TRANSACTION_TIME_LAST_MONTH')}</MenuItem>
+                                <MenuItem value={30}>{i18next.t('TRANSACTION_TIME_LAST_6_MONTHS')}</MenuItem>
+                                <MenuItem value={40}>{i18next.t('TRANSACTION_TIME_ALL_TIME')}</MenuItem>
                             </Select>
                         </FormControl>
                     </Box>
@@ -266,13 +285,13 @@ const TransactionsBits = (props) => {
                 <Table sx={{minWidth: 700}} aria-label="customized-table">
                     <TableHead>
                         <TableRow>
-                            <TableCell style={{fontWeight: "bold"}}>Date</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Transaction</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Document Type</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Registered</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Value</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Bits</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Transaction ID</TableCell>
+                            <TableCell style={{fontWeight: "bold"}}>{i18next.t('LBL_DATE')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_TRANSACTION')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_DOCUMENT_TYPE')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_POST_REGISTERED')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_EURO')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_MM_POINTS')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_TRANSACTION_ID')}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

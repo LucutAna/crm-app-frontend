@@ -12,6 +12,7 @@ import {startsWith} from 'lodash';
 import SalesDivisionService from "../../shared/services/SalesDivisionService";
 import {GlobalContext} from "../../context/GlobalState";
 import ConfigService from "../../shared/services/ConfigService";
+import i18next from "i18next";
 
 const PostRegistrationSalesSlipInputs = ({configData}) => {
     const allowThreeDigits = configData?.saleSlipRegistration.allowThreeDigits;
@@ -105,7 +106,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
             <Formik initialValues={formFields} validationSchema={validationSchema} onSubmit={onSubmit}>
                 {(salesSlipForm) => (
                     <Form className={classes.root}>
-                        <p>Please enter the code on the receipt here.</p>
+                        <p>{i18next.t('LBL_REGISTRATION_SALES_SLIP_DESCRIPTION_1')}</p>
                         <Grid container spacing={5}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -114,7 +115,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                     fullWidth
                                     id="slipNo"
                                     name="slipNo"
-                                    label="Slip number*"
+                                    label={i18next.t('LBL_REGISTRATION_SALES_SLIPS_FIELD_NAME_SLIP_NO')}
                                     placeholder="1-5 digits"
                                     variant="outlined"
                                     value={salesSlipForm.values.slipNo}
@@ -129,7 +130,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                     fullWidth
                                     id="cashRegisterNo"
                                     name="cashRegisterNo"
-                                    label="Cash register*"
+                                    label={i18next.t('LBL_REGISTRATION_SALES_SLIPS_FIELD_NAME_CASHREGISTER_NO')}
                                     placeholder="3 digits"
                                     variant="outlined"
                                     value={salesSlipForm.values.cashRegisterNo}
@@ -144,7 +145,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                     fullWidth
                                     id="slipDate"
                                     name="slipDate"
-                                    label="Slip date*"
+                                    label={i18next.t('LBL_REGISTRATION_SALES_SLIPS_FIELD_NAME_DATE')}
                                     placeholder="DD.MM.YYYY"
                                     variant="outlined"
                                     value={salesSlipForm.values.slipDate}
@@ -161,7 +162,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                     fullWidth
                                     id="sapOutletId"
                                     name="sapOutletId"
-                                    label="Market number*"
+                                    label={i18next.t('LBL_REGISTRATION_SALES_SLIPS_FIELD_NAME_SAP_OUTLET_ID')}
                                     placeholder="1 character and 3 digits"
                                     variant="outlined"
                                     value={salesSlipForm.values.sapOutletId}
@@ -178,7 +179,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                     fullWidth
                                     id="cashierNo"
                                     name="cashierNo"
-                                    label="Cashier*"
+                                    label={i18next.t('LBL_REGISTRATION_SALES_SLIPS_FIELD_NAME_CASHIER_NO')}
                                     placeholder="1-6 digits"
                                     variant="outlined"
                                     value={salesSlipForm.values.cashierNo}
@@ -193,7 +194,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                     fullWidth
                                     id="slipTime"
                                     name="slipTime"
-                                    label="Slip time*"
+                                    label={i18next.t('LBL_REGISTRATION_SALES_SLIPS_FIELD_NAME_TIME')}
                                     placeholder="HH: MM"
                                     variant="outlined"
                                     value={salesSlipForm.values.slipTime}
@@ -212,7 +213,7 @@ const PostRegistrationSalesSlipInputs = ({configData}) => {
                                 disabled={!(salesSlipForm.isValid && salesSlipForm.dirty)}
                                 type="submit">
                             <SaveIcon fontSize="small"/>
-                            Save
+                            {i18next.t('BTN_REGISTRATION_SALES_SLIPS_ACTIVATE')}
                         </Button>
                     </Form>
                 )}

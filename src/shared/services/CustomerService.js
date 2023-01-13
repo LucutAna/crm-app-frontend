@@ -16,7 +16,7 @@ const generateCiid = data => {
 }
 
 const upsertCustomer = data => {
-    return axiosInstance.post(`/crm-customer/upsertCustomer/`, data);
+    return axiosInstance.post(`/crm-customer/customer/`, data);
 }
 
 const validateCardNumber = data => {
@@ -63,7 +63,8 @@ const isClubCardNumberFormatValid = (clubCardNumber, salesDivision, subsidiary) 
 
 const createCustomerUpsertData = (form, configData) => {
     const customerEnrollData = {
-        cardCiid: !!form.cardCiid ? form.cardCiid[0] : '',
+        //cardCiid: !!form.cardCiid || form.cardCiid[0],
+        cardCiid: form.generatedCard,
         subsidiary: configData.subsidiary,
         crefid: null,
         birthDate: form.birthDate,
@@ -99,7 +100,8 @@ const createCustomerUpsertData = (form, configData) => {
         smsConsentFlag: true,
         emailAddressAdded: false,
         phoneNumberAdded: false,
-        updateCustomerFlag: true
+        updateCustomerFlag: true,
+        registrationChannel: 'Store'
     }
     return customerEnrollData;
 };

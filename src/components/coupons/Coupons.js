@@ -7,12 +7,13 @@ import moment from 'moment';
 import CouponsStyles from './CouponsStyles';
 import CouponLogoMM from '../../assets/images/mm_coupon_default.png';
 import Spinner from '../spinners/customSpinner/CustomSpinner';
+import i18next from "i18next";
 
 const Coupons = ({coupons, onChangeStatusCoupon, openSpinnerCoupons}) => {
     const classes = CouponsStyles();
     return (
         <Paper elevation={3}>
-            <h3 className={classes.paperHeader}>Coupons</h3>
+            <h3 className={classes.paperHeader}>{i18next.t('TAB_COUPONS')}</h3>
             <div className={classes.paperContent}>
                 {
                     coupons.length > 0 ?
@@ -29,8 +30,8 @@ const Coupons = ({coupons, onChangeStatusCoupon, openSpinnerCoupons}) => {
                                         </Grid>
                                         <Grid className={classes.wrapperCouponInfo} item xs={12} sm={6}>
                                             <b className={classes.couponInfo}>{coupon.couponTypeName}</b>
-                                            <p className={classes.couponInfo}>Coupon Code : {coupon.couponCode}</p>
-                                            <p className={classes.couponInfo}>Valid Until: {coupon.endDate}</p>
+                                            <p className={classes.couponInfo}>{i18next.t('LBL_COUPON_CODE')} : {coupon.couponCode}</p>
+                                            <p className={classes.couponInfo}>{i18next.t('LBL_DATE_VALID')} : {coupon.endDate}</p>
                                         </Grid>
                                         <Grid item xs={12} sm={3}>
                                             <Button

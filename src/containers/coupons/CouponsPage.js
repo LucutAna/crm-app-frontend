@@ -19,6 +19,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Grid from "@material-ui/core/Grid";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import Tooltip from '@material-ui/core/Tooltip';
+import i18next from "i18next";
 
 const CouponsPage = (props) => {
     const {customerData, addTransactions, addCoupons, deleteCoupons, coupons, ...rest} = useContext(GlobalContext);
@@ -213,7 +214,7 @@ const CouponsPage = (props) => {
     }
     return (
         <div>
-            <h3>Coupons</h3>
+            <h3>{i18next.t('LBL_COUPONS')}</h3>
             <Grid container style={{textAlign: "end"}}>
                 <Grid container>
                     <Grid sm={2}>
@@ -251,13 +252,13 @@ const CouponsPage = (props) => {
                     <Grid sm={2}>
                         <Box sx={{minWidth: 120}}>
                             <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+                                <InputLabel id="demo-simple-select-label">{i18next.t('COUPON_ALL_DATES')}</InputLabel>
                                 <Select labelId="demo-simple-select-label"
                                         id="demo-simple-select"
                                         onChange={filterByExpirationDate}
                                 >
-                                    <MenuItem value={10}>Filter by expiration period</MenuItem>
-                                    <MenuItem value={20}>Expiration date in the next 60 days</MenuItem>
+                                    <MenuItem value={10}>{i18next.t('COUPON_ALL_DATES')}</MenuItem>
+                                    <MenuItem value={20}>{i18next.t('COUPON_WITHIN_60_DAYS')}</MenuItem>
                                 </Select>
                             </FormControl>
                         </Box>
@@ -265,7 +266,7 @@ const CouponsPage = (props) => {
 
                     <Grid sm={6}>
                         <Button variant="contained" style={{marginLeft: "auto"}} endIcon={<RefreshIcon/>}
-                                onClick={couponsRefreshButton}>Coupons refresh</Button>
+                                onClick={couponsRefreshButton}>{i18next.t('BTN_REFRESH')}</Button>
                     </Grid>
                 </Grid>
             </Grid>
@@ -273,16 +274,15 @@ const CouponsPage = (props) => {
                 <Table sx={{minWidth: 700}} aria-label="customized-table">
                     <TableHead>
                         <TableRow>
-                            <TableCell style={{fontWeight: "bold"}}>Date</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Code</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Name</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Description</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Date</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Expiration Date</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Redeem Date</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Value</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Coupon Status</TableCell>
-                            <TableCell align="right" style={{fontWeight: "bold"}}>Action</TableCell>
+                            <TableCell style={{fontWeight: "bold"}}>{i18next.t('LBL_DATE')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_COUPON_CODE')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_NAME')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_DESCRIPTION')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_DATE_VALID')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_REDEMPTION_DATE')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_COUPON_VALUE')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_STATUS')}</TableCell>
+                            <TableCell align="right" style={{fontWeight: "bold"}}>{i18next.t('LBL_ACTION')}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -294,7 +294,6 @@ const CouponsPage = (props) => {
                                 <Tooltip title={card.couponTypeDescription}>
                                     <TableCell align="right">Coupon Description</TableCell>
                                 </Tooltip>
-                                <TableCell align="right">{}</TableCell>
                                 <TableCell align="right">{moment(card.endDate).format("DD-MM-yyyy")}</TableCell>
                                 <TableCell align="right">{card.redemptionDate}</TableCell>
                                 <TableCell align="right">{card.value}</TableCell>
