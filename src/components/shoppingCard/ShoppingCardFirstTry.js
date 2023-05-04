@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import CustomerDataStep from "./CustomerDataStep";
-import {GlobalContext} from "../../context/GlobalState";
 import CardDetailsStep from "./CardDetailsStep";
 import ChecklistStep from "./ChecklistStep";
-import SuccessPage from "./SuccessPage";
-import CustomerService from "../../shared/services/CustomerService";
 import SummaryStep from "./SummaryStep";
+import InstantCard from "./InstantCard";
+import NoInstantCard from "./NoInstantCard";
+import SuccessPage from './SuccessPage';
 
 const steps = [
     {component: <CustomerDataStep/>},
@@ -15,7 +15,7 @@ const steps = [
 ]
 
 
-const ShoppingCard = (props) => {
+const ShoppingCardFirstTry = (props) => {
 
     return(
         <div>
@@ -23,9 +23,12 @@ const ShoppingCard = (props) => {
             <CardDetailsStep/>
             <ChecklistStep/>
             <SummaryStep/>
+            <InstantCard/>
+            <NoInstantCard/>
+            {/*<SuccessPage/>*/}
         </div>
 
     )
 }
 
-export default ShoppingCard;
+export default ShoppingCardFirstTry;

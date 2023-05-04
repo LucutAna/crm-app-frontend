@@ -17,10 +17,9 @@ const ChecklistStep = () => {
                             { name: 'checkboxBirthdate', value: 4, checked:false},
                             { name: 'checkboxIncome', value: 5, checked:false}];
 
-    const checkChanged = (state) => {
+    const checkChanged = () => {
         console.log("checked")
         setChecked(checkboxStatus.value);
-      //  console.log(checkboxes)
     }
 
     return(
@@ -36,7 +35,7 @@ const ChecklistStep = () => {
                             birthDate: date,
                             income: ''
                         }}
-                    >
+                     onSubmit={console.log('checklist submited')}>
                         <Form>
                             <Grid container spacing={4}>
                                 <Grid style={{paddingLeft:"27px", paddingBottom:'20px'}}>

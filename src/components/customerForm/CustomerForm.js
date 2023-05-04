@@ -74,7 +74,7 @@ const validationSchema = yup.object({
         .required('Birth Date is required'),
     generatedCard: yup
         .number('Club Card Number must be 16 digits')
-        .required('Club Card Number is requred')
+        .required('Club Card Number is required')
 });
 
 
@@ -186,7 +186,6 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                     onSetOpenSnackbar({open, message, code});
                     return
                 }
-                ;
                 addCustomer({...customerSelected.data});
                 customerFormRef.current.resetForm(formFields);
                 //fil customer for with data from CCR
@@ -250,7 +249,6 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                     let code = 'info';
                     onSetOpenSnackbar({open, message, code});
                 }
-                ;
                 setCustomersDataResult(customerResult.data);
                 setOpenSpinner(false);
                 setOpenCustomersModal(true);
@@ -294,13 +292,6 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
         setOpenCustomersModal(false);
     };
 
-    const clearFormFields = (customerForm) => {
-        deleteCustomerData();
-        deleteTransactions();
-        onClearSearchInput();
-        customerForm.resetForm(formFields);
-    }
-
     const generateCardNumber = async () =>{
         try {
             let data = {
@@ -315,7 +306,12 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
                 console.log(error);
             }
     }
-
+    const clearFormFields = (customerForm) => {
+        deleteCustomerData();
+        deleteTransactions();
+        onClearSearchInput();
+        customerForm.resetForm(formFields);
+    }
     const onSubmit = (values, actions) => {
         //use consent flag from selectCustomer response
         let consentFlag = false;
@@ -334,7 +330,7 @@ const CustomerForm = forwardRef(({ciid, configData, onNewRegistration, onClearSe
             country: values.country,
             updateCustomerFlag: values.updateCustomerFlag,
             customerConsentFlag: consentFlag,
-            generatedCard: values.generatedCard
+            generatedCard: generatedCard
         }, configData);
         console.log("enrollCustomer", enrollCustomer)
         onNewRegistration({...enrollCustomer})

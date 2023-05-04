@@ -12,7 +12,8 @@ import OrderHistory from "./containers/order-history/OrderHistory";
 import CouponsPage from "./containers/coupons/CouponsPage";
 import SuccessPage from "./containers/successPage/SuccessPage";
 import ClubAccountPage from "./containers/club-account/ClubAccountPage"
-import ShoppingCard from "./components/shoppingCard/ShoppingCard";
+// import ShoppingCard from "./components/shoppingCard/ShoppingCardFirstTry";
+import ShoppingCard from "./components/shoppingCardFeature/ShoppingCard";
 import ConfigService from './shared/services/ConfigService'
 import {GlobalProvider} from './context/GlobalState';
 import Header from "./components/header/Header";
@@ -24,6 +25,7 @@ import {useTranslation, Trans} from 'react-i18next';
 import './i18n/i18n';
 import i18n from 'i18next';
 import {loadResources} from "./i18n/i18n";
+import CustomerDataStep from "./components/shoppingCardFeature/CustomerDataStep";
 
 function App() {
     const drawerWidth = 240;
@@ -41,6 +43,7 @@ function App() {
             const dataConfig = await ConfigService.getConfigData({...storeConfig.data});
 
             console.log('dataConfig.data.locales[0]', dataConfig.data.locales[0])
+            console.log('storeconfig', storeConfig)
 
             loadResources(dataConfig.data.locales[0]).then(async (response) => {
                 i18n.addResourceBundle('pl', 'translations', response, true, true);
@@ -123,7 +126,7 @@ function App() {
                                        component={() => <ClubAccountPage configData={configData}/>}/>
                                 <Route path='/channel-permissions'
                                        component={() => <ChannelPermissionsPage configData={configData}/>}/>
-                                <Route path='/shopping-card' component={() => <ShoppingCard configData={configData}/>}/>
+                                <Route path='/shopping-card' component={() => <CustomerDataStep configData={configData}/>}/>
                                 <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                                 <Route path='/transactions-bits'
                                        component={() => <TransactionsBits configData={configData}/>}/>
