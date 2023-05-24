@@ -17,8 +17,9 @@ import ShoppingCard from "./components/shoppingCardFeature/ShoppingCard";
 import ConfigService from './shared/services/ConfigService'
 import {GlobalProvider} from './context/GlobalState';
 import Header from "./components/header/Header";
-import SideBarNav from "./components/sideBarNav/SideBarNav";
 import SnackbarComponent from "./components/snackbar/SnackbarComponent";
+import SideBarNav from "./components/sideBarNav/SideBarNav";
+import MultiStepForm from "./components/formikCard/formik";
 import ChannelPermissionsPage from "./containers/channel-permissions/ChannelPermissionsPage";
 import TransactionsBits from "./components/transactionsBits/TransactionsBits";
 import {useTranslation, Trans} from 'react-i18next';
@@ -127,6 +128,7 @@ function App() {
                                 <Route path='/channel-permissions'
                                        component={() => <ChannelPermissionsPage configData={configData}/>}/>
                                 <Route path='/shopping-card' component={() => <CustomerDataStep configData={configData}/>}/>
+                                <Route path='/formik' component={() => <MultiStepForm configData={configData}/>}/>
                                 <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                                 <Route path='/transactions-bits'
                                        component={() => <TransactionsBits configData={configData}/>}/>

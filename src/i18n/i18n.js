@@ -11,30 +11,30 @@ export const loadResources = async(locale:string)=>{
 }
 
 
-const backendOptions = {
-    loadPath: '{{lng}}|{{ns}}',
-    request: (options:any, url:any, payload:any, callback:any) => {
-        try {
-            console.log('i18n.language',i18n.language)
-            loadResources('de_DE').then((response) => {
-                // console.log('response din i18', response)
-                // i18n.addResourceBundle('de', 'translations', response);
-                // callback(null, {
-                //     data:
-                //         { de:
-                //                 { translation: response }
-                //         },
-                //     status: 200,
-                // });
-            });
-        } catch (e) {
-            console.error(e);
-            callback(null, {
-                status: 500,
-            });
-        }
-    },
-};
+// const backendOptions = {
+//     loadPath: '{{lng}}|{{ns}}',
+//     request: (options:any, url:any, payload:any, callback:any) => {
+//         try {
+//             console.log('i18n.language',i18n.language)
+//             loadResources('de_DE').then((response) => {
+//                 // console.log('response din i18', response)
+//                 // i18n.addResourceBundle('de', 'translations', response);
+//                 // callback(null, {
+//                 //     data:
+//                 //         { de:
+//                 //                 { translation: response }
+//                 //         },
+//                 //     status: 200,
+//                 // });
+//             });
+//         } catch (e) {
+//             console.error(e);
+//             callback(null, {
+//                 status: 500,
+//             });
+//         }
+//     },
+// };
 
 i18n
     .use(backend)
