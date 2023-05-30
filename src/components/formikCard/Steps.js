@@ -110,17 +110,6 @@ const StepOne = ({ activeStep, setActiveStep, configData, validationSchema }) =>
                 <option value="CH" label="Switzerland"/>
                 <option value="DE" label="Germany"/>
               </select>
-              {/* <FormControl fullWidth>
-                <InputLabel >Nationality</InputLabel> */}
-                  {/* <Select
-                    value={language}
-                    label="Nationality"
-                    onChange={handleChange}
-                  >
-                    <MenuItem value={'CH'}>Switzerland</MenuItem>
-                    <MenuItem value={'DE'}>Germany</MenuItem>
-                  </Select> */}
-              {/* </FormControl> */}
             </Grid>
           </Grid>
         </Grid>
@@ -151,7 +140,7 @@ const StepOne = ({ activeStep, setActiveStep, configData, validationSchema }) =>
                 >
             <Grid item xs={4}>
               <Field name="mobile"
-                type="number"
+                type="text"
                 component={TextField}
                 label={i18next.t('LBL_MOBILE_NUMBER')}
                 value={customerData.mobile}/>
@@ -160,14 +149,14 @@ const StepOne = ({ activeStep, setActiveStep, configData, validationSchema }) =>
             <Grid item xs={4}>
               <Field name="privateNumber"
                 className={classes.inputCustomerDataPrivateNumber}
-                type="number"
+                type="text"
                 component={TextField}
                 label={i18next.t('LBL_TEL_PRIVATE')}/>
             </Grid>
             <Grid item xs={4}>
               <Field name="businessNumber"
                 className={classes.inputCustomerDataContactInfo}
-                type="number"
+                type="text"
                 component={TextField}
                 label={i18next.t('LBL_TEL_BUSINESS')}/>
             </Grid>
@@ -320,17 +309,6 @@ const StepOne = ({ activeStep, setActiveStep, configData, validationSchema }) =>
         </Grid>
       </Grid>
       <div>
-        <Button 
-          disabled={activeStep === 0} 
-          onClick={() => setActiveStep(activeStep - 1)}
-        >
-          Back
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setActiveStep(activeStep + 1)}
-        >Next</Button>
       </div>
     </Grid>
   );
@@ -395,18 +373,6 @@ const StepTwo = ({ activeStep, setActiveStep, onSubmit }) => {
         </Grid>
       </Grid>
       <div style={{paddingTop: '20px'}}>
-        <Button 
-          disabled={activeStep === 0} 
-          onClick={() => setActiveStep(activeStep - 1)}
-        >
-          Back
-        </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          onClick={onSubmit}
-        >Submit</Button>
       </div>
     </Grid>
   );
@@ -424,17 +390,6 @@ const StepThree = ({ activeStep, setActiveStep }) => {
       <Field type="text" name="city" />
       <ErrorMessage name="city" component="div" />
       <div>
-        <Button 
-          disabled={activeStep === 0} 
-          onClick={() => setActiveStep(activeStep - 1)}
-        >
-          Back
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setActiveStep(activeStep + 1)}
-        >Next</Button>
       </div>
     </div>
   );
@@ -448,18 +403,6 @@ const StepFour = ({ activeStep, setActiveStep, onSubmit }) => {
       <Field as="textarea" name="message" />
       <ErrorMessage name="message" component="div" />
       <div>
-        <Button 
-          disabled={activeStep === 0} 
-          onClick={() => setActiveStep(activeStep - 1)}
-        >
-          Back
-        </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          onClick={onSubmit}
-        >Submit</Button>
       </div>
     </div>
   );

@@ -108,6 +108,14 @@ const SideBarNav = ({open, onHandleDrawerClose}) => {
                         <Typography variant="inherit">Shopping Card</Typography>
                     </NavLink>
                 </MenuItem>
+                <MenuItem>
+                    <NavLink className={classes.listItemIcon} to='/formik'>
+                        <ListItemIcon>
+                            <EmailIcon/>
+                        </ListItemIcon>
+                        <Typography variant="inherit">Formik</Typography>
+                    </NavLink>
+                </MenuItem>
             </MenuList>
         </Drawer>
     )
