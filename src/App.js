@@ -127,7 +127,6 @@ function App() {
                                        component={() => <ClubAccountPage configData={configData}/>}/>
                                 <Route path='/channel-permissions'
                                        component={() => <ChannelPermissionsPage configData={configData}/>}/>
-                                <Route path='/shopping-card' component={() => <CustomerDataStep configData={configData}/>}/>
                                 <Route path='/formik' component={() => <MultiStepForm configData={configData}/>}/>
                                 <Route path='/success' component={(customer) => <SuccessPage {...customer}/>}/>
                                 <Route path='/transactions-bits'

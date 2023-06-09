@@ -228,7 +228,7 @@ const Dashboard = ({configData}) => {
                     salesDivision: configData.salesDivision,
                     subsidiary: configData.subsidiary
                 };
-                getCouponsCustomer(couponsPayload);
+                await getCouponsCustomer(couponsPayload);
             }
         } catch (error) {
             console.log(error);

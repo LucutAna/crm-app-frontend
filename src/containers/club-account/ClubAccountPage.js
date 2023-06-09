@@ -16,18 +16,16 @@ import {GlobalContext} from "../../context/GlobalState";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import RefreshIcon from '@material-ui/icons/Refresh';
-import moment, {locale} from "moment";
-import ConfigService from "../../shared/services/ConfigService";
+import moment from "moment";
 import i18next from "i18next";
 
 const ClubAccountPage = (props) => {
-    const {customerData, addTransactions, addCoupons, deleteCoupons, ...rest} = useContext(GlobalContext);
+    const {customerData, addTransactions, addCoupons, deleteCoupons} = useContext(GlobalContext);
     const [transactions, setTransactions] = useState([]);
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [firstFilterWasApplied, setFilterWasApplied] = useState(false);
     const [secondFilterWasApplied, setSecondFilterWasApplied] = useState(false);
     const [transactionsFilterOptions, setTransactionsFilterOptions] = useState([]);
-    const [language, setLanguage] =useState([]);
 
     useEffect(async () => {
         const {configData} = props;

@@ -22,7 +22,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import i18next from "i18next";
 
 const CouponsPage = (props) => {
-    const {customerData, addTransactions, addCoupons, deleteCoupons, coupons, ...rest} = useContext(GlobalContext);
+    const {customerData, addCoupons, deleteCoupons, coupons} = useContext(GlobalContext);
     const [filteredCoupons, setFilteredCoupons] = useState([]);
     const [firstFilterWasApplied, setFirstFilterWasApplied] = useState(false);
     const [secondFilterWasApplied, setSecondFilterWasApplied] = useState(false);
