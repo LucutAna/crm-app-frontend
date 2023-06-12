@@ -3,6 +3,12 @@ import { makeStyles } from "@material-ui/core";
 const styles = makeStyles({
     inputCustomerDataContactInfo:{
         width: '100%',
+        marginTop: '10px',
+    },
+    inputCustomerDataContactInfoStep2:{
+        width: '100%',
+        // marginLeft: '20px',
+        marginTop: '10px',
     },
     labelStyle:{
         fontWeight:'bold',
@@ -19,7 +25,7 @@ const styles = makeStyles({
         paddingTop:'30px',
     },
     checklist:{
-        marginLeft:'10px'
+        // marginLeft:'10px'
     },
     submitButton:{
         width:'220px',
@@ -50,7 +56,7 @@ const styles = makeStyles({
     },
     emailField: {
         width: '100%'
-    }
+    },
 });
 
 export default styles;

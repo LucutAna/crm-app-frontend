@@ -1,6 +1,5 @@
 import React, {useState, useContext} from "react";
 import {Formik, Form, Field} from "formik";
-import * as Yup from "yup";
 import {Stepper, Step, StepLabel, Button, TextField} from "@material-ui/core";
 import {StepOne, StepTwo, StepThree, StepFour} from "./Steps";
 import {GlobalContext} from "../../context/GlobalState";
@@ -16,7 +15,7 @@ const MultiStepForm = (configData) => {
         language: customerData.language,
         firstName: customerData.firstName,
         lastName: customerData.lastName,
-        birthDate: customerData.birthDate.toString(),
+        birthDate: customerData.birthDate,
         civilStatus: '',
         nationality: customerData.country,
         mobile: customerData.mobile || '',
@@ -47,11 +46,40 @@ const MultiStepForm = (configData) => {
         if (!values.firstName) {
             errors.firstName = 'Required';
         }
-        console.log('errors', errors)
+        if (!values.lastName) {
+            errors.lastName = 'Required';
+        }
         if (!values.email) {
             errors.email = 'Required';
         } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
             errors.email = 'Invalid email address';
+        }
+        if (!values.civilStatus) {
+          errors.civilStatus = 'Required';
+        }
+        if (!values.mobile) {
+          errors.mobile = 'Required';
+        }
+        if (!values.street1) {
+          errors.street1 = 'Required';
+        }
+        if (!values.street) {
+          errors.street = 'Required';
+        }
+        if (!values.city) {
+          errors.city = 'Required';
+        }
+        if (!values.zipcode) {
+          errors.zipcode = 'Required';
+        }
+        if (!values.zipcode1) {
+          errors.zipcode1 = 'Required';
+        }
+        if (!values.city1) {
+          errors.city1 = 'Required';
+        }
+        if (!values.imprintName) {
+          errors.imprintName = 'Required';
         }
         console.log('values', values)
         return errors;
