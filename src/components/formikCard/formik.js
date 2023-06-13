@@ -55,32 +55,32 @@ const MultiStepForm = (configData) => {
             errors.email = 'Invalid email address';
         }
         if (!values.civilStatus) {
-          errors.civilStatus = 'Required';
+            errors.civilStatus = 'Required';
         }
         if (!values.mobile) {
-          errors.mobile = 'Required';
+            errors.mobile = 'Required';
         }
-        if (!values.street1) {
-          errors.street1 = 'Required';
-        }
-        if (!values.street) {
-          errors.street = 'Required';
-        }
-        if (!values.city) {
-          errors.city = 'Required';
-        }
-        if (!values.zipcode) {
-          errors.zipcode = 'Required';
-        }
-        if (!values.zipcode1) {
-          errors.zipcode1 = 'Required';
-        }
-        if (!values.city1) {
-          errors.city1 = 'Required';
-        }
-        if (!values.imprintName) {
-          errors.imprintName = 'Required';
-        }
+        // if (!values.street1) {
+        //   errors.street1 = 'Required';
+        // }
+        // if (!values.street) {
+        //   errors.street = 'Required';
+        // }
+        // if (!values.city) {
+        //   errors.city = 'Required';
+        // }
+        // if (!values.zipcode) {
+        //   errors.zipcode = 'Required';
+        // }
+        // if (!values.zipcode1) {
+        //   errors.zipcode1 = 'Required';
+        // }
+        // if (!values.city1) {
+        //   errors.city1 = 'Required';
+        // }
+        // if (!values.imprintName) {
+        //   errors.imprintName = 'Required';
+//}
         console.log('values', values)
         return errors;
     }
@@ -147,8 +147,8 @@ const MultiStepForm = (configData) => {
                         ))}
                     </Stepper>
                     {getStepContent(activeStep, customerForm)}
-                    {activeStep > 0 ? <Button onClick={() => setActiveStep(s => s - 1)}>Back</Button> : null}
-                    <Button type="submit">{isLastStep() ? 'Submit' : 'Next'}</Button>
+                    {activeStep > 0 ? <Button variant="contained" onClick={() => setActiveStep(s => s - 1)}>Back</Button> : null}
+                    <Button color="primary" variant="contained" type="submit">{isLastStep() ? 'Submit' : 'Next'}</Button>
                 </Form>}
         >
         </Formik>
