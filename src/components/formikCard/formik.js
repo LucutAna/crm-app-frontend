@@ -1,6 +1,6 @@
 import React, {useState, useContext} from "react";
-import {Formik, Form, Field} from "formik";
-import {Stepper, Step, StepLabel, Button, TextField} from "@material-ui/core";
+import {Formik, Form} from "formik";
+import {Stepper, Step, StepLabel, Button} from "@material-ui/core";
 import {StepOne, StepTwo, StepThree, StepFour} from "./Steps";
 import {GlobalContext} from "../../context/GlobalState";
 
@@ -9,6 +9,7 @@ const MultiStepForm = (configData) => {
     const [formValues, setFormValues] = useState({});
     const steps = ["Customer Data", "Card details and further more", "Summary", "Checklist"];
     const {customerData} = useContext(GlobalContext);
+    console.log('configData', configData);
 
     const initialValues = {
         salutation: customerData.salutation,
@@ -44,10 +45,10 @@ const MultiStepForm = (configData) => {
         const errors = {};
 
         if (!values.firstName) {
-            errors.firstName = 'Required';
+            errors.firstName = 'FirstName is Required';
         }
         if (!values.lastName) {
-            errors.lastName = 'Required';
+            errors.lastName = 'LastName is Required';
         }
         if (!values.email) {
             errors.email = 'Required';
@@ -62,9 +63,6 @@ const MultiStepForm = (configData) => {
         }
         // if (!values.street1) {
         //   errors.street1 = 'Required';
-        // }
-        // if (!values.street) {
-        //   errors.street = 'Required';
         // }
         // if (!values.city) {
         //   errors.city = 'Required';

@@ -10,9 +10,10 @@ import {FormControlLabel, RadioGroup, TextField, Checkbox,} from "@material-ui/c
 import DateFnsUtils from "@date-io/date-fns";
 import i18next from "i18next";
 import styles from './styles';
+import TextFieldWrapper from "./TextFieldWrapper";
 
 
-const StepOne = ({activeStep, setActiveStep, customerForm}) => {
+const StepOne = ({customerForm}) => {
     const {customerData} = useContext(GlobalContext);
     const classes = styles();
     const {errors, touched} = useFormikContext();
@@ -58,36 +59,26 @@ const StepOne = ({activeStep, setActiveStep, customerForm}) => {
                           direction="row"
                           spacing={4}>
                         <Grid item xs={6}>
-                            <Field name="firstName">
-                                {({field, form}) => (
-                                    <TextField
-                                        id="firstName"
-                                        label={i18next.t('LBL_FIRST_NAME')}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        onBlur={field.onBlur}
-                                        className={classes.inputCustomerDataContactInfo}
-                                        error={form.touched.firstName && Boolean(form.errors.firstName)}
-                                    />
-                                )}
-                            </Field>
-                            <ErrorMessage name="firstName" component="div"/>
+                            <Field
+                                id="firstName"
+                                name="firstName"
+                                component={TextFieldWrapper}
+                                label={i18next.t('LBL_FIRST_NAME')}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.firstName && Boolean(customerForm.errors.firstName)}
+                                helperText={customerForm.touched.firstName && customerForm.errors.firstName}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            <Field name="lastName">
-                                {({field, form}) => (
-                                    <TextField
-                                        id="lastName"
-                                        label={i18next.t('LBL_LAST_NAME')}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        className={classes.inputCustomerDataContactInfo}
-                                        onBlur={field.onBlur}
-                                        error={form.touched.lastName && Boolean(form.errors.lastName)}
-                                    />
-                                )}
-                            </Field>
-                            <ErrorMessage name="lastName" component="div"/>
+                            <Field
+                                id="lastName"
+                                name="lastName"
+                                component={TextFieldWrapper}
+                                label={i18next.t('LBL_LAST_NAME')}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.lastName && Boolean(customerForm.errors.lastName)}
+                                helperText={customerForm.touched.lastName && customerForm.errors.lastName}
+                            />
                         </Grid>
                     </Grid>
                     <Grid container
@@ -111,20 +102,13 @@ const StepOne = ({activeStep, setActiveStep, customerForm}) => {
                             </MuiPickersUtilsProvider>
                         </Grid>
                         <Grid item xs={4}>
-                            <Field name="civilStatus">
-                                {({field, form}) => (
-                                    <TextField
-                                        id="civilStatus"
-                                        // label={i18next.t('LBL_LAST_NAME')}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        className={classes.civilStatusField}
-                                        onBlur={field.onBlur}
-                                        error={form.touched.civilStatus && Boolean(form.errors.civilStatus)}
-                                    />
-                                )}
-                            </Field>
-                            <ErrorMessage name="civilStatus" component="div"/>
+                            <Field
+                                id="civilStatus"
+                                name="civilStatus"
+                                label={i18next.t('LBL_STATUS')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                            />
                         </Grid>
                         <Grid item xs={4}>
                             <select name="nationality" className={classes.nationalitySelect}>
@@ -148,22 +132,15 @@ const StepOne = ({activeStep, setActiveStep, customerForm}) => {
                           justifyContent="flex-start"
                           alignItems="center">
                         <Grid item xs={6}>
-                            <Field name="email">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="email"
-                                            label={i18next.t('LBL_EMAIL')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.email && Boolean(form.errors.email)}
-                                        />
-                                        <ErrorMessage name="email" component="div" className={classes.errorMessage}/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                name="email"
+                                id="email"
+                                label={i18next.t('LBL_EMAIL')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                                className={classes.inputCustomerDataContactInfo}
+                                error={customerForm.touched.email && Boolean(customerForm.errors.email)}
+                            />
                         </Grid>
                     </Grid>
                     <Grid container
@@ -171,66 +148,36 @@ const StepOne = ({activeStep, setActiveStep, customerForm}) => {
                           spacing={4}
                     >
                         <Grid item xs={4}>
-                            <Field name="mobile">
-                                {({field, form}) => (
-                                    <TextField
-                                        id="mobile"
-                                        label={i18next.t('LBL_MOBILE_NUMBER')}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        className={classes.inputCustomerDataContactInfo}
-                                        onBlur={field.onBlur}
-                                        error={form.touched.mobile && Boolean(form.errors.mobile)}
-                                    />
-                                )}
-                            </Field>
-                            <ErrorMessage name="mobile" component="div"/>
+                            <Field
+                                name="mobile"
+                                id="mobile"
+                                label={i18next.t('LBL_MOBILE_NUMBER')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.onChange}
+                                className={classes.inputCustomerDataContactInfo}
+                                error={customerForm.touched.mobile && Boolean(customerForm.errors.mobile)}
+                            />
                         </Grid>
                         <Grid item xs={4}>
-                            {/* <Field
-                  id="privateNumber"
-                  name="privateNumber"
-                  className={classes.inputCustomerDataPrivateNumber}
-                  type="text"
-                  label={i18next.t('LBL_TEL_PRIVATE')}
-                  onChange={customerForm.handleChange}
-                /> */}
-                            <Field name="privateNumber">
-                                {({field, form}) => (
-                                    <TextField
-                                        id="privateNumber"
-                                        label={i18next.t('LBL_TEL_PRIVATE')}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        className={classes.inputCustomerDataContactInfo}
-                                        onBlur={field.onBlur}
-                                        error={form.touched.privateNumber && Boolean(form.errors.privateNumber)}
-                                    />
-                                )}
-                            </Field>
+                            <Field
+                                id="privateNumber"
+                                name="privateNumber"
+                                type="text"
+                                label={i18next.t('LBL_TEL_PRIVATE')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                            />
                         </Grid>
                         <Grid item xs={4}>
-                            {/* <Field
-                  id="businessNumber"
-                  name="businessNumber"
-                  className={classes.inputCustomerDataContactInfo}
-                  type="text"
-                  label={i18next.t('LBL_TEL_BUSINESS')}
-                  onChange={customerForm.handleChange}
-                /> */}
-                            <Field name="businessNumber">
-                                {({field, form}) => (
-                                    <TextField
-                                        id="businessNumber"
-                                        label={i18next.t('LBL_TEL_BUSINESS')}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        className={classes.inputCustomerDataContactInfo}
-                                        onBlur={field.onBlur}
-                                        error={form.touched.businessNumber && Boolean(form.errors.businessNumber)}
-                                    />
-                                )}
-                            </Field>
+                            <Field
+                                id="businessNumber"
+                                name="businessNumber"
+                                className={classes.inputCustomerDataContactInfo}
+                                type="text"
+                                label={i18next.t('LBL_TEL_BUSINESS')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
@@ -246,88 +193,40 @@ const StepOne = ({activeStep, setActiveStep, customerForm}) => {
                           spacing={4}
                           style={{paddingTop: '20px'}}>
                         <Grid item xs={12}>
-                            {/* <Field
-                  id="street1"
-                  name="street1"
-                  label={i18next.t('LBL_STREET')}
-                  className={classes.inputCustomerDataContactInfo}
-                  onChange={customerForm.handleChange}
-                  error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
-                  helperText={customerForm.touched.street1 && customerForm.errors.street1}
-                />
-                <ErrorMessage name="customerData.street1" component="div" className="error"/> */}
-                            <Field name="street1">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="street1"
-                                            label={i18next.t('LBL_STREET')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.street1 && Boolean(form.errors.street1)}
-                                        />
-                                        <ErrorMessage name="street1" component="div"/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                id="street1"
+                                name="street1"
+                                label={i18next.t('LBL_STREET')}
+                                component={TextFieldWrapper}
+                                className={classes.inputCustomerDataContactInfo}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
+                                helperText={customerForm.touched.street1 && customerForm.errors.street1}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            {/* <Field
-                  name="zipcode"
-                  id="zipcode"
-                  className={classes.inputCustomerDataContactInfo}
-                  label={i18next.t('LBL_ZIPCODE')}
-                  onChange={customerForm.handleChange}
-                  error={customerForm.touched.zipcode && Boolean(customerForm.errors.zipcode)}
-                  helperText={customerForm.touched.zipcode && customerForm.errors.zipcode}
-                />
-                <ErrorMessage name="customerData.zipcode" component="div" className="error"/> */}
-                            <Field name="zipcode">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="zipcode"
-                                            label={i18next.t('LBL_ZIPCODE')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.zipcode && Boolean(form.errors.zipcode)}
-                                        />
-                                        <ErrorMessage name="zipcode" component="div"/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                name="zipcode"
+                                id="zipcode"
+                                className={classes.inputCustomerDataContactInfo}
+                                label={i18next.t('LBL_ZIPCODE')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.zipcode && Boolean(customerForm.errors.zipcode)}
+                                helperText={customerForm.touched.zipcode && customerForm.errors.zipcode}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            {/* <Field
-                  id="city"
-                  name="city"
-                  className={classes.inputCustomerDataContactInfo}
-                  label={i18next.t('LBL_CITY')}
-                  onChange={customerForm.handleChange}
-                  error={customerForm.touched.city && Boolean(customerForm.errors.city)}
-                  helperText={customerForm.touched.city && customerForm.errors.city}
-                />
-                <ErrorMessage name="customerData.city" component="div" className="error"/> */}
-                            <Field name="city">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="city"
-                                            label={i18next.t('LBL_CITY')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.city && Boolean(form.errors.city)}
-                                        />
-                                        <ErrorMessage name="city" component="div"/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                id="city"
+                                name="city"
+                                className={classes.inputCustomerDataContactInfo}
+                                label={i18next.t('LBL_CITY')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.city && Boolean(customerForm.errors.city)}
+                                helperText={customerForm.touched.city && customerForm.errors.city}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
@@ -368,74 +267,38 @@ const StepOne = ({activeStep, setActiveStep, customerForm}) => {
                           spacing={4}
                           style={{paddingTop: '20px'}}>
                         <Grid item xs={12}>
-                            {/* <Field name="street"
-                  label={i18next.t('LBL_STREET')}
-                  value={customerData.street1}
-                  className={classes.inputCustomerDataContactInfo}/>
-                <ErrorMessage name="customerData.street1" component="div" className="error"/> */}
-                            <Field name="street">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="street"
-                                            label={i18next.t('LBL_STREET')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.street && Boolean(form.errors.street)}
-                                        />
-                                        <ErrorMessage name="street" component="div"/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                name="street"
+                                id="street"
+                                label={i18next.t('LBL_STREET')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                                className={classes.inputCustomerDataContactInfo}
+                                error={customerForm.touched.street1 && Boolean(customerForm.errors.street1)}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            {/* <Field name="zipcode"
-                  className={classes.inputCustomerDataContactInfo}
-                  type="number"
-                  label={i18next.t('LBL_ZIPCODE')}
-                  value={customerData.zipcode}/>
-                <ErrorMessage name="customerData.zipcode" component="div" className="error"/> */}
-                            <Field name="zipcode1">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="zipcode1"
-                                            label={i18next.t('LBL_ZIPCODE')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.zipcode1 && Boolean(form.errors.zipcode1)}
-                                        />
-                                        <ErrorMessage name="zipcode1" component="div"/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                name="zipcode"
+                                id="zipcode"
+                                className={classes.inputCustomerDataContactInfo}
+                                type="number"
+                                label={i18next.t('LBL_ZIPCODE')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.zipcode && Boolean(customerForm.errors.zipcode)}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            {/* <Field name="city"
-                  className={classes.inputCustomerDataContactInfo}
-                  label={i18next.t('LBL_CITY')}
-                  value={customerData.city}/>
-                <ErrorMessage name="customerData.city" component="div" className="error"/> */}
-                            <Field name="zipcode1">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="city1"
-                                            label={i18next.t('LBL_CITY')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.city1 && Boolean(form.errors.city1)}
-                                        />
-                                        <ErrorMessage name="city1" component="div"/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                name="city"
+                                id="city"
+                                className={classes.inputCustomerDataContactInfo}
+                                label={i18next.t('LBL_CITY')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.city && Boolean(customerForm.errors.city)}
+                            />
                         </Grid>
                         <Grid item xs={8}>
                             <Grid container
@@ -464,62 +327,35 @@ const StepOne = ({activeStep, setActiveStep, customerForm}) => {
                           direction="row"
                           spacing={4}>
                         <Grid item xs={6}>
-                            {/* <Field name="job"
-                  className={classes.inputCustomerDataContactInfo}
-                  label={i18next.t('LBL_JOB')}/> */}
-                            <Field name="job">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="job"
-                                            label={i18next.t('LBL_JOB')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                        />
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                name="job"
+                                id="job"
+                                className={classes.inputCustomerDataContactInfo}
+                                label={i18next.t('LBL_JOB')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.onChange}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            {/* <Field name="employer"
-                  className={classes.inputCustomerDataContactInfo}
-                  label={i18next.t('LBL_EMPLOYER')}/> */}
-                            <Field name="employer">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="employer"
-                                            label={i18next.t('LBL_EMPLOYER')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                        />
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                name="employer"
+                                id="employer"
+                                className={classes.inputCustomerDataContactInfo}
+                                label={i18next.t('LBL_EMPLOYER')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            {/* <Field name="income"
-                  type="number"
-                  className={classes.inputCustomerDataContactInfo}
-                  label={i18next.t('LBL_INCOME')}/> */}
-                            <Field name="income">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="income"
-                                            label={i18next.t('LBL_INCOME')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfo}
-                                            onBlur={field.onBlur}
-                                        />
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                name="income"
+                                id="income"
+                                type="number"
+                                className={classes.inputCustomerDataContactInfo}
+                                label={i18next.t('LBL_INCOME')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
@@ -530,37 +366,23 @@ const StepOne = ({activeStep, setActiveStep, customerForm}) => {
     );
 };
 
-const StepTwo = ({activeStep, setActiveStep, customerForm}) => {
+const StepTwo = ({customerForm}) => {
     const classes = styles();
     return (
         <Grid>
             <Grid container>
                 <Grid container direction="row">
                     <Grid item xs={6}>
-                        {/* <Field
-                id="imprintName"
-                name="imprintName"
-                style={{marginLeft: '20px'}}
-                className={classes.emailField}
-                label={i18next.t('LBL_IMPRINT_NAME')}
-                onChange={customerForm.handleChange}
-            /> */}
-                        <Field name="imprintName">
-                            {({field, form}) => (
-                                <>
-                                    <TextField
-                                        id="imprintName"
-                                        label={i18next.t('LBL_IMPRINT_NAME')}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        className={classes.inputCustomerDataContactInfoStep2}
-                                        onBlur={field.onBlur}
-                                        error={form.touched.imprintName && Boolean(form.errors.imprintName)}
-                                    />
-                                    <ErrorMessage name="imprintName" component="div"/>
-                                </>
-                            )}
-                        </Field>
+                        <Field
+                            id="imprintName"
+                            name="imprintName"
+                            style={{marginLeft: '20px'}}
+                            className={classes.emailField}
+                            label={i18next.t('LBL_IMPRINT_NAME')}
+                            component={TextFieldWrapper}
+                            onChange={customerForm.handleChange}
+                            error={customerForm.touched.imprintName && Boolean(customerForm.errors.imprintName)}
+                        />
                     </Grid>
                 </Grid>
             </Grid>
@@ -574,10 +396,6 @@ const StepTwo = ({activeStep, setActiveStep, customerForm}) => {
                             <Checkbox id="saldoGarant"/>
                             <label>{i18next.t('LBL_SALDO_GARANT')}</label>
                         </Grid>
-                        {/* <Grid item xs={4} className={classes.checklist}>
-                <Checkbox id="checkCopyId"/>
-                <label>{i18next.t('LBL_COPY_OF_ID')}</label>
-            </Grid> */}
                     </Grid>
                 </Grid>
             </Grid>
@@ -585,56 +403,28 @@ const StepTwo = ({activeStep, setActiveStep, customerForm}) => {
                 <Grid item xs={6}>
                     <Grid container direction="row" spacing={4}>
                         <Grid item xs={6}>
-                            {/* <Field
-                id="name"
-                name="name"
-                style={{marginLeft: '8px'}}
-                type="text"
-                label={i18next.t('LBL_EMPLOYEE_NAME')}
-                onChange={customerForm.handleChange}
-              /> */}
-                            <Field name="name">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="name"
-                                            label={i18next.t('LBL_EMPLOYEE_NAME')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfoStep2}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.name && Boolean(form.errors.name)}
-                                        />
-                                        <ErrorMessage name="name" component="div"/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                id="name"
+                                name="name"
+                                style={{marginLeft: '8px'}}
+                                type="text"
+                                label={i18next.t('LBL_EMPLOYEE_NAME')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.name && Boolean(customerForm.errors.name)}
+                            />
                         </Grid>
                         <Grid item xs={6}>
-                            {/* <Field
-                id="staffNumber"
-                name="staffNumber"
-                className={classes.inputCustomerDataPrivateNumber}
-                type="number"
-                label={i18next.t('LBL_STAFF_NUMBERE')}
-                onChange={customerForm.handleChange}
-              /> */}
-                            <Field name="staffNumber">
-                                {({field, form}) => (
-                                    <>
-                                        <TextField
-                                            id="staffNumber"
-                                            label={i18next.t('LBL_STAFF_NUMBERE')}
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            className={classes.inputCustomerDataContactInfoStep2}
-                                            onBlur={field.onBlur}
-                                            error={form.touched.staffNumber && Boolean(form.errors.staffNumber)}
-                                        />
-                                        <ErrorMessage name="staffNumber" component="div"/>
-                                    </>
-                                )}
-                            </Field>
+                            <Field
+                                id="staffNumber"
+                                name="staffNumber"
+                                className={classes.inputCustomerDataContactInfoStep2}
+                                type="number"
+                                label={i18next.t('LBL_STAFF_NUMBERE')}
+                                component={TextFieldWrapper}
+                                onChange={customerForm.handleChange}
+                                error={customerForm.touched.staffNumber && Boolean(customerForm.errors.staffNumber)}
+                            />
                         </Grid>
                         <Grid item xs={4} style={{marginTop: '10px'}}>
                             <Checkbox id="unknown"/>
@@ -649,7 +439,7 @@ const StepTwo = ({activeStep, setActiveStep, customerForm}) => {
     );
 };
 
-const StepThree = ({activeStep, setActiveStep, customerForm}) => {
+const StepThree = ({customerForm}) => {
     const classes = styles();
     return (
         <div>
@@ -667,6 +457,7 @@ const StepThree = ({activeStep, setActiveStep, customerForm}) => {
                 <Field
                     id="language"
                     name="language"
+                    component={TextFieldWrapper}
                     onChange={customerForm.handleChange}
                     error={customerForm.touched.language && Boolean(customerForm.errors.language)}
                     helperText={customerForm.touched.language && customerForm.errors.language}
@@ -676,6 +467,7 @@ const StepThree = ({activeStep, setActiveStep, customerForm}) => {
                     id="salutation"
                     name="salutation"
                     onChange={customerForm.handleChange}
+                    component={TextFieldWrapper}
                     error={customerForm.touched.salutation && Boolean(customerForm.errors.salutation)}
                     helperText={customerForm.touched.salutation && customerForm.errors.salutation}
                 />
@@ -683,6 +475,7 @@ const StepThree = ({activeStep, setActiveStep, customerForm}) => {
                 <Field
                     id="firstName"
                     name="firstName"
+                    component={TextFieldWrapper}
                     onChange={customerForm.handleChange}
                     error={customerForm.touched.firstName && Boolean(customerForm.errors.firstName)}
                     helperText={customerForm.touched.firstName && customerForm.errors.firstName}
@@ -692,6 +485,7 @@ const StepThree = ({activeStep, setActiveStep, customerForm}) => {
                     id="lastName"
                     name="lastName"
                     onChange={customerForm.handleChange}
+                    component={TextFieldWrapper}
                     error={customerForm.touched.lastName && Boolean(customerForm.errors.lastName)}
                     helperText={customerForm.touched.lastName && customerForm.errors.lastName}
                 />
@@ -713,6 +507,7 @@ const StepThree = ({activeStep, setActiveStep, customerForm}) => {
                 <Field
                     id="civilStatus"
                     name="civilStatus"
+                    component={TextFieldWrapper}
                     onChange={customerForm.handleChange}
                 />
                 <label>{i18next.t('LBL_NATIONALITY')} </label>
@@ -720,6 +515,7 @@ const StepThree = ({activeStep, setActiveStep, customerForm}) => {
                     id="nationality"
                     name="nationality"
                     onChange={customerForm.handleChange}
+                    component={TextFieldWrapper}
                     error={customerForm.touched.nationality && Boolean(customerForm.errors.nationality)}
                     helperText={customerForm.touched.nationality && customerForm.errors.nationality}
                 />
